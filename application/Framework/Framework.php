@@ -3,6 +3,7 @@
 namespace Framework;
 
 use Controller\Controller;
+use Framework\Exception\ViewNotFound;
 
 final class Framework
 {
@@ -11,6 +12,12 @@ final class Framework
     private Controller $_controller;
     private string $_controllerName;
     private string $_actionName;
+
+    public function __construct()
+    {
+        // set number of decimals for all bcMath functions
+        bcscale(25);
+    }
 
     public function getControllerName(): string
     {
@@ -51,7 +58,13 @@ final class Framework
     public function runAction(Response $response): void
     {
         $actionMethod = $this->_actionName;
-        $this->_controller->$actionMethod($response);
+
+        try {
+            $this->_controller->$actionMethod($response);
+        } catch (ViewNotFound $e) {
+            // this is not perfect but better than printing an exception
+            echo '<span style="color:red">No correct view defined</span>';
+        }
     }
 
     private function routeNotFound(): void

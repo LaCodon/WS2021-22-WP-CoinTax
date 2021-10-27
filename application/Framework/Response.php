@@ -43,6 +43,16 @@ final class Response
     }
 
     /**
+     * Set a variable which then can be used in a view with $this->$name
+     * @param $name
+     * @param $value
+     */
+    public function setViewVar($name, $value)
+    {
+        $this->$name = $value;
+    }
+
+    /**
      * Returns the controllers name for the current request
      * @return string
      */
