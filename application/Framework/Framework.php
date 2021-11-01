@@ -7,16 +7,22 @@ use Framework\Exception\ViewNotFound;
 
 final class Framework
 {
+    const HTTP_UNAUTHORIZED = 401;
     const HTTP_NOT_FOUND = 404;
+    const HTTP_METHOD_NOT_ALLOWED = 405;
+    const HTTP_INTERNAL_SERVER_ERROR = 500;
 
     private Controller $_controller;
+    private Context $_context;
     private string $_controllerName;
     private string $_actionName;
 
-    public function __construct()
+    public function __construct(Context $context)
     {
         // set number of decimals for all bcMath functions
         bcscale(25);
+
+        $this->_context = $context;
     }
 
     public function getControllerName(): string
@@ -30,6 +36,11 @@ final class Framework
 
         $requestPath = str_replace($_SERVER['BASE'], '', $requestUri);
 
+        if ($requestPath === '') {
+            // if no path is given, redirect to index controller and index action
+            $requestPath = 'index/';
+        }
+
         $parts = explode('/', $requestPath);
         if ($parts === false || count($parts) !== 2) {
             $this->routeNotFound();
@@ -39,12 +50,23 @@ final class Framework
         $this->_controllerName = ucfirst(strtolower($parts[0]));
 
         $controllerClass = 'Controller\\' . $this->_controllerName . 'Controller';
-        $actionMethod = ucfirst(strtolower($parts[1])) . 'Action';
 
-        $controller = new $controllerClass();
+        // remove query parameters from action part
+        $parts[1] = explode('?', $parts[1], 2)[0];
+
+        $parts[1] = ucfirst(strtolower($parts[1]));
+        if (str_contains($parts[1], ".do")) {
+            $parts[1] = str_replace(".do", "Do", $parts[1]);
+        }
+        $actionMethod = $parts[1] . 'Action';
+
+        if (!class_exists($controllerClass)) {
+            $this->routeNotFound();
+            return false;
+        }
+
+        $controller = new $controllerClass($this->_context);
         if (!method_exists($controller, $actionMethod)) {
-            var_dump($actionMethod);
-
             $this->routeNotFound();
             return false;
         }

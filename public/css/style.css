@@ -1,0 +1,168 @@
+*, html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: #fafafa;
+}
+
+a, a:visited {
+    text-decoration: none;
+    color: initial;
+}
+
+input {
+    border-radius: 2px;
+    border: 1px solid #bababa;
+    padding: 10px 10px 10px 10px;
+    font-size: 0.9em;
+}
+
+hr {
+    border: 1px solid #bababa;
+}
+
+.roboto-mono {
+    font-family: 'Roboto Mono', sans-serif;
+}
+
+.h2 {
+    margin-bottom: 10px;
+}
+
+.flexbox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flexbox-center {
+    justify-content: center;
+}
+
+.nav-item {
+    padding: 15px;
+    margin: 0 20px 0 20px;
+    color: rgba(0,0,0,.5) !important;
+}
+
+.nav-item:hover {
+    color: rgba(0,0,0,.7) !important;
+}
+
+.center-box {
+    margin-top: 100px;
+    width: 500px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 0 0 10px 0;
+}
+
+.container {
+    margin: 20px;
+}
+
+.form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 15px;
+    margin-top: 20px;
+}
+
+.form-elem {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    row-gap: 5px;
+}
+
+span.error {
+    font-size: 0.7em;
+    color: #d93444;
+}
+
+input.error {
+    border: 1px solid #d93444;
+}
+
+.btn {
+    background-color: #198754;
+    border-radius: 2px;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    padding: 10px 10px 10px 10px;
+    font-size: 0.9em;
+}
+
+.btn:hover {
+    background-color: #157347;
+}
+
+.open-on-hover {
+    display: none;
+}
+
+.has-hover-child:hover > .open-on-hover {
+    display: block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    background-color: #fff;
+    top: 50px;
+    right: 0;
+    border: 1px solid #e0e0e0;
+}
+
+.dropdown-menu .nav-item {
+    margin: 0;
+    padding: 15px 50px 15px 25px;
+    align-self: stretch;
+}
+
+.dropdown-menu .nav-item:hover {
+    background-color: rgba(0,0,0,.1);
+}
+
+/** Specific styling **/
+header {
+    position: relative;
+    background-color: #fff;
+    height: 65px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav {
+    position: relative;
+    width: 1200px;
+}
+
+#logo {
+    margin-top: -6px;
+}
+
+#logo img {
+    height: 30px;
+}
+
+#logo h1 {
+    font-size: 30px;
+    line-height: 30px;
+    margin-left: 10px;
+}

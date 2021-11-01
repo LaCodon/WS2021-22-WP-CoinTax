@@ -9,10 +9,12 @@ final class Response
     public string $htmlTitle = '';
 
     private string $_controllerName;
+    private string $_baseUrl;
 
-    public function __construct(string $controllerName)
+    public function __construct(string $controllerName, string $baseUrl)
     {
         $this->_controllerName = $controllerName;
+        $this->_baseUrl = $baseUrl;
     }
 
     /**
@@ -29,6 +31,9 @@ final class Response
         require APPLICATION_PATH . 'View/Base/header.php';
         require $path;
         require APPLICATION_PATH . 'View/Base/footer.php';
+
+        // only keep input validation results for one page reload
+        Session::clearInputValidationResult();
     }
 
     /**
@@ -68,5 +73,66 @@ final class Response
     public function setHtmlTitle(string $title)
     {
         $this->htmlTitle = $title;
+    }
+
+    /**
+     * Get the URL for a form POST endpoint
+     * @param string $action
+     * @return string
+     */
+    public function getDoActionUrl(string $action): string
+    {
+        return strtolower($this->_baseUrl . $this->getControllerName()) . "/$action.do";
+    }
+
+    /**
+     * Get the URL for a GET endpoint
+     * @param string $action
+     * @param string $controller
+     * @return string
+     */
+    public function getActionUrl(string $action, string $controller = ''): string
+    {
+        if ($controller === '') {
+            $controller = $this->getControllerName();
+        }
+        if ($action === "index") {
+            $action = "";
+        }
+        return strtolower($this->_baseUrl . $controller) . "/$action";
+    }
+
+    /**
+     * Redirect the user to the given url, optionally append query parameters.
+     * This aborts further code execution
+     * @param string $target
+     * @param array $params
+     */
+    public function redirect(string $target, array $params = array()): void
+    {
+        if (count($params) !== 0) {
+            $target .= '?';
+        }
+
+        foreach ($params as $name => $value) {
+            $target .= $name . '=' . urlencode($value) . '&';
+        }
+
+        header('Location: ' . $target);
+        exit(0);
+    }
+
+    /**
+     * Returns true if current user is logged in
+     * @return bool
+     */
+    public function isAuthorized(): bool
+    {
+        $user = Session::getAuthorizedUser();
+        if ($user === null) {
+            return false;
+        }
+
+        return true;
     }
 }

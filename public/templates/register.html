@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>Registrieren</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono&effect=anaglyph&text=CoinTax">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header>
+
+    <nav class="flexbox">
+        <div class="flexbox">
+            <div class="flex-elem nav-item">
+                <a class="flexbox" id="logo" href=".">
+                    <img class="flex-elem" alt="CoinTax Logo" src="../img/logo.svg">
+                    <h1 class="flex-elem roboto-mono font-effect-anaglyph">CoinTax</h1>
+                </a>
+            </div>
+            <a href="." class="flex-elem nav-item">Übersicht</a>
+            <a href="." class="flex-elem nav-item">Orders</a>
+            <a href="." class="flex-elem nav-item">Transaktionen</a>
+        </div>
+        <div class="flexbox has-hover-child">
+            <div class="flex-elem nav-item">
+                Account
+            </div>
+            <div class="open-on-hover dropdown-menu">
+                <div class="flexbox flex-col">
+                    <a href="." class="flex-elem nav-item">Login</a>
+                    <a href="." class="flex-elem nav-item">Registrieren</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="flexbox flexbox-center">
+
+    <div class="flex-elem center-box">
+        <div class="container">
+            <h2 class="h2">Registrieren</h2>
+            <div class="flexbox flexbox-center">
+                <form style="width: 90%;" class="form" action="." method="post">
+                    <div class="form-elem">
+                        <label for="input-name">Name</label>
+                        <input class="error" id="input-name" type="text" name="name" placeholder="Vorname Nachname" required>
+                        <span class="error">Vorname und Nachname darf nicht leer sein</span>
+                    </div>
+                    <div class="form-elem">
+                        <label for="input-email">E-Mail</label>
+                        <input id="input-email" type="email" name="email" placeholder="mail@domain.de" required>
+                    </div>
+                    <div class="form-elem">
+                        <label for="input-password">Passwort</label>
+                        <input id="input-password" type="password" name="password" placeholder="Passwort" required>
+                    </div>
+                    <div class="form-elem">
+                        <label for="input-password-repeat">Passwort wiederholen</label>
+                        <input id="input-password-repeat" type="password" name="password-repeat" placeholder="Passwort wiederholen" required>
+                    </div>
+                    <hr>
+                    <div class="form-elem">
+                        <button class="btn" type="submit">Registrieren</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+</html>

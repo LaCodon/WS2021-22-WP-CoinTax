@@ -2,11 +2,21 @@
 
 namespace Controller;
 
+use Framework\Context;
 use Framework\Exception\ViewNotFound;
+use Framework\Framework;
 use Framework\Response;
+use Framework\Session;
+use PDO;
 
 class Controller
 {
+    public function __construct(
+        protected Context $_context
+    )
+    {
+    }
+
     /**
      * Default action for rendering index views
      * @param Response $resp
@@ -17,6 +27,40 @@ class Controller
             $resp->renderView("index");
         } catch (ViewNotFound $e) {
             echo 'No "index" view or "Action()" method defined for this controller (' . $resp->getControllerName() . 'Controller)';
+        }
+    }
+
+    /**
+     * Get the DB connection
+     * @return PDO
+     */
+    protected function db(): PDO
+    {
+        return $this->_context->_database->get();
+    }
+
+    /**
+     * Sends an http error code to the user if the HTTP method is not POST
+     */
+    protected function expectMethodPost(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(Framework::HTTP_METHOD_NOT_ALLOWED);
+            echo 'Method not allowed';
+            exit(0);
+        }
+    }
+
+    /**
+     * Sends a HTTP 401 code to the user if not logged in
+     */
+    protected function abortIfUnauthorized(): void
+    {
+        $user = Session::getAuthorizedUser();
+        if ($user === null) {
+            http_response_code(Framework::HTTP_UNAUTHORIZED);
+            echo 'Unauthorized';
+            exit(0);
         }
     }
 }
