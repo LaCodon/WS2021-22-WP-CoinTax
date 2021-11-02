@@ -14,30 +14,30 @@
 <header>
     <nav class="flexbox">
         <div class="flexbox">
-            <div class="flex-elem nav-item">
+            <div class="nav-item">
                 <a class="flexbox" id="logo" href="<?= $this->_baseUrl ?>">
-                    <img class="flex-elem" alt="CoinTax Logo" src="<?= $this->_baseUrl ?>img/logo.svg">
-                    <h1 class="flex-elem roboto-mono font-effect-anaglyph">CoinTax</h1>
+                    <img alt="CoinTax Logo" src="<?= $this->_baseUrl ?>img/logo.svg">
+                    <h1 class="roboto-mono font-effect-anaglyph">CoinTax</h1>
                 </a>
             </div>
             <?php if ($this->isAuthorized()): ?>
-                <a href="." class="flex-elem nav-item">Übersicht</a>
-                <a href="." class="flex-elem nav-item">Orders</a>
-                <a href="." class="flex-elem nav-item">Transaktionen</a>
+                <a href="<?= $this->getActionUrl('index', 'dashboard'); ?>" class="nav-item">Übersicht</a>
+                <a href="<?= $this->getActionUrl('index', 'order'); ?>" class="nav-item">Orders</a>
+                <a href="<?= $this->getActionUrl('index', 'transaction'); ?>" class="nav-item">Transaktionen</a>
             <?php endif; ?>
         </div>
         <div class="flexbox has-hover-child">
-            <div class="flex-elem nav-item">
-                Account
+            <div class="nav-item flexbox">
+                <span class="material-icons">account_circle</span> &nbsp; Account
             </div>
             <div class="open-on-hover dropdown-menu">
                 <div class="flexbox flex-col">
                     <?php if ($this->isAuthorized()): ?>
-                        <a href="<?= $this->getActionUrl('logout', 'login'); ?>" class="flex-elem nav-item">Logout</a>
+                        <a href="<?= $this->getActionUrl('logout', 'login'); ?>" class="nav-item">Logout</a>
                     <?php else: ?>
-                        <a href="<?= $this->getActionUrl('index', 'login'); ?>" class="flex-elem nav-item">Login</a>
+                        <a href="<?= $this->getActionUrl('index', 'login'); ?>" class="nav-item">Login</a>
                         <a href="<?= $this->getActionUrl('index', 'register'); ?>"
-                           class="flex-elem nav-item">Registrieren</a>
+                           class="nav-item">Registrieren</a>
                     <?php endif; ?>
                 </div>
             </div>

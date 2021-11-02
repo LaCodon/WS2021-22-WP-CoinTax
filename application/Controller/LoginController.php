@@ -18,6 +18,10 @@ final class LoginController extends Controller
      */
     public function Action(Response $resp): void
     {
+        if ($resp->isAuthorized()) {
+            $resp->redirect($resp->getActionUrl('index', 'dashboard'));
+        }
+
         $resp->setHtmlTitle('Login');
         $resp->renderView("index");
     }
@@ -48,14 +52,7 @@ final class LoginController extends Controller
 
         Session::setAuthorizedUser($user);
 
-        $resp->redirect($resp->getActionUrl('internal'));
-    }
-
-    public function InternalAction(Response $resp): void
-    {
-        $this->abortIfUnauthorized();
-
-        echo "logged in";
+        $resp->redirect($resp->getActionUrl('index', 'dashboard'));
     }
 
     public function LogoutAction(Response $resp): void

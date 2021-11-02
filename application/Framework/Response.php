@@ -108,7 +108,7 @@ final class Response
      * @param string $target
      * @param array $params
      */
-    public function redirect(string $target, array $params = array()): void
+    public function redirect(string $target, array $params = []): void
     {
         if (count($params) !== 0) {
             $target .= '?';

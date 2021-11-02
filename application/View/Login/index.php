@@ -5,7 +5,7 @@ use Framework\Form\TextInput;
 ?>
 <div class="flexbox flexbox-center">
 
-    <div class="flex-elem center-box">
+    <div class="center-box">
         <div class="container">
             <h2 class="h2">Einloggen</h2>
             <div class="flexbox flexbox-center">

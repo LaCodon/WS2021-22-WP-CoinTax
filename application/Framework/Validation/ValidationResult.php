@@ -5,8 +5,8 @@ namespace Framework\Validation;
 final class ValidationResult
 {
     public function __construct(
-        private array $_errors = array(),
-        private array $_values = array(),
+        private array $_errors = [],
+        private array $_values = [],
     )
     {
     }

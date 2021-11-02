@@ -19,6 +19,10 @@ final class RegisterController extends Controller
      */
     public function Action(Response $resp): void
     {
+        if ($resp->isAuthorized()) {
+            $resp->redirect($resp->getActionUrl('index', 'dashboard'));
+        }
+
         $resp->setHtmlTitle('Registrieren');
         $resp->renderView("index");
     }
