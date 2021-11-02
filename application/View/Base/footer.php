@@ -15,5 +15,7 @@
     </div>
 </footer>
 
+<script type="module" src="<?= $this->_baseUrl ?>js/script.js"></script>
+
 </body>
 </html>

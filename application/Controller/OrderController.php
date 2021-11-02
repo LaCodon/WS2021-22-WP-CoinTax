@@ -18,4 +18,22 @@ final class OrderController extends Controller
         $resp->renderView('index');
     }
 
+    /**
+     * @throws ViewNotFound
+     */
+    public function AddAction(Response $resp): void
+    {
+        $this->abortIfUnauthorized();
+
+        $resp->renderView('add');
+    }
+
+    public function AddDoAction(Response $resp): void
+    {
+        $this->abortIfUnauthorized();
+        $this->expectMethodPost();
+
+        var_dump_pre($_POST);
+    }
+
 }

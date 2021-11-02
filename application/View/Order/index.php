@@ -2,14 +2,16 @@
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
             <h2 class="h2">Orderübersicht</h2>
-            <a href=".">
+            <a href="<?= $this->getActionUrl('add'); ?>">
                 <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp; Order
                     hinzufügen
                 </button>
             </a>
         </div>
     </div>
+</section>
 
+<section class="flexbox flexbox-center">
     <div class="w12 flexbox flex-start flex-col flex-gap">
 
 
@@ -22,9 +24,9 @@
             <div class="flexbox w8 flexbox-center">
                 <div class="flexbox flexbox-center flex-col w2 flex-gap">
                     <div><img class="token-symbol"
-                              src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579"
+                              src="https://assets.coingecko.com/coins/images/5164/small/EURS_300x300.png?1550571779"
                               alt="Bitcoin"></div>
-                    <div class="text-light">0,000000001 BTC</div>
+                    <div class="text-light">0,20 EUR</div>
                 </div>
                 <div><span class="material-icons">chevron_right</span></div>
                 <div class="flexbox flexbox-center flex-col w2 flex-gap">
@@ -39,7 +41,7 @@
                 <div></div>
                 <div>
                     <button class="loupe-btn no-btn">
-                        <span><span class="material-icons loupe-icon text-light">loupe</span></span>
+                        <span class="material-icons loupe-icon text-light">loupe</span>
                     </button>
                 </div>
             </div>
@@ -71,7 +73,7 @@
                 <div></div>
                 <div>
                     <button class="loupe-btn no-btn">
-                        <span><span class="material-icons loupe-icon text-light">loupe</span></span>
+                        <span class="material-icons loupe-icon text-light">loupe</span>
                     </button>
                 </div>
             </div>

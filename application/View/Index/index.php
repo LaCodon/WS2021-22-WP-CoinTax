@@ -34,8 +34,10 @@
         </div>
 
     </div>
+    <div class="w12">
+        <hr>
+    </div>
 </section>
-
 <section class="flexbox flex-top">
     <div class="flexbox w12 m1 flexbox-center">
         <div>
