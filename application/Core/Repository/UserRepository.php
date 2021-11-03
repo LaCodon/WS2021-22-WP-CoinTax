@@ -20,7 +20,7 @@ final class UserRepository
      * @throws IdOverrideDisallowed
      * @throws UniqueConstraintViolation
      */
-    public function insert(User &$user): bool
+    public function insert(User $user): bool
     {
         if ($user->getId() !== -1) {
             // user is already in database

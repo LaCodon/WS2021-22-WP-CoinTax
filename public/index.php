@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1); // for development
 
 use Config\Config;
 use Framework\Context;
@@ -8,17 +9,18 @@ use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
 
+
 const APPLICATION_PATH = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR;
 
 require APPLICATION_PATH . 'globalFunctions.php';
 require APPLICATION_PATH . 'autoloader.php';
 
 try {
-    $database = new Database(Config::databaseHost, Config::databasePort,
+    $database = new Database(Config::databaseHost, intval(Config::databasePort),
         Config::databaseDb, Config::databaseUsername, Config::databasePassword);
 } catch (PDOException $e) {
     http_response_code(Framework::HTTP_INTERNAL_SERVER_ERROR);
-    echo "Internal Server Error (Database)";
+    echo 'Internal Server Error (Database)';
     exit(0);
 }
 

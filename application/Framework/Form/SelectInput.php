@@ -22,7 +22,7 @@ abstract class SelectInput
         return <<<EOF
             <div class="form-elem">
                 <label for="input-$name">$label</label>
-                <input class="$errorClass" id="input-$name" value="$oldValue" type="text" name="$name" autocomplete="off" data-js="enable-dropdown" $requiredAttr>
+                <input list="datalist-for-input-$name" class="$errorClass" id="input-$name" value="$oldValue" type="text" name="$name" autocomplete="off" data-js="enable-dropdown" $requiredAttr>
                 $errorSpan
                 <datalist id="datalist-for-input-$name">
                     $optionsRender

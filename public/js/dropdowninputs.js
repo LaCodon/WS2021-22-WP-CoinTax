@@ -8,6 +8,9 @@ function enableDropdownInputs() {
     for (const dropdownInput of dropdownInputs) {
         const dropdownData = document.getElementById(`datalist-for-${dropdownInput.id}`)
 
+        // disable browser default list
+        dropdownInput.setAttribute('list', '')
+
         dropdownInput.onfocus = function () {
             dropdownData.style.display = 'block'
         }
@@ -20,10 +23,9 @@ function enableDropdownInputs() {
 
         dropdownInput.oninput = function () {
             const text = dropdownInput.value.toUpperCase()
-            const longText = dropdownInput.innerHTML
             for (let option of dropdownData.options) {
                 if (option.value.toUpperCase().indexOf(text) > -1
-                    || option.value.toUpperCase().indexOf(longText) > -1) {
+                    || option.innerText.toUpperCase().indexOf(text) > -1) {
                     option.style.display = "block"
                 } else {
                     option.style.display = "none"
@@ -38,25 +40,12 @@ function enableDropdownInputs() {
             }
         }
 
-        dropdownInput.oninput = function () {
-            const text = dropdownInput.value.toUpperCase()
-            for (let option of dropdownData.options) {
-                if (option.value.toUpperCase().indexOf(text) > -1) {
-                    option.style.display = "block"
-                } else {
-                    option.style.display = "none"
-                }
-            }
-        }
-
         let currentFocus = -1
         dropdownInput.onkeydown = function (e) {
             if (e.keyCode === 40) {
-                currentFocus++
-                addActive(dropdownData.options)
+                selectNextActive(dropdownData.options, +1)
             } else if (e.keyCode === 38) {
-                currentFocus--
-                addActive(dropdownData.options)
+                selectNextActive(dropdownData.options, -1)
             } else if (e.keyCode === 13) {
                 e.preventDefault()
                 if (currentFocus > -1) {
@@ -66,19 +55,20 @@ function enableDropdownInputs() {
             }
         }
 
-        function addActive(x) {
+        function selectNextActive(x, direction) {
             if (!x) return false
-            removeActive(x)
-            if (currentFocus >= x.length) currentFocus = 0
-            if (currentFocus < 0)
-                currentFocus = (x.length - 1)
-            x[currentFocus].classList.add("active")
-        }
 
-        function removeActive(x) {
             for (let i = 0; i < x.length; i++) {
                 x[i].classList.remove("active")
             }
+
+            for (let i = 0; i < x.length * 2; ++i) {
+                currentFocus += direction
+                currentFocus = Math.abs(currentFocus % x.length)
+                if (x[currentFocus].style.display === 'block') break
+            }
+
+            x[currentFocus].classList.add("active")
         }
     }
 }
