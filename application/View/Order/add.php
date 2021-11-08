@@ -52,7 +52,7 @@ use Framework\Form\TextInput;
                                         <?= SelectInput::render('Gesendetes Token', 'send_token', $this->coin_options); ?>
                                     </div>
                                     <div class="w3">
-                                        <?= TextInput::render('Menge', 'send_amount', placeholder: '11,5', pattern: '^[0-9]+([,]{1}[0-9]+){0,1}$'); ?>
+                                        <?= TextInput::render('Menge', 'send_amount', placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
                                     </div>
                                 </div>
 
@@ -61,7 +61,7 @@ use Framework\Form\TextInput;
                                         <?= SelectInput::render('Empfangenes Token', 'receive_token', $this->coin_options); ?>
                                     </div>
                                     <div class="w3">
-                                        <?= TextInput::render('Menge', 'receive_amount', placeholder: '11,5', pattern: '^[0-9]+([,]{1}[0-9]+){0,1}$'); ?>
+                                        <?= TextInput::render('Menge', 'receive_amount', placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
                                     </div>
                                 </div>
 
@@ -70,7 +70,7 @@ use Framework\Form\TextInput;
                                         <?= SelectInput::render('Gebühren Token', 'fee_token', $this->coin_options, false); ?>
                                     </div>
                                     <div class="w3">
-                                        <?= TextInput::render('Menge', 'fee_amount', required: false, placeholder: '11,5', pattern: '^[0-9]+([,]{1}[0-9]+){0,1}$'); ?>
+                                        <?= TextInput::render('Menge', 'fee_amount', required: false, placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
                                     </div>
                                 </div>
 
@@ -98,8 +98,10 @@ use Framework\Form\TextInput;
         return x
     }
 
-    // file datetime field with current datetime
-    const now = new Date()
-    const value = `${now.getFullYear()}-${padNumber(now.getMonth() + 1)}-${padNumber(now.getDay())}T${padNumber(now.getHours())}:${padNumber(now.getMinutes())}`
-    document.querySelector("[name=datetime]").value = value
+    if (document.querySelector("[name=datetime]").value === '') {
+        // file datetime field with current datetime
+        const now = new Date()
+        document.querySelector("[name=datetime]").value =
+            `${now.getFullYear()}-${padNumber(now.getMonth() + 1)}-${padNumber(now.getDate())}T${padNumber(now.getHours())}:${padNumber(now.getMinutes())}`
+    }
 </script>

@@ -56,11 +56,15 @@ final class CoinRepository
 
     /**
      * Load coin with given id from database
-     * @param int $id
+     * @param int|null $id
      * @return Coin|null
      */
-    public function get(int $id): Coin|null
+    public function get(int|null $id): Coin|null
     {
+        if ($id === null) {
+            return null;
+        }
+
         $stmt = $this->_pdo->prepare('SELECT coin_id, symbol, name, coingecko_id, thumbnail_url FROM coin WHERE coin_id = :coinId LIMIT 1');
         $stmt->bindParam(':coinId', $id, PDO::PARAM_INT);
         if ($stmt->execute() === false) {
