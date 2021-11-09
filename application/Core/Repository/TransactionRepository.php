@@ -69,6 +69,27 @@ final class TransactionRepository
     }
 
     /**
+     * @param int $transactionId
+     * @param int $userId
+     * @return bool
+     */
+    public function delete(int $transactionId, int $userId): bool
+    {
+        // this also deletes transactions because of the foreign key constraint in the database
+        $stmt = $this->_pdo->prepare('DELETE FROM transaction WHERE transaction_id = :transId AND user_id = :userId LIMIT 1');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':transId', $transactionId, PDO::PARAM_INT);
+
+        $res = $stmt->execute();
+
+        if ($stmt->rowCount() !== 1 || $res == false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param object|bool $resultObj
      * @return Transaction|null
      */

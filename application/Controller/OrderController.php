@@ -8,6 +8,7 @@ use Core\Repository\TransactionRepository;
 use DateTime;
 use DateTimeZone;
 use Framework\Exception\ViewNotFound;
+use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
 use Framework\Validation\Input;
@@ -183,4 +184,34 @@ final class OrderController extends Controller
         $resp->redirect($resp->getActionUrl('index'));
     }
 
+    public function DeleteDoAction(Response $resp): void
+    {
+        $this->abortIfUnauthorized();
+
+        $input = InputValidator::parseAndValidate([
+            new Input(INPUT_GET, 'id', 'id', _filter: FILTER_VALIDATE_INT),
+            new Input(INPUT_GET, 'xhr', 'id', _required: false, _filter: FILTER_VALIDATE_INT),
+        ]);
+
+        if ($input->hasErrors()) {
+            if ($input->getValue('xhr') === '') {
+                $resp->redirect($resp->getActionUrl('index'));
+            } else {
+                $resp->abort('input errors', Framework::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $currentUser = Session::getAuthorizedUser();
+        $orderRepo = new OrderRepository($this->db());
+
+        if (!$orderRepo->delete($input->getValue('id'), $currentUser->getId())) {
+            if ($input->getValue('xhr') === '1') {
+                $resp->abort('failed to delete order', Framework::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        if ($input->getValue('xhr') === '') {
+            $resp->redirect($resp->getActionUrl('index'));
+        }
+    }
 }

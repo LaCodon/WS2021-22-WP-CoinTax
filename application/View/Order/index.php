@@ -14,8 +14,8 @@
 <section class="flexbox flexbox-center">
     <div class="w12 flexbox flex-start flex-col flex-gap">
 
-        <?php foreach ($this->orders as $order): ?>
-            <div class="w12 flexbox card">
+        <?php foreach ($this->orders as $orderId => $order): ?>
+            <div id="order-<?= $orderId; ?>" class="w12 flexbox card">
                 <div class="flexbox w2 flex-col flex-gap">
                     <span class="material-icons swap-icon">swap_horiz</span>
                     <span class="text-light"><?= $order['base']->getDatetimeUtc()->format('d.m.Y H:i'); ?> Uhr</span>
@@ -27,7 +27,7 @@
                                   src="<?= $order['baseCoin']->getThumbnailUrl(); ?>"
                                   alt="<?= $order['baseCoin']->getName(); ?>"></div>
                         <div class="text-light">
-                            <?= number_format((float)$order['base']->getValue(), 8, ',', '.'); ?>
+                            <?= rtrim(number_format((float)$order['base']->getValue(), 8, ',', '.'), '0'); ?>0
                             <?= $order['baseCoin']->getSymbol(); ?>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                                   src="<?= $order['quoteCoin']->getThumbnailUrl(); ?>"
                                   alt="<?= $order['quoteCoin']->getName(); ?>"></div>
                         <div class="text-light">
-                            <?= number_format((float)$order['quote']->getValue(), 8, ',', '.'); ?>
+                            <?= rtrim(number_format((float)$order['quote']->getValue(), 8, ',', '.'), '0'); ?>0
                             <?= $order['quoteCoin']->getSymbol(); ?>
                         </div>
                     </div>
@@ -46,19 +46,79 @@
                 <div class="flexbox w2">
                     <div></div>
                     <div>
-                        <button class="loupe-btn no-btn">
-                            <span class="material-icons loupe-icon text-light">loupe</span>
+                        <button class="loupe-btn no-btn" data-toggle="order-toggle-<?= $orderId; ?>">
+                            <span class="material-icons loupe-icon text-light">arrow_drop_down</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="flexbox w12 swap-details">
-                    <div class="w12">
-                        <!-- More details -->
+                <div id="order-toggle-<?= $orderId; ?>" data-hide="true" class="flexbox w12 swap-details">
+                    <div class="w12 flexbox flexbox-center">
+
+                        <div class="w6 container">
+
+                            <table class="table">
+                                <thead class="table-head">
+                                <tr>
+                                    <th></th>
+                                    <th>Token</th>
+                                    <th>Menge</th>
+                                    <th>Wert</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-body">
+                                <tr>
+                                    <td>Gesendet</td>
+                                    <td><?= $order['baseCoin']->getSymbol(); ?></td>
+                                    <td><?= number_format((float)$order['base']->getValue(), 18, ',', '.'); ?></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Empfangen</td>
+                                    <td><?= $order['quoteCoin']->getSymbol(); ?></td>
+                                    <td><?= number_format((float)$order['quote']->getValue(), 18, ',', '.'); ?></td>
+                                    <td>12.233,34 EUR</td>
+                                </tr>
+                                <tr>
+                                    <td>Gebühren</td>
+                                    <td><?= $order['feeCoin'] !== null ? $order['feeCoin']->getSymbol() : '-/-'; ?></td>
+                                    <td><?= $order['fee'] !== null ? number_format((float)$order['fee']->getValue(), 18, ',', '.') : '-/-'; ?></td>
+                                    <td>0,34 EUR</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div class="w1"></div>
+                        <div class="w2 flexbox flex-col flex-gap flex-end flex-stretch">
+                            <a class="flexbox flex-col flex-stretch" href="">
+                                <button class="btn default flexbox flexbox-center flex-gap">
+                                    <span class="material-icons">zoom_in</span>
+                                    Details
+                                </button>
+                            </a>
+
+                            <a class="flexbox flex-col flex-stretch"
+                               href="<?= $this->getDoActionUrl('delete') ?>?id=<?= $orderId; ?>">
+                                <button class="btn warning flexbox flexbox-center flex-gap"
+                                        data-delete-order="<?= $orderId; ?>">
+                                    <span class="material-icons">delete_outline</span>
+                                    Order löschen
+                                </button>
+                            </a>
+
+                        </div>
+
                     </div>
                 </div>
             </div>
         <?php endforeach; ?>
+
+        <?php if (count($this->orders) === 0): ?>
+            <div class="flexbox w12 flex-center flex-top">
+                <div class="container" id="no-orders-yet">Füge zuerst deine Orders hinzu</div>
+            </div>
+        <?php endif; ?>
 
     </div>
 </section>

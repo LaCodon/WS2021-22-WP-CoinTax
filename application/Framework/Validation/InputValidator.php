@@ -13,6 +13,14 @@ abstract class InputValidator
         foreach ($inputs as $input) {
             try {
                 $val = self::parseAndValidateSingle($input);
+                if ($val === null) {
+                    if ($input->_required) {
+                        throw new ValidationFailure("$input->_readableName darf nicht leer sein");
+                    } else {
+                        $val = '';
+                    }
+                }
+
                 $result->setValue($input->_name, $val);
             } catch (ValidationFailure $e) {
                 $result->setError($input->_name, $e->getMessage());

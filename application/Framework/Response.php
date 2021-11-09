@@ -123,6 +123,18 @@ final class Response
     }
 
     /**
+     * Aborts the request and further code execution
+     * @param string $msg
+     * @param int $code
+     */
+    public function abort(string $msg, int $code): void
+    {
+        http_response_code($code);
+        echo $msg;
+        exit(0);
+    }
+
+    /**
      * Returns true if current user is logged in
      * @return bool
      */

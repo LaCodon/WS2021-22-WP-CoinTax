@@ -91,6 +91,79 @@ final class OrderRepository
     }
 
     /**
+     * @param int|null $id
+     * @return Order|null
+     */
+    public function get(int $id): Order|null
+    {
+        $stmt = $this->_pdo->prepare('SELECT order_id, base_transaction, quote_transaction, fee_transaction FROM `order` WHERE order_id = :id LIMIT 1');
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        if ($stmt->execute() === false) {
+            return null;
+        }
+
+        return $this->makeOrder($stmt->fetchObject());
+    }
+
+    /**
+     * Deletes the order and all child transactions
+     * @param int $orderId
+     * @param int $userId
+     * @return bool
+     */
+    public function delete(int $orderId, int $userId): bool
+    {
+        $order = $this->get($orderId);
+        if ($order === null) {
+            return false;
+        }
+
+        $transactionRepo = new TransactionRepository($this->_pdo);
+
+        $base = $transactionRepo->get($order->getBaseTransactionId());
+        if ($base === null) {
+            return false;
+        }
+
+        $quote = $transactionRepo->get($order->getQuoteTransactionId());
+        if ($quote === null) {
+            return false;
+        }
+
+        $fee = $transactionRepo->get($order->getFeeTransactionId());
+
+        $this->_pdo->beginTransaction();
+
+        if (!$transactionRepo->delete($base->getId(), $userId)) {
+            $this->_pdo->rollBack();
+            return false;
+        }
+
+        if (!$transactionRepo->delete($quote->getId(), $userId)) {
+            $this->_pdo->rollBack();
+            return false;
+        }
+
+        if ($fee !== null) {
+            if (!$transactionRepo->delete($fee->getId(), $userId)) {
+                $this->_pdo->rollBack();
+                return false;
+            }
+        }
+
+        // this also deletes transactions because of the foreign key constraint in the database
+        $stmt = $this->_pdo->prepare('DELETE FROM `order` WHERE order_id = :orderId LIMIT 1');
+        $stmt->bindParam(':orderId', $orderId, PDO::PARAM_INT);
+
+        if (!$stmt->execute()) {
+            $this->_pdo->rollBack();
+            return false;
+        }
+
+        return $this->_pdo->commit();
+    }
+
+    /**
      * @param object|bool $resultObj
      * @return Order|null
      */
