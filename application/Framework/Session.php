@@ -68,6 +68,15 @@ abstract class Session
     }
 
     /**
+     * Returns true if the session already has a validation result
+     * @return bool
+     */
+    public static function hasNonEmptyInputValidationResult(): bool
+    {
+        return isset($_SESSION['framework_input_validation']) && $_SESSION['framework_input_validation']->hasValues();
+    }
+
+    /**
      * Remove the last ValidationResult
      */
     public static function clearInputValidationResult(): void

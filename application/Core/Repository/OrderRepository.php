@@ -66,6 +66,99 @@ final class OrderRepository
     }
 
     /**
+     * @throws IdOverrideDisallowed
+     */
+    public function updateComplete(int $orderId, int $userId, Transaction $baseTransaction, Transaction $quoteTransaction, Transaction|null $feeTransaction): Order|null
+    {
+        $order = $this->get($orderId);
+        if ($order === null) {
+            return null;
+        }
+
+        $baseTransaction->setId($order->getBaseTransactionId());
+        $quoteTransaction->setId($order->getQuoteTransactionId());
+        $feeTransaction?->setId($order->getFeeTransactionId());
+
+        if ($this->_pdo->beginTransaction() !== true) {
+            return null;
+        }
+
+        $transactionRepo = new TransactionRepository($this->_pdo);
+
+        if ($feeTransaction === null && $order->getFeeTransactionId() !== null) {
+            // fee was removed
+            if (!$transactionRepo->delete($order->getFeeTransactionId(), $userId)) {
+                $this->_pdo->rollBack();
+                return null;
+            }
+
+            $order->setFeeTransactionId(null);
+        } elseif ($feeTransaction !== null && $order->getFeeTransactionId() === null) {
+            // fee was added
+            if (!$transactionRepo->insert($feeTransaction)) {
+                $this->_pdo->rollBack();
+                return null;
+            }
+
+            $order->setFeeTransactionId($feeTransaction->getId());
+        }
+
+        if (!$this->update($order)) {
+            $this->_pdo->rollBack();
+            return null;
+        }
+
+        if (!$transactionRepo->update($baseTransaction)) {
+            $this->_pdo->rollBack();
+            return null;
+        }
+
+        if (!$transactionRepo->update($quoteTransaction)) {
+            $this->_pdo->rollBack();
+            return null;
+        }
+
+        if ($feeTransaction !== null && !$transactionRepo->update($feeTransaction)) {
+            $this->_pdo->rollBack();
+            return null;
+        }
+
+        if (!$this->_pdo->commit()) {
+            return null;
+        }
+
+        return $order;
+    }
+
+    /**
+     * @param Order $order
+     * @return bool
+     */
+    public function update(Order $order): bool
+    {
+        $orderId = $order->getId();
+        $baseId = $order->getBaseTransactionId();
+        $quoteId = $order->getQuoteTransactionId();
+        $feeId = $order->getFeeTransactionId();
+
+        $stmt = $this->_pdo->prepare('UPDATE `order` SET 
+                                                base_transaction = :baseId, 
+                                                quote_transaction = :quoteId, 
+                                                fee_transaction = :feeId 
+                                            WHERE order_id = :orderId LIMIT 1');
+        $stmt->bindParam(':baseId', $baseId, PDO::PARAM_INT);
+        $stmt->bindParam(':quoteId', $quoteId, PDO::PARAM_INT);
+        $stmt->bindParam(':orderId', $orderId, PDO::PARAM_INT);
+        if ($feeId === null) {
+            $stmt->bindParam(':feeId', $feeId, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindParam(':feeId', $feeId, PDO::PARAM_INT);
+        }
+
+        return $stmt->execute();
+    }
+
+    /**
      * @param int $userId
      * @return array
      */
@@ -103,6 +196,58 @@ final class OrderRepository
         }
 
         return $this->makeOrder($stmt->fetchObject());
+    }
+
+    /**
+     * Get an array with all relevant order components (transactions, coins, ...)
+     * @param int $id
+     * @return array|null
+     */
+    public function getComplete(int $id): array|null
+    {
+        $stmt = $this->_pdo->prepare('SELECT t.*, c.* FROM `order` AS o
+                                                JOIN `transaction` AS t ON o.base_transaction = t.transaction_id
+                                                JOIN `coin` AS c ON c.coin_id = t.coin_id
+                                            WHERE o.order_id = :orderId
+                                            UNION
+                                            SELECT t.*, c.* FROM `order` AS o
+                                                JOIN `transaction` AS t ON o.quote_transaction = t.transaction_id
+                                                JOIN `coin` AS c ON c.coin_id = t.coin_id
+                                            WHERE o.order_id = :orderId
+                                            UNION
+                                            SELECT t.*, c.* FROM `order` AS o
+                                                JOIN `transaction` AS t ON o.fee_transaction = t.transaction_id
+                                                JOIN `coin` AS c ON c.coin_id = t.coin_id
+                                            WHERE o.order_id = :orderId');
+        $stmt->bindParam(':orderId', $id, PDO::PARAM_INT);
+
+        if (!$stmt->execute()) {
+            return null;
+        }
+
+        $transactionRepo = new TransactionRepository($this->_pdo);
+        $coinRepo = new CoinRepository($this->_pdo);
+
+        $result = [
+            0 => null,
+            1 => null,
+            2 => null,
+        ];
+
+        $count = 0;
+        while (($obj = $stmt->fetchObject()) !== false) {
+            $result[$count] = [
+                'tx' => $transactionRepo->makeTransaction($obj),
+                'coin' => $coinRepo->makeCoin($obj),
+            ];
+            ++$count;
+        }
+
+        return [
+            'base' => $result[0],
+            'quote' => $result[1],
+            'fee' => $result[2],
+        ];
     }
 
     /**
@@ -151,7 +296,6 @@ final class OrderRepository
             }
         }
 
-        // this also deletes transactions because of the foreign key constraint in the database
         $stmt = $this->_pdo->prepare('DELETE FROM `order` WHERE order_id = :orderId LIMIT 1');
         $stmt->bindParam(':orderId', $orderId, PDO::PARAM_INT);
 
@@ -161,6 +305,25 @@ final class OrderRepository
         }
 
         return $this->_pdo->commit();
+    }
+
+    /**
+     * Returns true, if the given order is owned by the given user
+     * @param int $orderId
+     * @param int $userId
+     * @return bool
+     */
+    public function isOwnedByUser(int $orderId, int $userId): bool
+    {
+        $stmt = $this->_pdo->prepare('SELECT order_id FROM `order` AS o
+                                                JOIN `transaction` AS t ON o.base_transaction = t.transaction_id
+                                            WHERE t.user_id = :userId AND o.order_id = :orderId LIMIT 1');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':orderId', $orderId, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->rowCount() === 1;
     }
 
     /**

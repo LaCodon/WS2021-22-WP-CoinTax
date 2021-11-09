@@ -114,7 +114,7 @@ final class CoinRepository
      * @param object|bool $resultObj
      * @return Coin|null
      */
-    private function makeCoin(object|bool $resultObj): Coin|null
+    public function makeCoin(object|bool $resultObj): Coin|null
     {
         if ($resultObj === false) {
             return null;

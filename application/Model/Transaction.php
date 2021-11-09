@@ -78,11 +78,15 @@ final class Transaction
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
      * @throws IdOverrideDisallowed
      */
-    public function setId(int $id): void
+    public function setId(int|null $id): void
     {
+        if ($id === null) {
+            return;
+        }
+
         if ($this->_id !== -1) {
             throw new IdOverrideDisallowed();
         }

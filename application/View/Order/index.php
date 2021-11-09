@@ -18,7 +18,7 @@
             <div id="order-<?= $orderId; ?>" class="w12 flexbox card">
                 <div class="flexbox w2 flex-col flex-gap">
                     <span class="material-icons swap-icon">swap_horiz</span>
-                    <span class="text-light"><?= $order['base']->getDatetimeUtc()->format('d.m.Y H:i'); ?> Uhr</span>
+                    <span class="text-light"><?= $order['base']->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i'); ?> Uhr</span>
                 </div>
 
                 <div class="flexbox w8 flexbox-center">
@@ -77,13 +77,15 @@
                                     <td>Empfangen</td>
                                     <td><?= $order['quoteCoin']->getSymbol(); ?></td>
                                     <td><?= number_format((float)$order['quote']->getValue(), 18, ',', '.'); ?></td>
-                                    <td>12.233,34 EUR</td>
+                                    <td><?= number_format((float)$order['fiatValue'], 2, ',', '.'); ?> EUR</td>
                                 </tr>
                                 <tr>
-                                    <td>Gebühren</td>
-                                    <td><?= $order['feeCoin'] !== null ? $order['feeCoin']->getSymbol() : '-/-'; ?></td>
-                                    <td><?= $order['fee'] !== null ? number_format((float)$order['fee']->getValue(), 18, ',', '.') : '-/-'; ?></td>
-                                    <td>0,34 EUR</td>
+                                    <?php if ($order['fee'] !== null): ?>
+                                        <td>Gebühren</td>
+                                        <td><?= $order['feeCoin']->getSymbol(); ?></td>
+                                        <td><?= number_format((float)$order['fee']->getValue(), 18, ',', '.'); ?></td>
+                                        <td><?= number_format((float)$order['feeValue'], 2, ',', '.'); ?> EUR</td>
+                                    <?php endif; ?>
                                 </tr>
                                 </tbody>
                             </table>
@@ -91,7 +93,8 @@
                         </div>
                         <div class="w1"></div>
                         <div class="w2 flexbox flex-col flex-gap flex-end flex-stretch">
-                            <a class="flexbox flex-col flex-stretch" href="">
+                            <a class="flexbox flex-col flex-stretch"
+                               href="<?= $this->getActionUrl('details'); ?>?id=<?= $orderId; ?>">
                                 <button class="btn default flexbox flexbox-center flex-gap">
                                     <span class="material-icons">zoom_in</span>
                                     Details

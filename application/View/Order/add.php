@@ -7,8 +7,8 @@ use Framework\Form\TextInput;
 <section class="flexbox flexbox-center">
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
-            <h2 class="h2">Order hinzufügen</h2>
-            <a href="<?= $this->getActionUrl('index'); ?>">
+            <h2 class="h2"><?= isset($this->edit_order) ? 'Order bearbeiten' : 'Order hinzufügen'; ?></h2>
+            <a href="<?= isset($this->edit_order) ? $this->getActionUrl('details') . '?id=' . $this->order_id : $this->getActionUrl('index'); ?>">
                 <button class="btn warning flexbox"><span class="material-icons">highlight_off</span>&nbsp;Abbrechen
                 </button>
             </a>
@@ -42,8 +42,13 @@ use Framework\Form\TextInput;
                 <div class="flexbox flexbox-center w12">
                     <div class="card no-bg w7">
                         <div class="flexbox flexbox-center">
-                            <form style="width: 90%;" class="form" action="<?= $this->getDoActionUrl("add") ?>"
+                            <form style="width: 90%;" class="form"
+                                  action="<?= isset($this->edit_order) ? $this->getDoActionUrl("edit") : $this->getDoActionUrl("add") ?>"
                                   method="post">
+
+                                <?php if (isset($this->edit_order)): ?>
+                                    <input type="hidden" name="id" value="<?= $this->order_id; ?>">
+                                <?php endif; ?>
 
                                 <?= TextInput::render('Ausführungszeitpunkt (MEZ)', 'datetime', type: 'datetime-local'); ?>
 

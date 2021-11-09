@@ -66,4 +66,12 @@ final class Order
 
         $this->_id = $id;
     }
+
+    /**
+     * @param int|null $feeTransactionId
+     */
+    public function setFeeTransactionId(int|null $feeTransactionId): void
+    {
+        $this->_feeTransactionId = $feeTransactionId;
+    }
 }

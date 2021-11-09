@@ -2,8 +2,11 @@
 
 namespace Controller;
 
+use Core\Calc\PriceConverter;
+use Core\Coingecko\CoingeckoAPI;
 use Core\Repository\CoinRepository;
 use Core\Repository\OrderRepository;
+use Core\Repository\PriceRepository;
 use Core\Repository\TransactionRepository;
 use DateTime;
 use DateTimeZone;
@@ -13,6 +16,8 @@ use Framework\Response;
 use Framework\Session;
 use Framework\Validation\Input;
 use Framework\Validation\InputValidator;
+use Framework\Validation\ValidationResult;
+use Model\Coin;
 use Model\Transaction;
 use PDOException;
 use ValueError;
@@ -30,6 +35,7 @@ final class OrderController extends Controller
         $currentUser = Session::getAuthorizedUser();
 
         $orderRepo = new OrderRepository($this->db());
+        $priceConverter = new PriceConverter($this->db());
         $transactionRepo = new TransactionRepository($this->db());
         $coinRepo = new CoinRepository($this->db());
 
@@ -42,27 +48,33 @@ final class OrderController extends Controller
             $quote = $transactionRepo->get($order->getQuoteTransactionId());
             $fee = $transactionRepo->get($order->getFeeTransactionId());
 
+            $baseCoin = $coinRepo->get($base->getCoinId());
+            $quoteCoin = $coinRepo->get($quote->getCoinId());
+            $feeCoin = $coinRepo->get($fee?->getCoinId());
 
             $enrichedOrders[$order->getId()] = [
                 'base' => $base,
                 'quote' => $quote,
                 'fee' => $fee,
 
-                'baseCoin' => $coinRepo->get($base->getCoinId()),
-                'quoteCoin' => $coinRepo->get($quote->getCoinId()),
-                'feeCoin' => $coinRepo->get($fee?->getCoinId())
+                'baseCoin' => $baseCoin,
+                'quoteCoin' => $quoteCoin,
+                'feeCoin' => $feeCoin,
+
+                'fiatValue' => $priceConverter->getEurValueApiOptional($base, $quote, $baseCoin, $quoteCoin),
+                'feeValue' => $fee !== null ? $priceConverter->getEurValueApiOptionalSingle($fee, $feeCoin) : '-/-',
             ];
         }
 
         $resp->setViewVar('orders', $enrichedOrders);
-
+        $resp->setHtmlTitle('Orderübersicht');
         $resp->renderView('index');
     }
 
     /**
      * @throws ViewNotFound
      */
-    public function AddAction(Response $resp): void
+    public function AddAction(Response $resp, bool $render = true): void
     {
         $this->abortIfUnauthorized();
 
@@ -80,15 +92,25 @@ final class OrderController extends Controller
 
         $resp->setViewVar('coin_options', $coinOptions);
 
-        $resp->renderView('add');
+        // render is false if we are on the OrderController.EditAction
+        if ($render) {
+            $resp->setHtmlTitle('Order hinzufügen');
+            $resp->renderView('add');
+        }
     }
 
-    public function AddDoAction(Response $resp): void
+    public function AddDoAction(Response $resp, bool $edit = false): void
     {
         $this->abortIfUnauthorized();
         $this->expectMethodPost();
 
-        $input = InputValidator::parseAndValidate([
+        $oderRepo = new OrderRepository($this->db());
+        $coinRepo = new CoinRepository($this->db());
+        $currentUser = Session::getAuthorizedUser();
+
+        // ----------------------- BEGIN validation -----------------------
+
+        $inputFields = [
             new Input(INPUT_POST, 'datetime', 'Ausführungszeitpunkt'),
             new Input(INPUT_POST, 'send_token', 'Gesendetes Token'),
             new Input(INPUT_POST, 'send_amount', 'Menge'),
@@ -96,7 +118,19 @@ final class OrderController extends Controller
             new Input(INPUT_POST, 'receive_amount', 'Menge'),
             new Input(INPUT_POST, 'fee_token', 'Gebührentoken', _required: false),
             new Input(INPUT_POST, 'fee_amount', 'Menge', _required: false),
-        ]);
+        ];
+
+        if ($edit) {
+            $inputFields[] = new Input(INPUT_POST, 'id', 'id', _filter: FILTER_VALIDATE_INT);
+        }
+
+        $input = InputValidator::parseAndValidate($inputFields);
+
+        if ($edit) {
+            if (!$oderRepo->isOwnedByUser((int)$input->getValue('id'), $currentUser->getId())) {
+                $resp->redirect($resp->getActionUrl('index'));
+            }
+        }
 
         $datetimeUtc = DateTime::createFromFormat('Y-m-d\TH:i', $input->getValue('datetime'),
             new DateTimeZone('Europe/Berlin'));
@@ -105,8 +139,6 @@ final class OrderController extends Controller
         } else {
             $datetimeUtc->setTimezone(new DateTimeZone('UTC'));
         }
-
-        $coinRepo = new CoinRepository($this->db());
 
         $baseToken = $coinRepo->getBySymbol($input->getValue('send_token'));
         if ($baseToken === null) {
@@ -146,18 +178,20 @@ final class OrderController extends Controller
             }
         }
 
-        if ($baseToken->getId() === $quoteToken->getId()) {
+        if ($baseToken?->getId() === $quoteToken?->getId()) {
             $input->setError('receive_token', 'Das Token muss sich vom gesendeten Token unterscheiden');
         }
 
         if ($input->hasErrors()) {
             Session::setInputValidationResult($input);
-            $resp->redirect($resp->getActionUrl('add'));
+            if ($edit) {
+                $resp->redirect($resp->getActionUrl('edit') . '?id=' . $input->getValue('id'));
+            } else {
+                $resp->redirect($resp->getActionUrl('add'));
+            }
         }
 
         // ----------------------- END validation -----------------------
-
-        $currentUser = Session::getAuthorizedUser();
 
         $baseTransaction = new Transaction($currentUser->getId(), $datetimeUtc, Transaction::TYPE_SEND, $baseToken->getId(), $baseValue);
         $quoteTransaction = new Transaction($currentUser->getId(), $datetimeUtc, Transaction::TYPE_RECEIVE, $quoteToken->getId(), $quoteValue);
@@ -166,22 +200,34 @@ final class OrderController extends Controller
             $feeTransaction = new Transaction($currentUser->getId(), $datetimeUtc, Transaction::TYPE_SEND, $feeToken->getId(), $feeValue);
         }
 
-        $oderRepo = new OrderRepository($this->db());
         $order = null;
-        try {
-            $order = $oderRepo->makeAndInsert($baseTransaction, $quoteTransaction, $feeTransaction);
-        } catch (PDOException $e) {
-            var_dump_pre($e);
-            die();
+        if ($edit) {
+            try {
+                $order = $oderRepo->updateComplete((int)$input->getValue('id'), $currentUser->getId(), $baseTransaction, $quoteTransaction, $feeTransaction);
+            } catch (PDOException) {
+            }
+        } else {
+            try {
+                $order = $oderRepo->makeAndInsert($baseTransaction, $quoteTransaction, $feeTransaction);
+            } catch (PDOException) {
+            }
         }
 
         if ($order === null) {
             $input->setError('datetime', 'Unbekannter Fehler beim einfügen der Order');
             Session::setInputValidationResult($input);
-            $resp->redirect($resp->getActionUrl('add'));
+            if ($edit) {
+                $resp->redirect($resp->getActionUrl('edit') . '?id=' . $input->getValue('id'));
+            } else {
+                $resp->redirect($resp->getActionUrl('add'));
+            }
         }
 
-        $resp->redirect($resp->getActionUrl('index'));
+        if ($edit) {
+            $resp->redirect($resp->getActionUrl('details') . '?id=' . $input->getValue('id'));
+        } else {
+            $resp->redirect($resp->getActionUrl('index'));
+        }
     }
 
     public function DeleteDoAction(Response $resp): void
@@ -213,5 +259,80 @@ final class OrderController extends Controller
         if ($input->getValue('xhr') === '') {
             $resp->redirect($resp->getActionUrl('index'));
         }
+    }
+
+    public function DetailsAction(Response $resp, bool $render = true): void
+    {
+        $this->abortIfUnauthorized();
+
+        $input = InputValidator::parseAndValidate([
+            new Input(INPUT_GET, 'id', 'id', _filter: FILTER_VALIDATE_INT)
+        ]);
+
+        if ($input->hasErrors()) {
+            $resp->redirect($resp->getActionUrl('index'));
+        }
+
+        $orderId = $input->getValue('id');
+
+        $currentUser = Session::getAuthorizedUser();
+        $orderRepo = new OrderRepository($this->db());
+
+        if (!$orderRepo->isOwnedByUser($orderId, $currentUser->getId())) {
+            $resp->redirect($resp->getActionUrl('index'));
+        }
+
+        $order = $orderRepo->get($orderId);
+        if ($order === null) {
+            $resp->redirect($resp->getActionUrl('index'));
+        }
+
+        $resp->setViewVar('order_id', $orderId);
+        $resp->setViewVar('order', $order);
+
+        // render is false if we are in OrderController.EditAction
+        if ($render) {
+            $resp->setHtmlTitle('Orderdetails');
+            $resp->renderView('details');
+        }
+    }
+
+    /**
+     * @throws ViewNotFound
+     */
+    public function EditAction(Response $resp): void
+    {
+        $this->AddAction($resp, false);
+
+        $this->DetailsAction($resp, false);
+
+        $orderRepo = new OrderRepository($this->db());
+
+        $order = $resp->getViewVar('order');
+
+        $orderData = $orderRepo->getComplete($order->getId());
+
+        if (!Session::hasNonEmptyInputValidationResult()) {
+            // only set data if this request is not a response to an invalid form submission
+            Session::setInputValidationResult(new ValidationResult([], [
+                'datetime' => $orderData['base']['tx']->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('Y-m-d\TH:i'),
+                'send_token' => $orderData['base']['coin']->getSymbol(),
+                'receive_token' => $orderData['quote']['coin']->getSymbol(),
+                'fee_token' => isset($orderData['fee']) ? $orderData['fee']['coin']->getSymbol() : '',
+                'send_amount' => $orderData['base']['tx']->getValue(),
+                'receive_amount' => $orderData['quote']['tx']->getValue(),
+                'fee_amount' => isset($orderData['fee']) ? $orderData['fee']['tx']->getValue() : '',
+            ]));
+        }
+
+        $resp->setViewVar('edit_order', true);
+
+        $resp->setHtmlTitle('Order bearbeiten');
+        $resp->renderView('add');
+    }
+
+    public function EditDoAction(Response $resp): void
+    {
+        $this->AddDoAction($resp, true);
     }
 }

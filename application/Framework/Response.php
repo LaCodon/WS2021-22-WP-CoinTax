@@ -52,9 +52,18 @@ final class Response
      * @param $name
      * @param $value
      */
-    public function setViewVar($name, $value)
+    public function setViewVar($name, $value): void
     {
         $this->$name = $value;
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function getViewVar($name): mixed
+    {
+        return $this->$name;
     }
 
     /**

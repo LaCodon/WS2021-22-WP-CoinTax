@@ -323,6 +323,20 @@ input.error {
     text-align: right;
 }
 
+.breadcrumb {
+    margin-top: 20px;
+    margin-bottom: -40px;
+    font-size: 0.8em;
+    background-color: #ddd;
+    padding: 8px 15px 8px 15px;
+    border-radius: 5px;
+    width: 70px;
+}
+
+.breadcrumb .material-icons {
+    font-size: 1.8em;
+}
+
 
 /** Specific styling **/
 header {

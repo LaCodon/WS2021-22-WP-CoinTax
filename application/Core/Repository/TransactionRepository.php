@@ -69,14 +69,37 @@ final class TransactionRepository
     }
 
     /**
+     * @param Transaction $transaction
+     * @return bool
+     */
+    public function update(Transaction $transaction): bool
+    {
+        $transactionId = $transaction->getId();
+        $datetimeUtc = $transaction->getDatetimeUtc()->format('Y-m-d H:i:s');
+        $coinId = $transaction->getCoinId();
+        $coinValue = $transaction->getValue();
+
+        $stmt = $this->_pdo->prepare('UPDATE `transaction` SET 
+                                                datetime_utc = :datetime, 
+                                                coin_id = :coinId, 
+                                                coin_value = :value 
+                                            WHERE transaction_id = :transactionId LIMIT 1');
+        $stmt->bindParam(':transactionId', $transactionId, PDO::PARAM_INT);
+        $stmt->bindParam(':datetime', $datetimeUtc,);
+        $stmt->bindParam(':coinId', $coinId, PDO::PARAM_INT);
+        $stmt->bindParam(':value', $coinValue);
+
+        return $stmt->execute();
+    }
+
+    /**
      * @param int $transactionId
      * @param int $userId
      * @return bool
      */
     public function delete(int $transactionId, int $userId): bool
     {
-        // this also deletes transactions because of the foreign key constraint in the database
-        $stmt = $this->_pdo->prepare('DELETE FROM transaction WHERE transaction_id = :transId AND user_id = :userId LIMIT 1');
+        $stmt = $this->_pdo->prepare('DELETE FROM transaction WHERE transaction_id = :transId AND user_id = :userId');
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
         $stmt->bindParam(':transId', $transactionId, PDO::PARAM_INT);
 
@@ -93,7 +116,7 @@ final class TransactionRepository
      * @param object|bool $resultObj
      * @return Transaction|null
      */
-    private function makeTransaction(object|bool $resultObj): Transaction|null
+    public function makeTransaction(object|bool $resultObj): Transaction|null
     {
         if ($resultObj === false) {
             return null;

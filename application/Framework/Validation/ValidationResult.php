@@ -42,6 +42,11 @@ final class ValidationResult
         return count($this->_errors) > 0;
     }
 
+    public function hasValues(): bool
+    {
+        return count($this->_values) > 0;
+    }
+
     public function getValue(string $inputName): mixed
     {
         if (isset($this->_values[$inputName])) {
