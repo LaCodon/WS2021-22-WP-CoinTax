@@ -2,10 +2,8 @@
 
 namespace Controller;
 
-use Core\Repository\OrderRepository;
 use Framework\Exception\ViewNotFound;
 use Framework\Response;
-use Framework\Session;
 
 final class TransactionController extends Controller
 {
@@ -17,10 +15,8 @@ final class TransactionController extends Controller
     {
         $this->abortIfUnauthorized();
 
-        $currentUser = Session::getAuthorizedUser();
-
-        $orderRepo = new OrderRepository($this->db());
-        $orderRepo->getAllByUserId($currentUser->getId());
+        $orderController = new OrderController($this->_context);
+        $orderController->Action($resp, false);
 
         $resp->renderView('index');
     }

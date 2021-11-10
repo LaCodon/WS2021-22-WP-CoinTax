@@ -274,6 +274,14 @@ input.error {
     font-size: 3em;
 }
 
+.swap-icon.green {
+    color: #198754;
+}
+
+.swap-icon.red {
+    color: #c9303f;
+}
+
 .loupe-icon {
     font-size: 2em;
 }

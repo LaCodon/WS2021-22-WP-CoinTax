@@ -25,7 +25,7 @@ final class OrderController extends Controller
     /**
      * @throws ViewNotFound
      */
-    public function Action(Response $resp): void
+    public function Action(Response $resp, bool $render = true): void
     {
         $this->abortIfUnauthorized();
 
@@ -64,8 +64,11 @@ final class OrderController extends Controller
         }
 
         $resp->setViewVar('orders', $enrichedOrders);
-        $resp->setHtmlTitle('Orderübersicht');
-        $resp->renderView('index');
+
+        if ($render) {
+            $resp->setHtmlTitle('Orderübersicht');
+            $resp->renderView('index');
+        }
     }
 
     /**
