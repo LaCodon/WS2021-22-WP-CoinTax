@@ -184,7 +184,7 @@ final class OrderRepository
     }
 
     /**
-     * @param int|null $id
+     * @param int $id
      * @return Order|null
      */
     public function get(int $id): Order|null

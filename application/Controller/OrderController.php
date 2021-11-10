@@ -3,10 +3,8 @@
 namespace Controller;
 
 use Core\Calc\PriceConverter;
-use Core\Coingecko\CoingeckoAPI;
 use Core\Repository\CoinRepository;
 use Core\Repository\OrderRepository;
-use Core\Repository\PriceRepository;
 use Core\Repository\TransactionRepository;
 use DateTime;
 use DateTimeZone;
@@ -17,7 +15,6 @@ use Framework\Session;
 use Framework\Validation\Input;
 use Framework\Validation\InputValidator;
 use Framework\Validation\ValidationResult;
-use Model\Coin;
 use Model\Transaction;
 use PDOException;
 use ValueError;
