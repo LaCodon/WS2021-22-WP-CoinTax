@@ -4,6 +4,7 @@ namespace Core\Repository;
 
 use DateTime;
 use DateTimeZone;
+use Exception;
 use Framework\Exception\IdOverrideDisallowed;
 use Framework\Exception\UniqueConstraintViolation;
 use Model\Transaction;
@@ -66,6 +67,40 @@ final class TransactionRepository
         }
 
         return $this->makeTransaction($stmt->fetchObject());
+    }
+
+    public function getThisYearByCoin(int $userId, int $coinId, int $year): array|null
+    {
+        $startTime = sprintf('%d-01-01 00:00:00', $year);
+        $endTime = sprintf('%d-12-31 23:59:59', $year);
+
+        try {
+            $startTime = (new DateTime($startTime, new DateTimeZone('Europe/Berlin')))->setTimezone(new DateTimeZone('UTC'));
+            $endTime = (new DateTime($endTime, new DateTimeZone('Europe/Berlin')))->setTimezone(new DateTimeZone('UTC'));
+        } catch (Exception) {
+            return null;
+        }
+
+        $startTime = $startTime->format('Y-m-d H:i:s');
+        $endTime = $endTime->format('Y-m-d H:i:s');
+
+        $stmt = $this->_pdo->prepare('SELECT * FROM transaction WHERE user_id = :userId AND datetime_utc BETWEEN :startTime AND :endTime AND coin_id = :coinId');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':coinId', $coinId, PDO::PARAM_INT);
+        $stmt->bindParam(':startTime', $startTime);
+        $stmt->bindParam(':endTime', $endTime);
+
+        if ($stmt->execute() === false) {
+            return null;
+        }
+
+        $result = [];
+
+        while (($obj = $stmt->fetchObject()) !== false) {
+            $result[] = $this->makeTransaction($obj);
+        }
+
+        return $result;
     }
 
     /**

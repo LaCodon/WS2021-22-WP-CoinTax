@@ -110,6 +110,31 @@ final class CoinRepository
     }
 
     /**
+     * Returns a list of all coins ever used by the given user over all transactions
+     * @param int $userId
+     * @return array|null
+     */
+    public function getUniqueCoinsByUserId(int $userId): array|null
+    {
+        $stmt = $this->_pdo->prepare('SELECT c.* FROM coin c
+                                                JOIN transaction t ON t.coin_id = c.coin_id
+                                            WHERE t.user_id = :userId
+                                            GROUP BY c.coin_id');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        if ($stmt->execute() === false) {
+            return null;
+        }
+
+        $result = [];
+
+        while (($obj = $stmt->fetchObject()) !== false) {
+            $result[] = $this->makeCoin($obj);
+        }
+
+        return $result;
+    }
+
+    /**
      * Create a coin from a PDO result object
      * @param object|bool $resultObj
      * @return Coin|null
