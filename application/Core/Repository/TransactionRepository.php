@@ -104,6 +104,31 @@ final class TransactionRepository
     }
 
     /**
+     * Returns all transactions of a given user with a given coin
+     * @param int $userId
+     * @param int $coinId
+     * @return array|null
+     */
+    public function getByCoin(int $userId, int $coinId): array|null
+    {
+        $stmt = $this->_pdo->prepare('SELECT * FROM transaction WHERE user_id = :userId AND coin_id = :coinId');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':coinId', $coinId, PDO::PARAM_INT);
+
+        if ($stmt->execute() === false) {
+            return null;
+        }
+
+        $result = [];
+
+        while (($obj = $stmt->fetchObject()) !== false) {
+            $result[] = $this->makeTransaction($obj);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param Transaction $transaction
      * @return bool
      */

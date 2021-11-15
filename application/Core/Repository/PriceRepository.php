@@ -37,15 +37,17 @@ final class PriceRepository
         }
 
         if ($stmt->rowCount() === 0) {
-
             $api = new CoingeckoAPI();
             $price = $api->getPriceData($coin, $datetime);
             if ($price === null) {
                 return null;
             }
 
-            if (!$this->insert($coin, $price, $datetime)) {
-                return null;
+            // only insert price date if its not from today because price may change over the day
+            $now = (new DateTime('now', new DateTimeZone('UTC')))->setTime(0, 0);
+            $then = (clone $datetime)->setTimezone(new DateTimeZone('UTC'))->setTime(0, 0);
+            if ((int)$now->diff($then)->format('%d') !== 0) {
+                $this->insert($coin, $price, $datetime);
             }
 
             return $price;

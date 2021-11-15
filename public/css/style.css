@@ -269,6 +269,10 @@ input.error {
     border: none;
 }
 
+.lr-padding {
+    padding: 0 20px 0 20px;
+}
+
 .swap-icon {
     color: #35baf6;
     font-size: 3em;
@@ -343,6 +347,18 @@ input.error {
 
 .breadcrumb .material-icons {
     font-size: 1.8em;
+}
+
+.big-value {
+    margin: 20px 0 10px 0;
+    font-size: 2em;
+    color: #198754;
+    text-align: right;
+}
+
+.hint {
+    color: rgba(0, 0, 0, .4);
+    font-size: 0.8em;
 }
 
 
@@ -436,6 +452,10 @@ nav {
 
 .w12 {
     width: 1200px;
+}
+
+.w100 {
+    width: 100%;
 }
 
 .text-center {

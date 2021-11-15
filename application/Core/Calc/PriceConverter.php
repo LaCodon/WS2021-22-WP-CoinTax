@@ -4,6 +4,7 @@ namespace Core\Calc;
 
 use Core\Repository\CoinRepository;
 use Core\Repository\PriceRepository;
+use DateTime;
 use Model\Coin;
 use Model\Transaction;
 
@@ -83,5 +84,27 @@ final class PriceConverter
         }
 
         return bcmul($price, $transaction->getValue());
+    }
+
+    /**
+     * Get value of given amount of coin for a specific point in time. Searches DB for price information or get
+     * price data from coin gecko.
+     * @param string $value
+     * @param Coin $coin
+     * @param DateTime $dateTime
+     * @return string
+     */
+    public function getEurValuePlainApiOptional(string $value, Coin $coin, DateTime $dateTime): string
+    {
+        if ($coin->getSymbol() === self::EUR_COIN_SYMBOL) {
+            return $value;
+        }
+
+        $price = $this->_priceRepo->get($coin, $dateTime);
+        if ($price === null) {
+            return '0.0';
+        }
+
+        return bcmul($price, $value);
     }
 }

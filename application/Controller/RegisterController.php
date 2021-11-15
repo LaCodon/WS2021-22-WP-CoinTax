@@ -56,9 +56,9 @@ final class RegisterController extends Controller
         }
 
         $user = new User(
-            trim($inputValidationResult->getValue("firstname")),
-            trim($inputValidationResult->getValue("lastname")),
-            $inputValidationResult->getValue("email"),
+            htmlspecialchars(trim($inputValidationResult->getValue("firstname"))),
+            htmlspecialchars(trim($inputValidationResult->getValue("lastname"))),
+            htmlspecialchars($inputValidationResult->getValue("email")),
             password_hash($inputValidationResult->getValue("password"), PASSWORD_DEFAULT));
 
         $userRepo = new UserRepository($this->db());
