@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Calc;
+namespace Core\Calc\Fifo;
 
 use Core\Exception\InvalidFifoException;
 use Model\Transaction;
@@ -109,7 +109,7 @@ final class Fifo
 
         $result = [
             'success' => false,
-            'transactions' => []
+            'sale' => new FifoSale($compensateTransaction),
         ];
 
         $remaining = $compensateTransaction->getValue();
@@ -120,6 +120,8 @@ final class Fifo
                 // no more transactions for funding left
                 break;
             }
+
+            $currenTransaction->setCurrentUsedAmount($remaining);
 
             switch (bccomp($currenTransaction->_remainingAmount, $remaining)) {
                 case 1:
@@ -140,7 +142,7 @@ final class Fifo
                     $this->popInternal();
             }
 
-            $result['transactions'][] = $currenTransaction;
+            $result['sale']->addBackingFifoTransaction($currenTransaction);
         }
 
         // compensation was only successful if whole given transaction is funded

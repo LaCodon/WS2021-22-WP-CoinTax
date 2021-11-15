@@ -27,5 +27,7 @@ function format_number(string $number, int $minDecimals = 2, int $maxDecimals = 
     }
     $parts[1] = str_pad($parts[1], $minDecimals, '0');
 
+    $parts[0] = number_format($parts[0], 0, ',', '.');
+
     return $parts[0] . ',' . $parts[1];
 }

@@ -93,7 +93,7 @@
                         </div>
                         <div class="w1"></div>
                         <div class="w2 flexbox flex-col flex-gap flex-end flex-stretch">
-                            <a class="flexbox flex-col flex-stretch"
+                            <a class="flexbox flex-col flex-stretch" target="_blank"
                                href="<?= $this->getActionUrl('details'); ?>?id=<?= $orderId; ?>">
                                 <button class="btn default flexbox flexbox-center flex-gap">
                                     <span class="material-icons">zoom_in</span>

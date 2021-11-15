@@ -1,7 +1,7 @@
 <section class="flexbox flexbox-center">
     <div class="w12">
-        <a href="<?= $this->getActionUrl('index'); ?>" class="breadcrumb flexbox">
-            <span class="material-icons">arrow_back</span><span>Zurück</span>
+        <a href="javascript:window.close()" class="breadcrumb flexbox">
+            <span class="material-icons">arrow_back</span><span>Schließen</span>
         </a>
     </div>
     <div class="w12 m05 flexbox flex-start flex-col">

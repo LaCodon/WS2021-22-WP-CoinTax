@@ -21,9 +21,9 @@
                 </a>
             </div>
             <?php if ($this->isAuthorized()): ?>
-                <a href="<?= $this->getActionUrl('index', 'dashboard'); ?>" class="nav-item">Übersicht</a>
-                <a href="<?= $this->getActionUrl('index', 'order'); ?>" class="nav-item">Orders</a>
-                <a href="<?= $this->getActionUrl('index', 'transaction'); ?>" class="nav-item">Transaktionen</a>
+                <a href="<?= $this->getActionUrl('index', 'dashboard'); ?>" class="nav-item <?= $this->_controllerName === 'Dashboard' ? 'active' : '' ?>">Übersicht</a>
+                <a href="<?= $this->getActionUrl('index', 'order'); ?>" class="nav-item <?= $this->_controllerName === 'Order' ? 'active' : '' ?>">Orders</a>
+                <a href="<?= $this->getActionUrl('index', 'transaction'); ?>" class="nav-item <?= $this->_controllerName === 'Transaction' ? 'active' : '' ?>">Transaktionen</a>
             <?php endif; ?>
         </div>
         <div class="flexbox has-hover-child">

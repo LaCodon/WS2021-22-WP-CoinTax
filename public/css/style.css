@@ -134,6 +134,11 @@ option:hover, .active{
     color: rgba(0, 0, 0, .7) !important;
 }
 
+.nav-item.active {
+    background-color: transparent;
+    border-bottom: 2px solid  rgba(0, 0, 0, .6);
+}
+
 .center-box {
     margin-top: 100px;
     width: 500px;
@@ -342,7 +347,7 @@ input.error {
     background-color: #ddd;
     padding: 8px 15px 8px 15px;
     border-radius: 5px;
-    width: 70px;
+    width: 90px;
 }
 
 .breadcrumb .material-icons {
@@ -356,13 +361,35 @@ input.error {
     text-align: right;
 }
 
+.big-value.red {
+    color: #c9303f;
+}
+
 .hint {
-    color: rgba(0, 0, 0, .4);
+    color: rgba(0, 0, 0, .4) !important;
     font-size: 0.8em;
 }
 
+.coin-holding {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 15px 0 15px 0;
+}
 
-/** Specific styling **/
+.coin-holding-thumbnail {
+    width: 30px;
+    height: 30px;
+}
+
+.win-lose-tag {
+    font-size: 0.8em;
+    color: #198754;
+}
+
+.win-lose-tag.red {
+    color: #c9303f;
+}
+
+    /** Specific styling **/
 header {
     position: relative;
     background-color: #fff;
@@ -402,7 +429,7 @@ nav {
 #no-orders-yet {
     font-size: 2em;
     color: #ccc;
-    margin: 200px;
+    margin: 160px;
 }
 
 /** Helper **/
@@ -476,6 +503,24 @@ nav {
 
 .text-light {
     color: rgba(0, 0, 0, .6) !important;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.m01 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.m02 {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .m05 {
