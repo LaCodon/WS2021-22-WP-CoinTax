@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+const APPLICATION_DEBUG = false;
+
 use Config\Config;
 use Framework\Context;
 use Framework\Database;

@@ -21,8 +21,12 @@ function deleteOrderAction() {
                 xhr.onload = function () {
                     console.log(xhr.status)
                     if (xhr.status === 200) {
-                        const parentOrder = document.getElementById('order-' + orderId)
-                        parentOrder.remove()
+                        if (deleteBtn.getAttribute('data-closetab') === 'true') {
+                            window.close();
+                        } else {
+                            const parentOrder = document.getElementById('order-' + orderId)
+                            parentOrder.remove()
+                        }
                     } else {
                         xhr.onerror(undefined)
                     }

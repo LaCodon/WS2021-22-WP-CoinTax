@@ -2,6 +2,7 @@
 
 namespace Controller;
 
+use Core\Calc\Fifo\Fifo;
 use Core\Calc\PriceConverter;
 use Core\Repository\CoinRepository;
 use Core\Repository\OrderRepository;
@@ -323,6 +324,9 @@ final class OrderController extends Controller
         }
     }
 
+    /**
+     * @throws ViewNotFound
+     */
     public function DetailsAction(Response $resp, bool $render = true): void
     {
         $this->abortIfUnauthorized();
@@ -349,11 +353,102 @@ final class OrderController extends Controller
             $resp->redirect($resp->getActionUrl('index'));
         }
 
+        $orderData = $orderRepo->getComplete($orderId);
+
         $resp->setViewVar('order_id', $orderId);
         $resp->setViewVar('order', $order);
+        $resp->setViewVar('order_data', $orderData);
 
         // render is false if we are in OrderController.EditAction
         if ($render) {
+            $transactionRepo = new TransactionRepository($this->db());
+            $priceConverter = new PriceConverter($this->db());
+
+            $valueEur = [
+                'base' => $priceConverter->getEurValueApiOptionalSingle($orderData['base']['tx'], $orderData['base']['coin']),
+                'quote' => $priceConverter->getEurValueApiOptionalSingle($orderData['quote']['tx'], $orderData['quote']['coin']),
+                'fee' => $orderData['fee'] !== null ? $priceConverter->getEurValueApiOptionalSingle($orderData['fee']['tx'], $orderData['fee']['coin']) : '0.0',
+            ];
+
+            // ---------------------------------------------------------------------------------------------------------
+            $transactions = $transactionRepo->getThisYearByCoin($currentUser->getId(), $orderData['base']['coin']->getId(), 2021);
+
+            $receiveFifo = new Fifo(Fifo::RECEIVE_FIFO);
+            $sendFifo = new Fifo(FIFO::SEND_FIFO);
+
+            foreach ($transactions as $tx) {
+                if ($tx->getType() === Transaction::TYPE_RECEIVE) {
+                    $receiveFifo->push($tx);
+                } else {
+                    $sendFifo->push($tx);
+                }
+            }
+
+            $baseSell = null;
+
+            while (($fifoTx = $sendFifo->pop()) !== null) {
+                $sell = $receiveFifo->compensate($fifoTx->getTransaction());
+
+                if (APPLICATION_DEBUG === true) {
+                    echo 'Sold ' . $fifoTx->getTransaction()->getValue() . $orderData['base']['coin']->getSymbol() . ' backed by<br>';
+                    foreach ($sell['sale']->getBackingFifoTransactions() as $tx) {
+                        echo '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
+                        echo $tx->getTransaction()->getValue() . ' (actual used: ' . $tx->getCurrentUsedAmount() . ')';
+                        echo '<br>';
+                    }
+                    echo '<br><br>';
+                }
+
+                if ($fifoTx->getTransaction()->getId() === $orderData['base']['tx']->getId()) {
+                    // compensated current tx
+                    $baseSell = $sell;
+                    break;
+                }
+            }
+            debug('-------------------------------<br>');
+            // ---------------------------------------------------------------------------------------------------------
+            $feeSell = null;
+            if ($orderData['fee'] !== null) {
+                $transactions = $transactionRepo->getThisYearByCoin($currentUser->getId(), $orderData['fee']['coin']->getId(), 2021);
+
+                $receiveFifo = new Fifo(Fifo::RECEIVE_FIFO);
+                $sendFifo = new Fifo(FIFO::SEND_FIFO);
+
+                foreach ($transactions as $tx) {
+                    if ($tx->getType() === Transaction::TYPE_RECEIVE) {
+                        $receiveFifo->push($tx);
+                    } else {
+                        $sendFifo->push($tx);
+                    }
+                }
+
+                while (($fifoTx = $sendFifo->pop()) !== null) {
+                    $sell = $receiveFifo->compensate($fifoTx->getTransaction());
+
+                    if (APPLICATION_DEBUG === true) {
+                        echo 'Sold ' . $fifoTx->getTransaction()->getValue() . $orderData['fee']['coin']->getSymbol() . ' backed by<br>';
+                        foreach ($sell['sale']->getBackingFifoTransactions() as $tx) {
+                            echo '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
+                            echo $tx->getTransaction()->getValue() . ' (actual used: ' . $tx->getCurrentUsedAmount() . ')';
+                            echo '<br>';
+                        }
+                        echo '<br><br>';
+                    }
+
+                    if ($fifoTx->getTransaction()->getId() === $orderData['fee']['tx']->getId()) {
+                        // compensated current tx
+                        $feeSell = $sell;
+                        break;
+                    }
+                }
+            }
+            // ---------------------------------------------------------------------------------------------------------
+
+            $resp->setViewVar('base_data', $baseSell);
+            $resp->setViewVar('fee_data', $feeSell);
+            $resp->setViewVar('value_eur', $valueEur);
+            $resp->setViewVar('price_converter', $priceConverter);
+
             $resp->setHtmlTitle('Orderdetails');
             $resp->renderView('details');
         }
@@ -368,11 +463,7 @@ final class OrderController extends Controller
 
         $this->DetailsAction($resp, false);
 
-        $orderRepo = new OrderRepository($this->db());
-
-        $order = $resp->getViewVar('order');
-
-        $orderData = $orderRepo->getComplete($order->getId());
+        $orderData = $resp->getViewVar('order_data');
 
         if (!Session::hasNonEmptyInputValidationResult()) {
             // only set data if this request is not a response to an invalid form submission

@@ -2,6 +2,7 @@
 
 namespace Controller;
 
+use Core\Calc\PriceConverter;
 use Framework\Exception\ViewNotFound;
 use Framework\Response;
 
@@ -14,6 +15,8 @@ final class TransactionController extends Controller
     public function Action(Response $resp): void
     {
         $this->abortIfUnauthorized();
+
+        $priceConverter = new PriceConverter($this->db());
 
         $orderController = new OrderController($this->_context);
         $orderController->Action($resp, false);
@@ -37,6 +40,11 @@ final class TransactionController extends Controller
                     $order['quote'] = null;
                     $order['quoteCoin'] = null;
                     --$txCount;
+                } else {
+                    // In the OrderController, we fetch the price for the quoteCoin but only if the baseCoin is not EUR.
+                    // To ensure the correct price for this single transaction, we re-fetch the price for the quote
+                    // transaction at this point.
+                    $order['fiatValue'] = $priceConverter->getEurValueApiOptionalSingle($order['quote'], $order['quoteCoin']);
                 }
 
                 if ($order['fee'] !== null && $order['feeCoin']->getSymbol() !== $filterCoin->getSymbol()) {

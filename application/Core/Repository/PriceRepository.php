@@ -60,7 +60,7 @@ final class PriceRepository
             } else {
                 // cache price data if apcu is enabled
                 if (function_exists('apcu_cache_info')) {
-                    apcu_add(sprintf('%d-%s', $coinId, $dateStr), $price, 60 * 2);
+                    apcu_add(sprintf('%d-%s', $coinId, $dateStr), $price, 60 * 5);
                 }
             }
 

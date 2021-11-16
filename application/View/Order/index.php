@@ -56,7 +56,7 @@ use Framework\Form\TextInput;
                                   src="<?= $order['baseCoin']->getThumbnailUrl(); ?>"
                                   alt="<?= $order['baseCoin']->getName(); ?>"></div>
                         <div class="text-light">
-                            <?= rtrim(number_format((float)$order['base']->getValue(), 8, ',', '.'), '0'); ?>0
+                            <?= format_number($order['base']->getValue(), 2, 8); ?>
                             <?= $order['baseCoin']->getSymbol(); ?>
                         </div>
                     </div>
@@ -66,7 +66,7 @@ use Framework\Form\TextInput;
                                   src="<?= $order['quoteCoin']->getThumbnailUrl(); ?>"
                                   alt="<?= $order['quoteCoin']->getName(); ?>"></div>
                         <div class="text-light">
-                            <?= rtrim(number_format((float)$order['quote']->getValue(), 8, ',', '.'), '0'); ?>0
+                            <?= format_number($order['quote']->getValue(), 2, 8); ?>
                             <?= $order['quoteCoin']->getSymbol(); ?>
                         </div>
                     </div>
@@ -99,21 +99,21 @@ use Framework\Form\TextInput;
                                 <tr>
                                     <td>Gesendet</td>
                                     <td><?= $order['baseCoin']->getSymbol(); ?></td>
-                                    <td><?= number_format((float)$order['base']->getValue(), 18, ',', '.'); ?></td>
+                                    <td><?= format_number($order['base']->getValue()); ?></td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td>Empfangen</td>
                                     <td><?= $order['quoteCoin']->getSymbol(); ?></td>
-                                    <td><?= number_format((float)$order['quote']->getValue(), 18, ',', '.'); ?></td>
-                                    <td><?= number_format((float)$order['fiatValue'], 2, ',', '.'); ?> EUR</td>
+                                    <td><?= format_number($order['quote']->getValue()); ?></td>
+                                    <td><?= format_number($order['fiatValue'], 2, 2); ?> EUR</td>
                                 </tr>
                                 <tr>
                                     <?php if ($order['fee'] !== null): ?>
                                         <td>Gebühren</td>
                                         <td><?= $order['feeCoin']->getSymbol(); ?></td>
-                                        <td><?= number_format((float)$order['fee']->getValue(), 18, ',', '.'); ?></td>
-                                        <td><?= number_format((float)$order['feeValue'], 2, ',', '.'); ?> EUR</td>
+                                        <td><?= format_number($order['fee']->getValue()); ?></td>
+                                        <td><?= format_number($order['feeValue'], 2, 2); ?> EUR</td>
                                     <?php endif; ?>
                                 </tr>
                                 </tbody>
