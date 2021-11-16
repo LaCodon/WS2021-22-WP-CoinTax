@@ -6,11 +6,8 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Framework\Exception\IdOverrideDisallowed;
-use Framework\Exception\UniqueConstraintViolation;
 use Model\Transaction;
 use \PDO;
-use Model\User;
-use PDOException;
 
 final class TransactionRepository
 {

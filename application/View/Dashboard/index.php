@@ -31,26 +31,29 @@
                     </div>
 
                     <?php foreach ($this->coin_sums as $symbol => $coinSum): ?>
-                        <div class="flexbox w100 coin-holding">
-                            <div class="flexbox flex-start flex-center flex-stretch">
-                                <div class="flexbox w2 flex-start flex-center flex-gap">
-                                    <img class="coin-holding-thumbnail"
-                                         src="<?= $this->coins[$symbol]->getThumbnailUrl(); ?>"
-                                         alt="<?= $symbol ?>">
-                                    <div><span class="text-bold"><?= $this->coins[$symbol]->getName(); ?></span> <span
-                                                class="hint"><?= $symbol ?></span></div>
+                        <a href="<?= $this->getActionUrl('index', 'order') ?>?token=<?= $symbol ?>">
+                            <div class="flexbox w100 coin-holding">
+                                <div class="flexbox flex-start flex-center flex-stretch">
+                                    <div class="flexbox w2 flex-start flex-center flex-gap">
+                                        <img class="coin-holding-thumbnail"
+                                             src="<?= $this->coins[$symbol]->getThumbnailUrl(); ?>"
+                                             alt="<?= $symbol ?>">
+                                        <div><span class="text-bold"><?= $this->coins[$symbol]->getName(); ?></span>
+                                            <span
+                                                    class="hint"><?= $symbol ?></span></div>
+                                    </div>
+                                    <div class="w3 text-right">
+                                        <?= format_number($coinSum, 2, 8); ?> <?= $symbol ?>
+                                    </div>
                                 </div>
-                                <div class="w3 text-right">
-                                    <?= format_number($coinSum, 2, 8); ?> <?= $symbol ?>
+                                <div class="flexbox flex-col">
+                                    <div>
+                                        <?= format_number($this->coin_values[$symbol], 2, 2); ?> EUR
+                                    </div>
+                                    <span class="win-lose-tag <?= bccomp($this->win_lose_eur_per_coin[$symbol]['total_win_lose_eur'], 0) < 0 ? 'red' : '' ?>"><?= format_number($this->win_lose_eur_per_coin[$symbol]['total_win_lose_eur'], 2, 2); ?> EUR</span>
                                 </div>
                             </div>
-                            <div class="flexbox flex-col">
-                                <div>
-                                    <?= format_number($this->coin_values[$symbol], 2, 2); ?> EUR
-                                </div>
-                                <span class="win-lose-tag <?= bccomp($this->win_lose_eur_per_coin[$symbol]['total_win_lose_eur'], 0) < 0 ? 'red' : '' ?>"><?= format_number($this->win_lose_eur_per_coin[$symbol]['total_win_lose_eur'], 2, 2); ?> EUR</span>
-                            </div>
-                        </div>
+                        </a>
                     <?php endforeach; ?>
 
                 <?php else: ?>

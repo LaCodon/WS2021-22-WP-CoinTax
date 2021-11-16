@@ -36,7 +36,61 @@ final class OrderController extends Controller
         $transactionRepo = new TransactionRepository($this->db());
         $coinRepo = new CoinRepository($this->db());
 
-        $orders = $orderRepo->getAllByUserId($currentUser->getId());
+        // ----------------------- BEGIN input validation -----------------------
+        $input = InputValidator::parseAndValidate([
+            new Input(INPUT_GET, 'from', 'Von', false),
+            new Input(INPUT_GET, 'to', 'Bis', false),
+            new Input(INPUT_GET, 'token', 'Token', false),
+        ]);
+
+        $filterFrom = null;
+        $filterTo = null;
+        $filterCoin = null;
+
+        if ($input->getValue('from') !== '') {
+            $filterFrom = DateTime::createFromFormat('Y-m-d\TH:i', $input->getValue('from'),
+                new DateTimeZone('Europe/Berlin'));
+            if ($filterFrom === false) {
+                $input->setError('from', 'Ungültiges Format');
+                $filterFrom = null;
+            } else {
+                $filterFrom->setTimezone(new DateTimeZone('UTC'));
+            }
+        }
+
+        if ($input->getValue('to') !== '') {
+            $filterTo = DateTime::createFromFormat('Y-m-d\TH:i', $input->getValue('to'),
+                new DateTimeZone('Europe/Berlin'));
+            if ($filterTo === false) {
+                $input->setError('from', 'Ungültiges Format');
+                $filterTo = null;
+            } else {
+                $filterTo->setTimezone(new DateTimeZone('UTC'));
+            }
+        }
+
+        if ($input->getValue('token') !== '') {
+            $filterCoin = $coinRepo->getBySymbol($input->getValue('token'));
+            if ($filterCoin === null) {
+                $input->setError('token', 'Unbekanntes Token');
+            }
+        }
+
+        if (!Session::hasNonEmptyInputValidationResult()) {
+            // only set data if this request is not a response to an invalid form submission
+            Session::setInputValidationResult(new ValidationResult([], [
+                'from' => $filterFrom !== null ? $filterFrom->setTimezone(new DateTimeZone('Europe/Berlin'))->format('Y-m-d\TH:i') : '',
+                'to' => $filterTo !== null ? $filterTo->setTimezone(new DateTimeZone('Europe/Berlin'))->format('Y-m-d\TH:i') : '',
+                'token' => $filterCoin !== null ? $filterCoin->getSymbol() : '',
+            ]));
+        }
+
+        if ($input->hasErrors()) {
+            Session::setInputValidationResult($input);
+        }
+        // ----------------------- END input validation -----------------------
+
+        $orders = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin);
 
         $enrichedOrders = [];
 
@@ -63,8 +117,11 @@ final class OrderController extends Controller
             ];
         }
 
+        $this->makeCoinOptions($resp);
         $resp->setViewVar('orders', $enrichedOrders);
+        $resp->setViewVar('filterCoin', $filterCoin);
 
+        // $render is false if called from TransactionController
         if ($render) {
             $resp->setHtmlTitle('Orderübersicht');
             $resp->renderView('index');
@@ -78,6 +135,17 @@ final class OrderController extends Controller
     {
         $this->abortIfUnauthorized();
 
+        $this->makeCoinOptions($resp);
+
+        // render is false if we are on the OrderController.EditAction
+        if ($render) {
+            $resp->setHtmlTitle('Order hinzufügen');
+            $resp->renderView('add');
+        }
+    }
+
+    private function makeCoinOptions(Response $resp): void
+    {
         $coinRepo = new CoinRepository($this->db());
         $coins = $coinRepo->getAll();
 
@@ -91,12 +159,6 @@ final class OrderController extends Controller
         }
 
         $resp->setViewVar('coin_options', $coinOptions);
-
-        // render is false if we are on the OrderController.EditAction
-        if ($render) {
-            $resp->setHtmlTitle('Order hinzufügen');
-            $resp->renderView('add');
-        }
     }
 
     public function AddDoAction(Response $resp, bool $edit = false): void

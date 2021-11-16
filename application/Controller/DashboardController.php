@@ -4,11 +4,13 @@ namespace Controller;
 
 use Core\Calc\Fifo\Fifo;
 use Core\Calc\PriceConverter;
+use Core\Exception\InvalidFifoException;
 use Core\Repository\CoinRepository;
 use Core\Repository\TransactionRepository;
 use DateTime;
 use DateTimeZone;
-use Framework\Exception\ViewNotFound;
+use Exception;
+use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
 use Model\Transaction;
@@ -18,7 +20,7 @@ final class DashboardController extends Controller
 {
 
     /**
-     * @throws ViewNotFound
+     * @param Response $resp
      */
     public function Action(Response $resp): void
     {
@@ -29,24 +31,30 @@ final class DashboardController extends Controller
 
         $coins = $coinRepo->getUniqueCoinsByUserId($currentUser->getId());
 
-        $portfolioValue = $this->calculatePortfolioValue($currentUser, $coins);
-        $yearlyWinLose = $this->calculateYearlyWin($currentUser, $coins, 2021);
+        try {
+            $portfolioValue = $this->calculatePortfolioValue($currentUser, $coins);
+            $yearlyWinLose = $this->calculateYearlyWin($currentUser, $coins, 2021);
 
-        $resp->setViewVar('firstname', $currentUser->getFirstName());
-        $resp->setViewVar('portfolio_value', $portfolioValue['eur_sum']);
-        $resp->setViewVar('coin_sums', $portfolioValue['coin_sums']);
-        $resp->setViewVar('coin_values', $portfolioValue['coin_values']);
-        $resp->setViewVar('coins', $portfolioValue['coins']);
-        $resp->setViewVar('win_lose_eur_per_coin', $yearlyWinLose['per_coin']);
-        $resp->setViewVar('win_lose_eur_total', $yearlyWinLose['total']);
+            $resp->setViewVar('firstname', $currentUser->getFirstName());
+            $resp->setViewVar('portfolio_value', $portfolioValue['eur_sum']);
+            $resp->setViewVar('coin_sums', $portfolioValue['coin_sums']);
+            $resp->setViewVar('coin_values', $portfolioValue['coin_values']);
+            $resp->setViewVar('coins', $portfolioValue['coins']);
+            $resp->setViewVar('win_lose_eur_per_coin', $yearlyWinLose['per_coin']);
+            $resp->setViewVar('win_lose_eur_total', $yearlyWinLose['total']);
 
-        $resp->setHtmlTitle('Dashboard');
-        $resp->renderView('index');
+            $resp->setHtmlTitle('Dashboard');
+            $resp->renderView('index');
+        } catch (Exception $e) {
+            $resp->abort('error during tax calculation:' . $e->getMessage(), Framework::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * @param User $user
-     * @return array #[ArrayShape(['eur_sum' => "string", 'coin_sums' => "array", 'coin_values' => "array"])]
+     * @param array $coins
+     * @return array #[ArrayShape(['eur_sum' => "string", 'coin_sums' => "array", 'coin_values' => "array", 'coins' => "array(Coins)"])]
+     * @throws Exception
      */
     private function calculatePortfolioValue(User $user, array $coins): array
     {
@@ -89,6 +97,7 @@ final class DashboardController extends Controller
      * @param array $coins
      * @param int $year
      * @return array
+     * @throws InvalidFifoException
      */
     private function calculateYearlyWin(User $user, array $coins, int $year): array
     {

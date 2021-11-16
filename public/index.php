@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1); // for development
+declare(strict_types=1);
 
 use Config\Config;
 use Framework\Context;

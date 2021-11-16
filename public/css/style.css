@@ -169,6 +169,21 @@ option:hover, .active{
     row-gap: 5px;
 }
 
+.search-elem > .form-elem {
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-elem > .form-elem > input {
+    flex-grow: 1;
+}
+
+.search-elem > .form-elem > datalist {
+    top: 40px;
+}
+
 span.error {
     font-size: 0.7em;
     color: #d93444;
@@ -206,6 +221,15 @@ input.error {
 
 .btn.warning:hover {
     background-color: #bb2d3d;
+}
+
+.btn.grey {
+    background-color: #ddd;
+    color: #000;
+}
+
+.btn.grey:hover {
+    background-color: #d5d5d5;
 }
 
 .no-btn {

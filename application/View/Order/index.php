@@ -1,13 +1,42 @@
+<?php
+
+use Framework\Form\SelectInput;
+use Framework\Form\TextInput;
+
+?>
 <section class="flexbox flexbox-center">
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
-            <h2 class="h2">Orderübersicht</h2>
+            <h2 class="h2">Orderübersicht <span class="hint">(<?= count($this->orders); ?>)</span></h2>
             <a href="<?= $this->getActionUrl('add'); ?>">
                 <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp; Order
                     hinzufügen
                 </button>
             </a>
         </div>
+    </div>
+</section>
+
+<section class="flexbox flexbox-center">
+    <div class="w12 flexbox flex-start flex-col">
+        <form method="GET" action="<?= $this->getActionUrl('index'); ?>" class="flexbox w12">
+            <div class="flexbox m01 flex-gap">
+                <div class="search-elem w3">
+                    <?= TextInput::render('Von:', 'from', 'datetime-local', false); ?>
+                </div>
+                <div class="search-elem w3">
+                    <?= TextInput::render('Bis:', 'to', 'datetime-local', false); ?>
+                </div>
+                <div class="search-elem w4">
+                    <?= SelectInput::render('Token:', 'token', $this->coin_options, false); ?>
+                </div>
+            </div>
+            <div class="flexbox flex-end w1">
+                <button class="btn grey flexbox" type="submit"><span class="material-icons">filter_alt</span>&nbsp;
+                    Filtern
+                </button>
+            </div>
+        </form>
     </div>
 </section>
 
@@ -119,7 +148,7 @@
 
         <?php if (count($this->orders) === 0): ?>
             <div class="flexbox w12 flex-center flex-top">
-                <div class="container" id="no-orders-yet">Füge zuerst deine Orders hinzu</div>
+                <div class="container" id="no-orders-yet">Keine Orders gefunden</div>
             </div>
         <?php endif; ?>
 

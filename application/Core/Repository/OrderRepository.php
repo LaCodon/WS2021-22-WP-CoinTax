@@ -2,7 +2,11 @@
 
 namespace Core\Repository;
 
+use Cassandra\Date;
+use DateTime;
+use DateTimeZone;
 use Framework\Exception\IdOverrideDisallowed;
+use Model\Coin;
 use Model\Order;
 use Model\Transaction;
 use \PDO;
@@ -159,16 +163,56 @@ final class OrderRepository
     }
 
     /**
+     * Same as getAllByUserId
      * @param int $userId
+     * @param DateTime|null $from
+     * @param DateTime|null $to
+     * @param Coin|null $coin
      * @return array
      */
-    public function getAllByUserId(int $userId): array
+    public function getAllByUserIdWithFilter(int $userId, DateTime|null $from = null, DateTime|null $to = null, Coin|null $coin = null): array
     {
-        $stmt = $this->_pdo->prepare('SELECT order_id, base_transaction, quote_transaction, fee_transaction FROM `order` AS o
+        $filter = '';
+        $extraJoin = '';
+
+        if ($from !== null && $to !== null) {
+            $filter .= 'AND t.datetime_utc BETWEEN :from AND :to ';
+        } elseif ($from !== null && $to === null) {
+            $filter .= 'AND t.datetime_utc > :from ';
+        } elseif ($from === null && $to !== null) {
+            $filter .= 'AND t.datetime_utc < :to ';
+        }
+
+        if ($coin !== null) {
+            $extraJoin .= 'JOIN `transaction` AS t1 ON o.quote_transaction = t1.transaction_id ';
+            $extraJoin .= 'JOIN `transaction` AS t2 ON o.fee_transaction = t2.transaction_id ';
+            $filter .= 'AND ( t.coin_id = :coinId OR t1.coin_id = :coinId OR t2.coin_id = :coinId )';
+        }
+
+        $stmt = $this->_pdo->prepare("SELECT order_id, base_transaction, quote_transaction, fee_transaction FROM `order` AS o
                                                 JOIN `transaction` AS t ON o.base_transaction = t.transaction_id
+                                                $extraJoin
                                             WHERE t.user_id = :userId
-                                            ORDER BY t.datetime_utc DESC');
+                                            $filter
+                                            ORDER BY t.datetime_utc DESC");
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+
+        if ($from !== null) {
+            $from->setTimezone(new DateTimeZone('UTC'));
+            $from = $from->format('Y-m-d H:i:s');
+            $stmt->bindParam(':from', $from);
+        }
+
+        if ($to !== null) {
+            $to->setTimezone(new DateTimeZone('UTC'));
+            $to = $to->format('Y-m-d H:i:s');
+            $stmt->bindParam(':to', $to);
+        }
+
+        if ($coin !== null) {
+            $coinId = $coin->getId();
+            $stmt->bindParam(':coinId', $coinId, PDO::PARAM_INT);
+        }
 
         if ($stmt->execute() === false) {
             return [];

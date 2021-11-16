@@ -37,6 +37,15 @@ final class PriceRepository
         }
 
         if ($stmt->rowCount() === 0) {
+            // first check cache if enabled
+            if (function_exists('apcu_cache_info')) {
+                $success = false;
+                $price = apcu_fetch(sprintf('%d-%s', $coinId, $dateStr), $success);
+                if ($success) {
+                    return $price;
+                }
+            }
+
             $api = new CoingeckoAPI();
             $price = $api->getPriceData($coin, $datetime);
             if ($price === null) {
@@ -48,6 +57,11 @@ final class PriceRepository
             $then = (clone $datetime)->setTimezone(new DateTimeZone('UTC'))->setTime(0, 0);
             if ((int)$now->diff($then)->format('%d') !== 0) {
                 $this->insert($coin, $price, $datetime);
+            } else {
+                // cache price data if apcu is enabled
+                if (function_exists('apcu_cache_info')) {
+                    apcu_add(sprintf('%d-%s', $coinId, $dateStr), $price, 60 * 2);
+                }
             }
 
             return $price;
