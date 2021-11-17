@@ -185,16 +185,17 @@ final class OrderRepository
 
         if ($coin !== null) {
             $extraJoin .= 'JOIN `transaction` AS t1 ON o.quote_transaction = t1.transaction_id ';
-            $extraJoin .= 'JOIN `transaction` AS t2 ON o.fee_transaction = t2.transaction_id ';
+            $extraJoin .= 'LEFT JOIN `transaction` AS t2 ON o.fee_transaction = t2.transaction_id ';
             $filter .= 'AND ( t.coin_id = :coinId OR t1.coin_id = :coinId OR t2.coin_id = :coinId )';
         }
 
-        $stmt = $this->_pdo->prepare("SELECT order_id, base_transaction, quote_transaction, fee_transaction FROM `order` AS o
-                                                JOIN `transaction` AS t ON o.base_transaction = t.transaction_id
-                                                $extraJoin
-                                            WHERE t.user_id = :userId
-                                            $filter
-                                            ORDER BY t.datetime_utc DESC");
+        $query = "SELECT order_id, base_transaction, quote_transaction, fee_transaction FROM `order` AS o
+                        JOIN `transaction` AS t ON o.base_transaction = t.transaction_id
+                        $extraJoin
+                    WHERE t.user_id = :userId
+                    $filter
+                    ORDER BY t.datetime_utc DESC";
+        $stmt = $this->_pdo->prepare($query);
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
 
         if ($from !== null) {

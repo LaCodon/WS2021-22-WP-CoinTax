@@ -121,7 +121,7 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
                         EUR)
                     </td>
                     <?php if ($this->order_data['base']['coin']->getSymbol() === PriceConverter::EUR_COIN_SYMBOL): ?>
-                        <td class="hint">Für EUR werden keine Herkunftskäufe berechnet, da 1 EUR immer den Wert 1 EUR
+                        <td class="hint">Für EUR werden keine Herkunftskäufe berechnet, da 1 EUR immer den Preis 1 EUR
                             hat.
                         </td>
                     <?php else: ?>
@@ -148,13 +148,14 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
                                     $fiatSum = bcadd($fiatSum, $buyPrice);
                                     ?>
                                     <tr>
-                                        <td><?= $backingTx->getTransaction()->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i'); ?>
+                                            <td><?= $backingTx->getTransaction()->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i'); ?>
                                             Uhr
                                         </td>
                                         <td><?= format_number($backingTx->getTransaction()->getValue()); ?></td>
                                         <td><?= format_number($backingTx->getCurrentUsedAmount()); ?></td>
                                         <td class="no-border-right"><?= format_number($buyPrice, 2, 2); ?> EUR
-                                            (<?= format_number($coinCost, 2, 2) ?> EUR)
+                                            (<?= format_number($coinCost, 2, 2) ?> EUR)<br>
+                                            <?php if (!$backingTx->isTaxRelevant()): ?><span class="hint">Kein steuerpflichtiger Verkauf</span><?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

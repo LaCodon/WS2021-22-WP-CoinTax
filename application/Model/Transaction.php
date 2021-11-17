@@ -3,6 +3,7 @@
 namespace Model;
 
 use DateTime;
+use DateTimeZone;
 use Framework\Exception\IdOverrideDisallowed;
 
 final class Transaction
@@ -42,6 +43,7 @@ final class Transaction
      */
     public function getDatetimeUtc(): DateTime
     {
+        $this->_datetimeUtc->setTimezone(new DateTimeZone('UTC'));
         return $this->_datetimeUtc;
     }
 

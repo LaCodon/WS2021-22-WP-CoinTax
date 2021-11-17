@@ -41,16 +41,18 @@ final class FifoSale
      * @param Coin $coin
      * @return string
      */
-    public function calculateWinLoss(PriceConverter $priceConverter, Coin $coin): string
+    public function calculateWinLoss(PriceConverter $priceConverter, Coin $coin, bool $onlyTaxRelevant = true): string
     {
         $soldEurSum = $priceConverter->getEurValueApiOptionalSingle($this->_sellTransaction, $coin);
         $boughtEurSum = '0.0';
 
         foreach ($this->_backingFifoTransactions as $backedBy) {
-            $usedQuota = bcdiv($backedBy->getCurrentUsedAmount(), $backedBy->getTransaction()->getValue());
-            $totalTxEurValue = $priceConverter->getEurValueApiOptionalSingle($backedBy->getTransaction(), $coin);
-            $usedEurValue = bcmul($usedQuota, $totalTxEurValue);
-            $boughtEurSum = bcadd($boughtEurSum, $usedEurValue);
+            if ($backedBy->isTaxRelevant()) {
+                $usedQuota = bcdiv($backedBy->getCurrentUsedAmount(), $backedBy->getTransaction()->getValue());
+                $totalTxEurValue = $priceConverter->getEurValueApiOptionalSingle($backedBy->getTransaction(), $coin);
+                $usedEurValue = bcmul($usedQuota, $totalTxEurValue);
+                $boughtEurSum = bcadd($boughtEurSum, $usedEurValue);
+            }
         }
 
         return bcsub($soldEurSum, $boughtEurSum);

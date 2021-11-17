@@ -50,7 +50,7 @@
                                     <div>
                                         <?= format_number($this->coin_values[$symbol], 2, 2); ?> EUR
                                     </div>
-                                    <span class="win-lose-tag <?= bccomp($this->win_lose_eur_per_coin[$symbol]['total_win_lose_eur'], 0) < 0 ? 'red' : '' ?>"><?= format_number($this->win_lose_eur_per_coin[$symbol]['total_win_lose_eur'], 2, 2); ?> EUR</span>
+                                    <span class="win-lose-tag <?= bccomp($this->win_lose_eur_per_coin[$symbol], 0) < 0 ? 'red' : '' ?>"><?= format_number($this->win_lose_eur_per_coin[$symbol], 2, 2); ?> EUR</span>
                                 </div>
                             </div>
                         </a>

@@ -3,12 +3,16 @@
 namespace Core\Calc\Fifo;
 
 use Core\Exception\InvalidFifoException;
+use DateInterval;
 use Model\Transaction;
 
 final class Fifo
 {
     const SEND_FIFO = 1;
     const RECEIVE_FIFO = 2;
+
+    const ARRAY_ELEM_SALE = 'sale';
+    const ARRAY_ELEM_SUCCESS = 'success';
 
     private array $_list = [];
     private bool $_sorted = false;
@@ -89,17 +93,17 @@ final class Fifo
     /**
      * Return a list of receive transactions that fund the given send transaction. Also returns an indicator
      * about whether the funds sufficed or not
-     * @param Transaction $compensateTransaction
-     * @return array #[ArrayShape(['success' => "bool", 'transactions' => "array(FifoTransaction)"])]
+     * @param Transaction $compensateMeTx
+     * @return array #[ArrayShape(['success' => "bool", 'sale' => "FifoSale"])]
      * @throws InvalidFifoException
      */
-    public function compensate(Transaction $compensateTransaction): array
+    public function compensate(Transaction $compensateMeTx): array
     {
         if ($this->_type === self::SEND_FIFO) {
             throw new InvalidFifoException('Cannot compensate an outgoing transaction with a list of outgoing transactions');
         }
 
-        if ($compensateTransaction->getType() !== Transaction::TYPE_SEND) {
+        if ($compensateMeTx->getType() !== Transaction::TYPE_SEND) {
             throw new InvalidFifoException('Don\'t have to compensate an incoming transaction');
         }
 
@@ -108,20 +112,24 @@ final class Fifo
         }
 
         $result = [
-            'success' => false,
-            'sale' => new FifoSale($compensateTransaction),
+            self::ARRAY_ELEM_SUCCESS => false,
+            self::ARRAY_ELEM_SALE => new FifoSale($compensateMeTx),
         ];
 
-        $remaining = $compensateTransaction->getValue();
+        $remaining = $compensateMeTx->getValue();
 
         while (bccomp($remaining, '0.0') !== 0) {
             $currenTransaction = $this->peek();
-            if ($currenTransaction === null || $currenTransaction->_transaction->getDatetimeUtc() > $compensateTransaction->getDatetimeUtc()) {
+            if ($currenTransaction === null || $currenTransaction->getTransaction()->getDatetimeUtc() > $compensateMeTx->getDatetimeUtc()) {
                 // no more transactions for funding left
                 break;
             }
 
             $currenTransaction->setCurrentUsedAmount($remaining);
+
+            // only tax relevant if purchase and sale happen within time range of one year
+            $currentTxDateTime = clone $currenTransaction->getTransaction()->getDatetimeUtc();
+            $currenTransaction->_isTaxRelevant = $currentTxDateTime->add(new DateInterval('P1Y')) > $compensateMeTx->getDatetimeUtc();
 
             switch (bccomp($currenTransaction->_remainingAmount, $remaining)) {
                 case 1:
@@ -142,12 +150,12 @@ final class Fifo
                     $this->popInternal();
             }
 
-            $result['sale']->addBackingFifoTransaction($currenTransaction);
+            $result[self::ARRAY_ELEM_SALE]->addBackingFifoTransaction($currenTransaction);
         }
 
         // compensation was only successful if whole given transaction is funded
         if (bccomp($remaining, '0.0') === 0) {
-            $result['success'] = true;
+            $result[self::ARRAY_ELEM_SUCCESS] = true;
         }
         return $result;
     }
