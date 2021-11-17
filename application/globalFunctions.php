@@ -38,7 +38,7 @@ function format_number(string $number, int $minDecimals = 2, int $maxDecimals = 
         $parts[0] = '-' . $parts[0];
     }
 
-    return $parts[0] . ',' . $parts[1];
+    return $parts[0] . (strlen($parts[1]) !== 0 ? ',' . $parts[1] : '');
 }
 
 /**
@@ -50,4 +50,76 @@ function debug(string $string): void
     if (APPLICATION_DEBUG === true) {
         echo $string;
     }
+}
+
+/**
+ * Round function for BCMath numbers. Result will be returned formatted with format_number()
+ * @param string $number
+ * @param int $decimalCount
+ * @return string
+ */
+function bcround(string $number, int $decimalCount = 2): string
+{
+    if (str_contains($number, '.') === false) {
+        return $number;
+    }
+
+    $decimalCount = max($decimalCount, 0);
+    list($ints, $decimals) = explode('.', $number, 2);
+    $isNegative = str_contains($ints, '-');
+    $ints = str_replace('-', '', $ints);
+
+    if ($decimalCount > strlen($decimals)) {
+        return format_number($number, min($decimalCount, 2), $decimalCount);
+    }
+
+    $carry = 0;
+    for ($i = strlen($decimals) - 1; $i >= $decimalCount; --$i) {
+        $decimal = intval($decimals[$i]);
+        $decimal += $carry;
+        if ($decimal >= 5) {
+            $carry = 1;
+        } else {
+            $carry = 0;
+        }
+        $decimals[$i] = 0;
+    }
+
+    if ($decimalCount - 1 >= 0) {
+        if (intval($decimals[$decimalCount - 1]) + $carry === 10) {
+            $decimals[$decimalCount - 1] = '0';
+            for ($i = 2; $decimalCount - $i >= 0; $i++) {
+                if (intval($decimals[$decimalCount - $i]) + $carry === 10) {
+                    $decimals[$decimalCount - $i] = '0';
+                } else {
+                    $decimals[$decimalCount - $i] = intval($decimals[$decimalCount - $i]) + $carry;
+                    $carry = 0;
+                }
+            }
+        } else {
+            $decimals[$decimalCount - 1] = intval($decimals[$decimalCount - 1]) + $carry;
+            $carry = 0;
+        }
+    }
+
+    if ($carry === 1) {
+        for ($i = strlen($ints) - 1; $i >= 0; --$i) {
+            $int = intval($ints[$i]);
+            $int += $carry;
+            if ($int === 10) {
+                $ints[$i] = 0;
+                $carry = 1;
+            } else {
+                $ints[$i] = $int;
+                $carry = 0;
+                break;
+            }
+        }
+
+        if ($carry === 1) {
+            $ints = '1' . $ints;
+        }
+    }
+
+    return format_number(($isNegative ? '-' : '') . $ints . '.' . $decimals, min($decimalCount, 2), $decimalCount);
 }

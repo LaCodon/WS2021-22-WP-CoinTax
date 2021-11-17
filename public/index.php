@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const APPLICATION_DEBUG = false;
+const APPLICATION_DEBUG = true;
 
 use Config\Config;
 use Framework\Context;
@@ -16,6 +16,10 @@ const APPLICATION_PATH = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARA
 
 require APPLICATION_PATH . 'globalFunctions.php';
 require APPLICATION_PATH . 'autoloader.php';
+
+if (APPLICATION_DEBUG === true) {
+    require APPLICATION_PATH . 'tests.php';
+}
 
 try {
     $database = new Database(Config::databaseHost, intval(Config::databasePort),
