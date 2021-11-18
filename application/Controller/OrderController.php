@@ -2,6 +2,9 @@
 
 namespace Controller;
 
+use Core\Calc\Fifo\Fifo;
+use Core\Calc\Fifo\FifoSale;
+use Core\Calc\Fifo\FifoTransaction;
 use Core\Calc\PriceConverter;
 use Core\Calc\Tax\WinLossCalculator;
 use Core\Exception\WinLossNotCalculableException;
@@ -123,8 +126,16 @@ final class OrderController extends Controller
         $resp->setViewVar('orders', $enrichedOrders);
         $resp->setViewVar('filterCoin', $filterCoin);
 
+        Session::setCurrentFilter([
+            'from' => $input->getValue('from'),
+            'to' => $input->getValue('to'),
+            'token' => $input->getValue('token'),
+        ]);
+
         // $render is false if called from TransactionController
         if ($render) {
+            $resp->setViewVar('back_filter', Session::getCurrentFilterQuery());
+
             $resp->setHtmlTitle('Orderübersicht');
             $resp->renderView('index');
         }
@@ -141,6 +152,8 @@ final class OrderController extends Controller
 
         // render is false if we are on the OrderController.EditAction
         if ($render) {
+            $resp->setViewVar('back_filter', Session::getCurrentFilterQuery());
+
             $resp->setHtmlTitle('Order hinzufügen');
             $resp->renderView('add');
         }
@@ -305,7 +318,7 @@ final class OrderController extends Controller
 
         if ($input->hasErrors()) {
             if ($input->getValue('xhr') === '') {
-                $resp->redirect($resp->getActionUrl('index'));
+                $resp->redirect($resp->getActionUrl('index') . '?' . Session::getCurrentFilterQuery());
             } else {
                 $resp->abort('input errors', Framework::HTTP_BAD_REQUEST);
             }
@@ -321,7 +334,7 @@ final class OrderController extends Controller
         }
 
         if ($input->getValue('xhr') === '') {
-            $resp->redirect($resp->getActionUrl('index'));
+            $resp->redirect($resp->getActionUrl('index') . '?' . Session::getCurrentFilterQuery());
         }
     }
 
@@ -362,7 +375,6 @@ final class OrderController extends Controller
 
         // render is false if we are in OrderController.EditAction
         if ($render) {
-            $transactionRepo = new TransactionRepository($this->db());
             $priceConverter = new PriceConverter($this->db());
             $winLossCalculator = new WinLossCalculator($this->db());
 
@@ -373,23 +385,31 @@ final class OrderController extends Controller
             ];
 
             $baseSell = null;
+            $baseWinLoss = null;
             try {
                 $baseSell = $winLossCalculator->calculateWinLoss($orderData['base']['coin'], $currentUser, $orderData['base']['tx']);
+                $baseWinLoss = $baseSell[Fifo::ARRAY_ELEM_SALE]->calculateWinLoss($priceConverter, $orderData['base']['coin']);
             } catch (WinLossNotCalculableException $e) {
             }
 
             debug('-------------------------------<br>');
 
             $feeSell = null;
+            $feeWinLoss = null;
             if ($orderData['fee'] !== null) {
                 try {
                     $feeSell = $winLossCalculator->calculateWinLoss($orderData['fee']['coin'], $currentUser, $orderData['fee']['tx']);
+                    $feeWinLoss = $feeSell[Fifo::ARRAY_ELEM_SALE]->calculateWinLoss($priceConverter, $orderData['fee']['coin']);
                 } catch (WinLossNotCalculableException $e) {
                 }
             }
 
+            $resp->setViewVar('back_filter', Session::getCurrentFilterQuery());
+
             $resp->setViewVar('base_data', $baseSell);
+            $resp->setViewVar('base_win_loss', $baseWinLoss);
             $resp->setViewVar('fee_data', $feeSell);
+            $resp->setViewVar('fee_win_loss', $feeWinLoss);
             $resp->setViewVar('value_eur', $valueEur);
             $resp->setViewVar('price_converter', $priceConverter);
 

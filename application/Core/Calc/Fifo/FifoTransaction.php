@@ -2,6 +2,8 @@
 
 namespace Core\Calc\Fifo;
 
+use Core\Calc\PriceConverter;
+use Model\Coin;
 use Model\Transaction;
 
 final class FifoTransaction
@@ -43,6 +45,22 @@ final class FifoTransaction
     public function getCurrentUsedAmount(): string
     {
         return $this->_currentUsedAmount;
+    }
+
+    /**
+     * Returns the EUR value of the current used amount and the cost per coin
+     * @param Coin $coin
+     * @param PriceConverter $priceConverter
+     * @return array(EURValue,CostPerCoin)
+     */
+    public function getCurrentUsedEurValue(Coin $coin, PriceConverter $priceConverter): array
+    {
+        $buyPrice = $priceConverter->getEurValueApiOptionalSingle($this->getTransaction(), $coin);
+        $buyPrice = bcdiv($buyPrice, $this->getTransaction()->getValue());
+        return [
+            bcmul($buyPrice, $this->getCurrentUsedAmount()),
+            $buyPrice
+        ];
     }
 
     /**

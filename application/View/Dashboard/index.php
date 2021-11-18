@@ -82,10 +82,19 @@
             </div>
             <div class="w3 flexbox card lr-padding">
                 <div class="container w100">
-                    <h2>Gesamtgewinn 2021</h2>
+                    <h2>Realisierter Gesamtgewinn 2021</h2>
+                    <span class="hint">(unabhängig von steuerlicher Relevanz)</span><br>
                     <span class="hint">Stand: <?= (new DateTime('now', new DateTimeZone('Europe/Berlin')))->format('d.m.Y H:i'); ?> Uhr</span>
                     <div class="big-value <?= bccomp($this->win_lose_eur_total, 0) < 0 ? 'red' : '' ?>">
                         <?= format_number($this->win_lose_eur_total, 2, 2); ?> EUR
+                    </div>
+                </div>
+            </div>
+            <div class="w3 flexbox card lr-padding">
+                <div class="container w100">
+                    <h2>Insgesamt investiert</h2>
+                    <div class="big-value">
+                        <?= format_number($this->invested_eur, 2, 2); ?> EUR
                     </div>
                 </div>
             </div>

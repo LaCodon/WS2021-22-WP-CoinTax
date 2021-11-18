@@ -39,22 +39,46 @@ final class FifoSale
      * Calculates the total win / lost in EUR achieved by this coin sell
      * @param PriceConverter $priceConverter
      * @param Coin $coin
+     * @param bool $onlyTaxRelevant
      * @return string
      */
-    public function calculateWinLoss(PriceConverter $priceConverter, Coin $coin, bool $onlyTaxRelevant = true): string
+    public function calculateWinLoss(PriceConverter $priceConverter, Coin $coin): FifoWinLossResult
     {
-        $soldEurSum = $priceConverter->getEurValueApiOptionalSingle($this->_sellTransaction, $coin);
-        $boughtEurSum = '0.0';
+        $taxableAmount = $this->_sellTransaction->getValue();
+        $totalAmount = '0.0';
+        $totalBoughtEurSum = '0.0';
+        $taxableBoughtEurSum = '0.0';
 
         foreach ($this->_backingFifoTransactions as $backedBy) {
-            if ($backedBy->isTaxRelevant()) {
-                $usedQuota = bcdiv($backedBy->getCurrentUsedAmount(), $backedBy->getTransaction()->getValue());
-                $totalTxEurValue = $priceConverter->getEurValueApiOptionalSingle($backedBy->getTransaction(), $coin);
-                $usedEurValue = bcmul($usedQuota, $totalTxEurValue);
-                $boughtEurSum = bcadd($boughtEurSum, $usedEurValue);
+            $usedQuota = bcdiv($backedBy->getCurrentUsedAmount(), $backedBy->getTransaction()->getValue());
+            $totalTxEurValue = $priceConverter->getEurValueApiOptionalSingle($backedBy->getTransaction(), $coin);
+            $usedEurValue = bcmul($usedQuota, $totalTxEurValue);
+            $totalBoughtEurSum = bcadd($totalBoughtEurSum, $usedEurValue);
+
+            $totalAmount = bcadd($totalAmount, $backedBy->getCurrentUsedAmount());
+
+            if (!$backedBy->isTaxRelevant()) {
+                $taxableAmount = bcsub($taxableAmount, $backedBy->getCurrentUsedAmount());
+            } else {
+                $taxableBoughtEurSum = bcadd($taxableBoughtEurSum, $usedEurValue);
             }
         }
 
-        return bcsub($soldEurSum, $boughtEurSum);
+        $taxableSoldEurSum = $priceConverter->getEurValuePlainApiOptional($taxableAmount, $coin, $this->_sellTransaction->getDatetimeUtc());
+        $totalSoldEurSum = $priceConverter->getEurValuePlainApiOptional($this->_sellTransaction->getValue(), $coin, $this->_sellTransaction->getDatetimeUtc());
+
+        $winLoss = bcsub($totalSoldEurSum, $totalBoughtEurSum);
+        $taxRelevantWinLoss = bcsub($taxableSoldEurSum, $taxableBoughtEurSum);
+
+        return new FifoWinLossResult(
+            $winLoss,
+            $taxRelevantWinLoss,
+            $taxableAmount,
+            $totalAmount,
+            $totalBoughtEurSum,
+            $taxableBoughtEurSum,
+            $totalSoldEurSum,
+            $taxableSoldEurSum,
+        );
     }
 }

@@ -373,12 +373,16 @@ input.error {
     border-right: 0;
 }
 
+.table-body td.bold {
+    font-weight: bold;
+}
+
 .breadcrumb {
     font-size: 0.8em;
     background-color: #ddd;
     padding: 8px 15px 8px 15px;
     border-radius: 5px;
-    width: 90px;
+    width: 70px;
 }
 
 .breadcrumb .material-icons {

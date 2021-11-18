@@ -4,22 +4,12 @@ use Core\Calc\Fifo\FifoTransaction;
 use Core\Calc\PriceConverter;
 use Model\Coin;
 
-function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $priceConverter): array
-{
-    $buyPrice = $priceConverter->getEurValueApiOptionalSingle($backingTx->getTransaction(), $coin);
-    $buyPrice = bcdiv($buyPrice, $backingTx->getTransaction()->getValue());
-    return [
-        bcmul($buyPrice, $backingTx->getCurrentUsedAmount()),
-        $buyPrice
-    ];
-}
-
 ?>
 <section class="flexbox flexbox-center">
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
-            <a href="javascript:window.close()" class="breadcrumb flexbox">
-                <span class="material-icons">arrow_back</span><span>Schließen</span>
+            <a href="<?= $this->getActionUrl('index'); ?>?<?= $this->back_filter; ?>" class="breadcrumb flexbox">
+                <span class="material-icons">arrow_back</span><span>Zurück</span>
             </a>
             <div class="flexbox flex-gap">
                 <a href="<?= $this->getActionUrl('edit'); ?>?id=<?= $this->order_id; ?>">
@@ -116,8 +106,8 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
                     <td>Verkauf</td>
                     <td><?= $this->order_data['base']['coin']->getSymbol(); ?></td>
                     <td><?= format_number($this->order_data['base']['tx']->getValue()); ?></td>
-                    <td><?= format_number($this->value_eur['base'], 2, 2); ?> EUR
-                        (<?= format_number(bcdiv($this->value_eur['base'], $this->order_data['base']['tx']->getValue()), 2, 2); ?>
+                    <td><?= bcround($this->value_eur['base']); ?> EUR
+                        (<?= bcround(bcdiv($this->value_eur['base'], $this->order_data['base']['tx']->getValue())); ?>
                         EUR)
                     </td>
                     <?php if ($this->order_data['base']['coin']->getSymbol() === PriceConverter::EUR_COIN_SYMBOL): ?>
@@ -136,25 +126,16 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
                                 </tr>
                                 </thead>
                                 <tbody class="table-body">
-                                <?php
-                                $tokenSum = '0.0';
-                                $fiatSum = '0.0';
-                                ?>
                                 <?php foreach ($this->base_data['sale']->getBackingFifoTransactions() as $backingTx): ?>
-                                    <?php
-                                    list($buyPrice, $coinCost) = getBuyPrice($backingTx, $this->order_data['base']['coin'], $this->price_converter);
-
-                                    $tokenSum = bcadd($tokenSum, $backingTx->getCurrentUsedAmount());
-                                    $fiatSum = bcadd($fiatSum, $buyPrice);
-                                    ?>
+                                    <?php list($buyPrice, $coinCost) = $backingTx->getCurrentUsedEurValue($this->order_data['base']['coin'], $this->price_converter); ?>
                                     <tr>
-                                            <td><?= $backingTx->getTransaction()->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i'); ?>
+                                        <td><?= $backingTx->getTransaction()->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i'); ?>
                                             Uhr
                                         </td>
                                         <td><?= format_number($backingTx->getTransaction()->getValue()); ?></td>
                                         <td><?= format_number($backingTx->getCurrentUsedAmount()); ?></td>
-                                        <td class="no-border-right"><?= format_number($buyPrice, 2, 2); ?> EUR
-                                            (<?= format_number($coinCost, 2, 2) ?> EUR)<br>
+                                        <td class="no-border-right"><?= bcround($buyPrice); ?> EUR
+                                            (<?= bcround($coinCost) ?> EUR)<br>
                                             <?php if (!$backingTx->isTaxRelevant()): ?><span class="hint">Kein steuerpflichtiger Verkauf</span><?php endif; ?>
                                         </td>
                                     </tr>
@@ -162,8 +143,8 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
                                 <tr>
                                     <td class="no-border-bot">SUMME</td>
                                     <td class="no-border-bot"></td>
-                                    <td class="no-border-bot"><?= format_number($tokenSum); ?></td>
-                                    <td class="no-border-bot no-border-right"><?= format_number($fiatSum, 2, 2); ?>
+                                    <td class="no-border-bot"><?= format_number($this->base_win_loss->getTotalAmount()); ?></td>
+                                    <td class="no-border-bot no-border-right"><?= bcround($this->base_win_loss->getTotalBoughtEurSum()); ?>
                                         EUR
                                     </td>
                                 </tr>
@@ -176,8 +157,8 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
                     <td>Kauf</td>
                     <td><?= $this->order_data['quote']['coin']->getSymbol(); ?></td>
                     <td><?= format_number($this->order_data['quote']['tx']->getValue()); ?></td>
-                    <td><?= format_number($this->value_eur['quote'], 2, 2); ?> EUR
-                        (<?= format_number(bcdiv($this->value_eur['quote'], $this->order_data['quote']['tx']->getValue()), 2, 2); ?>
+                    <td><?= bcround($this->value_eur['quote']); ?> EUR
+                        (<?= bcround(bcdiv($this->value_eur['quote'], $this->order_data['quote']['tx']->getValue())); ?>
                         EUR)
                     </td>
                     <td></td>
@@ -187,54 +168,54 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
                         <td>Verkauf (Gebühren)</td>
                         <td><?= $this->order_data['fee']['coin']->getSymbol(); ?></td>
                         <td><?= format_number($this->order_data['fee']['tx']->getValue()); ?></td>
-                        <td><?= format_number($this->value_eur['fee'], 2, 2); ?> EUR
-                            (<?= format_number(bcdiv($this->value_eur['fee'], $this->order_data['fee']['tx']->getValue()), 2, 2); ?>
+                        <td><?= bcround($this->value_eur['fee']); ?> EUR
+                            (<?= bcround(bcdiv($this->value_eur['fee'], $this->order_data['fee']['tx']->getValue())); ?>
                             EUR)
                         </td>
-                        <td class="no-padding">
-                            <table class="table">
-                                <thead class="table-head">
-                                <tr>
-                                    <th>Zeitpunkt</th>
-                                    <th>Gekaufte Menge</th>
-                                    <th>In dieser Order<br/>verkaufte Menge</th>
-                                    <th class="no-border-right">Wert der verkauften<br/> Menge beim Kauf (Preis)</th>
-                                </tr>
-                                </thead>
-                                <tbody class="table-body">
-                                <?php
-                                $feeTokenSum = '0.0';
-                                $feeFiatSum = '0.0';
-                                ?>
-                                <?php foreach ($this->fee_data['sale']->getBackingFifoTransactions() as $backingTx): ?>
-                                    <?php
-                                    list($buyPrice, $coinCost) = getBuyPrice($backingTx, $this->order_data['fee']['coin'], $this->price_converter);
-
-                                    $feeTokenSum = bcadd($feeTokenSum, $backingTx->getCurrentUsedAmount());
-                                    $feeFiatSum = bcadd($feeFiatSum, $buyPrice);
-                                    ?>
+                        <?php if ($this->order_data['base']['coin']->getSymbol() === PriceConverter::EUR_COIN_SYMBOL): ?>
+                            <td class="hint">Für EUR werden keine Herkunftskäufe berechnet, da 1 EUR immer den Preis 1
+                                EUR
+                                hat.
+                            </td>
+                        <?php else: ?>
+                            <td class="no-padding">
+                                <table class="table">
+                                    <thead class="table-head">
                                     <tr>
-                                        <td><?= $backingTx->getTransaction()->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i'); ?>
-                                            Uhr
-                                        </td>
-                                        <td><?= format_number($backingTx->getTransaction()->getValue()); ?></td>
-                                        <td><?= format_number($backingTx->getCurrentUsedAmount()); ?></td>
-                                        <td class="no-border-right"><?= format_number($buyPrice, 2, 2); ?> EUR
-                                            (<?= format_number($coinCost, 2, 2) ?> EUR)
+                                        <th>Zeitpunkt</th>
+                                        <th>Gekaufte Menge</th>
+                                        <th>In dieser Order<br/>verkaufte Menge</th>
+                                        <th class="no-border-right">Wert der verkauften<br/> Menge beim Kauf (Preis)
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-body">
+                                    <?php foreach ($this->fee_data['sale']->getBackingFifoTransactions() as $backingTx): ?>
+                                        <?php list($buyPrice, $coinCost) = $backingTx->getCurrentUsedEurValue($this->order_data['fee']['coin'], $this->price_converter); ?>
+                                        <tr>
+                                            <td><?= $backingTx->getTransaction()->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i'); ?>
+                                                Uhr
+                                            </td>
+                                            <td><?= format_number($backingTx->getTransaction()->getValue()); ?></td>
+                                            <td><?= format_number($backingTx->getCurrentUsedAmount()); ?></td>
+                                            <td class="no-border-right"><?= bcround($buyPrice); ?> EUR
+                                                (<?= bcround($coinCost) ?> EUR)<br>
+                                                <?php if (!$backingTx->isTaxRelevant()): ?><span class="hint">Kein steuerpflichtiger Verkauf</span><?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    <tr>
+                                        <td class="no-border-bot">SUMME</td>
+                                        <td class="no-border-bot"></td>
+                                        <td class="no-border-bot"><?= format_number($this->fee_win_loss->getTotalAmount()); ?></td>
+                                        <td class="no-border-bot no-border-right"><?= bcround($this->fee_win_loss->getTotalBoughtEurSum()); ?>
+                                            EUR
                                         </td>
                                     </tr>
-                                <?php endforeach; ?>
-                                <tr>
-                                    <td class="no-border-bot">SUMME</td>
-                                    <td class="no-border-bot"></td>
-                                    <td class="no-border-bot"><?= format_number($feeTokenSum); ?></td>
-                                    <td class="no-border-bot no-border-right"><?= format_number($feeFiatSum, 2, 2); ?>
-                                        EUR
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </td>
+                                    </tbody>
+                                </table>
+                            </td>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </tr>
                 </tbody>
@@ -242,26 +223,94 @@ function getBuyPrice(FifoTransaction $backingTx, Coin $coin, PriceConverter $pri
 
         </div>
         <div class="w12 m01">
-            <?php if (isset($fiatSum)): ?>
+            <?php if ($this->base_win_loss !== null && $this->order_data['base']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL): ?>
                 <div class="flexbox flex-gap flex-end flex-stretch">
                     <h2 class="h2" style="margin-top: 6px">Erzielter Gewinn durch Verkauf des Tokens:</h2>
                     <div>
-                        <?php
-                        $winLoss = bcsub($this->value_eur['base'], $fiatSum);
-                        ?>
-                        <span class="big-value no-margin <?= bccomp($winLoss, '0.0') < 0 ? 'red' : ''; ?>"><?= format_number($winLoss, 2, 2) ?></span>
+                        <span class="big-value no-margin <?= bccomp($this->base_win_loss->getTotalWinLoss(), '0.0') < 0 ? 'red' : ''; ?>"><?= bcround($this->base_win_loss->getTotalWinLoss()); ?></span>
                         <span class="hint">EUR</span>
                     </div>
                 </div>
             <?php endif; ?>
-            <?php if (isset($feeFiatSum)): ?>
+            <?php if ($this->fee_win_loss !== null && $this->order_data['fee']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL): ?>
                 <div class="flexbox flex-gap flex-end flex-stretch m01">
                     <h2 class="h2" style="margin-top: 6px">Erzielter Gewinn durch Verkauf des Gebühr-Tokens:</h2>
                     <div>
-                        <?php
-                        $winLoss = bcsub($this->value_eur['fee'], $feeFiatSum);
-                        ?>
-                        <span class="big-value no-margin <?= bccomp($winLoss, '0.0') < 0 ? 'red' : ''; ?>"><?= format_number($winLoss, 2, 2) ?></span>
+                        <span class="big-value no-margin <?= bccomp($this->fee_win_loss->getTotalWinLoss(), '0.0') < 0 ? 'red' : ''; ?>"><?= bcround($this->fee_win_loss->getTotalWinLoss()); ?></span>
+                        <span class="hint">EUR</span>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($this->base_win_loss !== null && $this->order_data['base']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL
+            || $this->fee_win_loss !== null && $this->order_data['fee']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL): ?>
+            <div class="w12 container m01 flexbox">
+                <h2 class="h2">Steuerdetails</h2>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($this->base_win_loss !== null && $this->order_data['base']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL): ?>
+            <div class="w6">
+                <table class="table">
+                    <tbody class="table-body">
+                    <tr>
+                        <td class="bold">Steuerlich relevante verkaufte Menge</td>
+                        <td><?= format_number($this->base_win_loss->getTaxableAmount()); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Steuerlich relevanter Verkaufswert</td>
+                        <td><?= bcround($this->base_win_loss->getTaxableSoldEurSum()); ?> EUR</td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Steuerlich relevanter Kaufwert</td>
+                        <td><?= bcround($this->base_win_loss->getTaxableBoughtEurSum()); ?> EUR</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+        <?php if ($this->fee_win_loss !== null && $this->order_data['fee']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL): ?>
+            <div class="w6">
+                <hr>
+            </div>
+            <div class="w6">
+                <table class="table">
+                    <tbody class="table-body">
+                    <tr>
+                        <td class="bold">Steuerlich relevante verkaufte Menge (Gebühr)</td>
+                        <td><?= format_number($this->fee_win_loss->getTaxableAmount()); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Steuerlich relevanter Verkaufswert (Gebühr)</td>
+                        <td><?= bcround($this->fee_win_loss->getTaxableSoldEurSum()); ?> EUR</td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Steuerlich relevanter Kaufwert (Gebühr)</td>
+                        <td><?= bcround($this->fee_win_loss->getTaxableBoughtEurSum()); ?> EUR</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+
+        <div class="w12 m01">
+            <?php if ($this->base_win_loss !== null && $this->order_data['base']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL): ?>
+                <div class="flexbox flex-gap flex-end flex-stretch">
+                    <h2 class="h2" style="margin-top: 6px">Erzielter steuerlich relevanter Gewinn durch Verkauf des
+                        Tokens:</h2>
+                    <div>
+                        <span class="big-value no-margin <?= bccomp($this->base_win_loss->getTaxRelevantWinLoss(), '0.0') < 0 ? 'red' : ''; ?>"><?= bcround($this->base_win_loss->getTaxRelevantWinLoss()); ?></span>
+                        <span class="hint">EUR</span>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if ($this->fee_win_loss !== null && $this->order_data['fee']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL): ?>
+                <div class="flexbox flex-gap flex-end flex-stretch">
+                    <h2 class="h2" style="margin-top: 6px">Erzielter steuerlich relevanter Gewinn durch Verkauf des
+                        Gebühren-Tokens:</h2>
+                    <div>
+                        <span class="big-value no-margin <?= bccomp($this->fee_win_loss->getTaxRelevantWinLoss(), '0.0') < 0 ? 'red' : ''; ?>"><?= bcround($this->fee_win_loss->getTaxRelevantWinLoss()); ?></span>
                         <span class="hint">EUR</span>
                     </div>
                 </div>

@@ -44,6 +44,7 @@ final class DashboardController extends Controller
             $resp->setViewVar('coins', $portfolioValue[WinLossCalculator::ARRAY_ELEM_COINS]);
             $resp->setViewVar('win_lose_eur_per_coin', $yearlyWinLose[WinLossCalculator::ARRAY_ELEM_PER_COIN]);
             $resp->setViewVar('win_lose_eur_total', $yearlyWinLose[WinLossCalculator::ARRAY_ELEM_TOTAL]);
+            $resp->setViewVar('invested_eur', $yearlyWinLose[WinLossCalculator::ARRAY_ELEM_INVESTED_EUR]);
 
             $resp->setHtmlTitle('Dashboard');
             $resp->renderView('index');

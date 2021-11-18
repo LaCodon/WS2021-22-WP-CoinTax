@@ -58,7 +58,7 @@ function debug(string $string): void
  * @param int $decimalCount
  * @return string
  */
-function bcround(string $number, int $decimalCount = 2): string
+function bcround(string $number, int $decimalCount = 4): string
 {
     if (str_contains($number, '.') === false) {
         return $number;

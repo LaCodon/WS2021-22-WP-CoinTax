@@ -89,6 +89,20 @@ abstract class Session
         $_SESSION['framework_authorized_user'] = $user;
     }
 
+    public static function setCurrentFilter(array $filter): void
+    {
+        $_SESSION['cointax_filter'] = http_build_query($filter);
+    }
+
+    public static function getCurrentFilterQuery(): string
+    {
+        if (isset($_SESSION['cointax_filter'])) {
+            return $_SESSION['cointax_filter'];
+        }
+
+        return '';
+    }
+
     public static function getAuthorizedUser(): User|null
     {
         if (isset($_SESSION['framework_authorized_user'])) {
