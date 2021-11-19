@@ -7,7 +7,7 @@ use Framework\Form\TextInput;
 <section class="flexbox flexbox-center">
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
-            <h2 class="h2"><?= isset($this->edit_order) ? 'Order bearbeiten' : 'Order hinzufügen'; ?></h2>
+            <h2 class="h2"><?= isset($this->edit_order) ? 'Trade bearbeiten' : 'Trade hinzufügen'; ?></h2>
             <a href="<?= isset($this->edit_order) ? $this->getActionUrl('details') . '?id=' . $this->order_id : $this->getActionUrl('index') . '?' . $this->back_filter; ?>">
                 <button class="btn warning flexbox"><span class="material-icons">highlight_off</span>&nbsp;Abbrechen
                 </button>

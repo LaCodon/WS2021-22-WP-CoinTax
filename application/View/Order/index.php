@@ -7,9 +7,9 @@ use Framework\Form\TextInput;
 <section class="flexbox flexbox-center">
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
-            <h2 class="h2">Orderübersicht <span class="hint">(<?= count($this->orders); ?>)</span></h2>
+            <h2 class="h2">Tradeübersicht <span class="hint">(<?= count($this->orders); ?>)</span></h2>
             <a href="<?= $this->getActionUrl('add'); ?>">
-                <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp; Order
+                <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp; Trade
                     hinzufügen
                 </button>
             </a>
@@ -135,7 +135,7 @@ use Framework\Form\TextInput;
                                 <button class="btn warning flexbox flexbox-center flex-gap"
                                         data-delete-order="<?= $orderId; ?>">
                                     <span class="material-icons">delete_outline</span>
-                                    Order löschen
+                                    Trade löschen
                                 </button>
                             </a>
 

@@ -8,14 +8,14 @@ function deleteOrderAction() {
         }
 
         deleteBtn.onclick = function () {
-            if (confirm('Soll diese Order wirklich gelöscht werden?')) {
+            if (confirm('Soll dieser Trade wirklich gelöscht werden?')) {
                 const orderId = deleteBtn.getAttribute('data-delete-order')
 
                 const xhr = new XMLHttpRequest()
                 xhr.open('GET', './delete.do?xhr=1&id=' + orderId)
 
                 xhr.onerror = function () {
-                    alert('Unerwarteter Fehler beim löschen der Order')
+                    alert('Unerwarteter Fehler beim löschen des Trades')
                 }
 
                 xhr.onload = function () {

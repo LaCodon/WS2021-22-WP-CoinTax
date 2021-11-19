@@ -154,7 +154,7 @@ final class OrderController extends Controller
         if ($render) {
             $resp->setViewVar('back_filter', Session::getCurrentFilterQuery());
 
-            $resp->setHtmlTitle('Order hinzufügen');
+            $resp->setHtmlTitle('Trade hinzufügen');
             $resp->renderView('add');
         }
     }
@@ -413,7 +413,7 @@ final class OrderController extends Controller
             $resp->setViewVar('value_eur', $valueEur);
             $resp->setViewVar('price_converter', $priceConverter);
 
-            $resp->setHtmlTitle('Orderdetails');
+            $resp->setHtmlTitle('Tradedetails');
             $resp->renderView('details');
         }
     }

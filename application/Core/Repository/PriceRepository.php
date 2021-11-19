@@ -2,10 +2,12 @@
 
 namespace Core\Repository;
 
+use Core\Calc\PriceConverter;
 use Core\Coingecko\CoingeckoAPI;
 use DateTime;
 use DateTimeZone;
 use Model\Coin;
+use Model\Transaction;
 use PDO;
 
 final class PriceRepository
@@ -69,6 +71,33 @@ final class PriceRepository
 
         $obj = $stmt->fetchObject();
         return $obj->eur_value;
+    }
+
+    /**
+     * Get the EUR value of the given transaction from a corresponding transaction in the same order if available
+     * @param Transaction $transaction
+     * @return string|null
+     */
+    public function getTransactionEurValueFromOrder(Transaction $transaction): string|null
+    {
+        $transactionId = $transaction->getId();
+        $eurSymbol = PriceConverter::EUR_COIN_SYMBOL;
+
+        $stmt = $this->_pdo->prepare('SELECT otherT.coin_value FROM `transaction` t
+                                                JOIN `order` o ON o.base_transaction = t.transaction_id OR o.quote_transaction = t.transaction_id
+                                                JOIN `transaction` otherT ON 
+                                                    (otherT.transaction_id = o.base_transaction AND otherT.transaction_id != t.transaction_id) 
+                                                    OR (otherT.transaction_id = o.quote_transaction AND otherT.transaction_id != t.transaction_id)
+                                               JOIN `coin` c ON otherT.coin_id = c.coin_id
+                                            WHERE t.transaction_id = :txId AND c.symbol = :eurSymbol');
+        $stmt->bindParam(':txId', $transactionId, PDO::PARAM_INT);
+        $stmt->bindParam(':eurSymbol', $eurSymbol);
+
+        if ($stmt->execute() === false || $stmt->rowCount() !== 1) {
+            return null;
+        }
+
+        return $stmt->fetchObject()->coin_value;
     }
 
     /**

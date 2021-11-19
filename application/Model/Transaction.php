@@ -95,4 +95,5 @@ final class Transaction
 
         $this->_id = $id;
     }
+    
 }

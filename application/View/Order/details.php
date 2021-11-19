@@ -13,7 +13,7 @@ use Model\Coin;
             </a>
             <div class="flexbox flex-gap">
                 <a href="<?= $this->getActionUrl('edit'); ?>?id=<?= $this->order_id; ?>">
-                    <button class="btn flexbox"><span class="material-icons">edit</span>&nbsp; Order bearbeiten
+                    <button class="btn flexbox"><span class="material-icons">edit</span>&nbsp; Trade bearbeiten
                     </button>
                 </a>
                 <a class="flexbox flex-col flex-stretch"
@@ -21,7 +21,7 @@ use Model\Coin;
                     <button class="btn warning flexbox flexbox-center flex-gap"
                             data-delete-order="<?= $this->order_id; ?>" data-closetab="true">
                         <span class="material-icons">delete_outline</span>
-                        Order löschen
+                        Trade löschen
                     </button>
                 </a>
             </div>
@@ -32,7 +32,7 @@ use Model\Coin;
 <section class="flexbox flexbox-center">
     <div class="flexbox flexbox-center flex-col flex-gap w13">
         <div class="w12 container m01 flexbox">
-            <h2 class="h2">Orderdetails</h2>
+            <h2 class="h2">Tradedetails</h2>
         </div>
     </div>
 </section>
@@ -121,7 +121,7 @@ use Model\Coin;
                                 <tr>
                                     <th>Zeitpunkt</th>
                                     <th>Gekaufte Menge</th>
-                                    <th>In dieser Order<br/>verkaufte Menge</th>
+                                    <th>In diesem Trade<br/>verkaufte Menge</th>
                                     <th class="no-border-right">Wert der verkauften<br/>Menge beim Kauf (Preis)</th>
                                 </tr>
                                 </thead>
@@ -184,7 +184,7 @@ use Model\Coin;
                                     <tr>
                                         <th>Zeitpunkt</th>
                                         <th>Gekaufte Menge</th>
-                                        <th>In dieser Order<br/>verkaufte Menge</th>
+                                        <th>In diesem Trade<br/>verkaufte Menge</th>
                                         <th class="no-border-right">Wert der verkauften<br/> Menge beim Kauf (Preis)
                                         </th>
                                     </tr>
@@ -266,6 +266,10 @@ use Model\Coin;
                         <td class="bold">Steuerlich relevanter Kaufwert</td>
                         <td><?= bcround($this->base_win_loss->getTaxableBoughtEurSum()); ?> EUR</td>
                     </tr>
+                    <tr>
+                        <td class="bold">Differenz</td>
+                        <td><?= bcround($this->base_win_loss->getTaxRelevantWinLoss()); ?> EUR</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -288,6 +292,10 @@ use Model\Coin;
                     <tr>
                         <td class="bold">Steuerlich relevanter Kaufwert (Gebühr)</td>
                         <td><?= bcround($this->fee_win_loss->getTaxableBoughtEurSum()); ?> EUR</td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Differenz (Gebühr)</td>
+                        <td><?= bcround($this->fee_win_loss->getTaxRelevantWinLoss()); ?> EUR</td>
                     </tr>
                     </tbody>
                 </table>

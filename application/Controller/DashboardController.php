@@ -14,6 +14,9 @@ use Exception;
 use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
+use Framework\Validation\Input;
+use Framework\Validation\InputValidator;
+use Framework\Validation\ValidationResult;
 use Model\Transaction;
 use Model\User;
 
@@ -33,18 +36,32 @@ final class DashboardController extends Controller
 
         $coins = $coinRepo->getUniqueCoinsByUserId($currentUser->getId());
 
+        $input = InputValidator::parseAndValidate([
+            new Input(INPUT_GET, 'year', 'Jahr', false, FILTER_VALIDATE_INT)
+        ]);
+
+
+        $year = intval((new DateTime('now', new DateTimeZone('Europe/Berlin')))->format('Y'));
+        if ($input->getValue('year') !== '') {
+            $year = intval($input->getValue('year'));
+            $input->setValue('year', $year);
+        }
+
+        Session::setInputValidationResult($input);
+
         try {
             $portfolioValue = $winLossCalculator->calculatePortfolioValue($currentUser, $coins);
-            $yearlyWinLose = $winLossCalculator->calculateTotalWinLossForYear($currentUser, $coins, 2021, false);
+            $yearlyWinLose = $winLossCalculator->calculateTotalWinLossForYear($currentUser, $coins, $year, false);
 
             $resp->setViewVar('firstname', $currentUser->getFirstName());
+            $resp->setViewVar('calc_year', $year);
+
             $resp->setViewVar('portfolio_value', $portfolioValue[WinLossCalculator::ARRAY_ELEM_EUR_SUM]);
             $resp->setViewVar('coin_sums', $portfolioValue[WinLossCalculator::ARRAY_ELEM_COIN_SUMS]);
             $resp->setViewVar('coin_values', $portfolioValue[WinLossCalculator::ARRAY_ELEM_COIN_VALUES]);
             $resp->setViewVar('coins', $portfolioValue[WinLossCalculator::ARRAY_ELEM_COINS]);
             $resp->setViewVar('win_lose_eur_per_coin', $yearlyWinLose[WinLossCalculator::ARRAY_ELEM_PER_COIN]);
             $resp->setViewVar('win_lose_eur_total', $yearlyWinLose[WinLossCalculator::ARRAY_ELEM_TOTAL]);
-            $resp->setViewVar('invested_eur', $yearlyWinLose[WinLossCalculator::ARRAY_ELEM_INVESTED_EUR]);
 
             $resp->setHtmlTitle('Dashboard');
             $resp->renderView('index');

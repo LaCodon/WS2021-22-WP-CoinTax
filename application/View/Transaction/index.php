@@ -10,7 +10,7 @@ use Model\Transaction;
         <div class="flexbox w12">
             <h2 class="h2">Transaktionsübersicht <span class="hint">(<?= $this->tx_count; ?>)</span></h2>
             <a href="<?= $this->getActionUrl('add', 'order'); ?>">
-                <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp; Order
+                <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp; Trade
                     hinzufügen
                 </button>
             </a>

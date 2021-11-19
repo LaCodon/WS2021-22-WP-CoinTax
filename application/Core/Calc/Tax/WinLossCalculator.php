@@ -25,7 +25,6 @@ final class WinLossCalculator
 
     const ARRAY_ELEM_TOTAL = 'total';
     const ARRAY_ELEM_PER_COIN = 'per_coin';
-    const ARRAY_ELEM_INVESTED_EUR = 'invested_eur';
 
     public function __construct(
         private PDO $_pdo,
@@ -166,16 +165,14 @@ final class WinLossCalculator
         $result = [
             self::ARRAY_ELEM_TOTAL => '0.0',
             self::ARRAY_ELEM_PER_COIN => [],
-            self::ARRAY_ELEM_INVESTED_EUR => '0.0',
         ];
 
         foreach ($coins as $coin) {
-            $winLoseForCoin = $this->calculateWinLoss($coin, $user, onlyTaxRelevant: $onlyTaxRelevant, year: $year);
-
             if ($coin->getSymbol() === PriceConverter::EUR_COIN_SYMBOL) {
-                $result[self::ARRAY_ELEM_INVESTED_EUR] = $winLoseForCoin;
                 continue;
             }
+
+            $winLoseForCoin = $this->calculateWinLoss($coin, $user, onlyTaxRelevant: $onlyTaxRelevant, year: $year);
 
             $result[self::ARRAY_ELEM_PER_COIN][$coin->getSymbol()] = $winLoseForCoin;
             $result[self::ARRAY_ELEM_TOTAL] = bcadd($result[self::ARRAY_ELEM_TOTAL], $winLoseForCoin);

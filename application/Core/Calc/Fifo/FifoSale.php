@@ -39,8 +39,7 @@ final class FifoSale
      * Calculates the total win / lost in EUR achieved by this coin sell
      * @param PriceConverter $priceConverter
      * @param Coin $coin
-     * @param bool $onlyTaxRelevant
-     * @return string
+     * @return FifoWinLossResult
      */
     public function calculateWinLoss(PriceConverter $priceConverter, Coin $coin): FifoWinLossResult
     {
@@ -64,8 +63,8 @@ final class FifoSale
             }
         }
 
-        $taxableSoldEurSum = $priceConverter->getEurValuePlainApiOptional($taxableAmount, $coin, $this->_sellTransaction->getDatetimeUtc());
-        $totalSoldEurSum = $priceConverter->getEurValuePlainApiOptional($this->_sellTransaction->getValue(), $coin, $this->_sellTransaction->getDatetimeUtc());
+        $taxableSoldEurSum = $priceConverter->getEurValueApiOptionalSingle($this->_sellTransaction, $coin, $taxableAmount);
+        $totalSoldEurSum = $priceConverter->getEurValueApiOptionalSingle($this->_sellTransaction, $coin);
 
         $winLoss = bcsub($totalSoldEurSum, $totalBoughtEurSum);
         $taxRelevantWinLoss = bcsub($taxableSoldEurSum, $taxableBoughtEurSum);

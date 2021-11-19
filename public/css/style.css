@@ -215,6 +215,10 @@ input.error {
     background-color: #31d2f2;
 }
 
+.btn.default.active {
+    background-color: #25a0b7;
+}
+
 .btn.warning {
     background-color: #c9303f;
 }

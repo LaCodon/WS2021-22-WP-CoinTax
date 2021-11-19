@@ -66,16 +66,26 @@ final class PriceConverter
      * Same as getEurValueApiOptional but for only one transaction
      * @param Transaction $transaction
      * @param Coin|null $coin
+     * @param string|null $actualAmount
      * @return string
      */
-    public function getEurValueApiOptionalSingle(Transaction $transaction, Coin|null $coin = null): string
+    public function getEurValueApiOptionalSingle(Transaction $transaction, Coin|null $coin = null, string|null $actualAmount = null): string
     {
+        if ($actualAmount === null) {
+            $actualAmount = $transaction->getValue();
+        }
+
         if ($coin === null) {
             $coin = $this->_coinRepo->get($transaction->getCoinId());
         }
 
         if ($coin->getSymbol() === self::EUR_COIN_SYMBOL) {
-            return $transaction->getValue();
+            return $actualAmount;
+        }
+
+        $price = $this->_priceRepo->getTransactionEurValueFromOrder($transaction);
+        if ($price !== null) {
+            return $price;
         }
 
         $price = $this->_priceRepo->get($coin, $transaction->getDatetimeUtc());
@@ -83,7 +93,7 @@ final class PriceConverter
             return '0.0';
         }
 
-        return bcmul($price, $transaction->getValue());
+        return bcmul($price, $actualAmount);
     }
 
     /**
