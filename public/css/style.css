@@ -607,3 +607,11 @@ nav {
 .no-margin {
     margin: 0;
 }
+
+.lh25 {
+    line-height: 25px;
+}
+
+.pointer {
+    cursor: pointer;
+}

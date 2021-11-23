@@ -2,6 +2,7 @@
 
 namespace Core\Repository;
 
+use Core\Exception\SqlException;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -167,6 +168,25 @@ final class TransactionRepository
         }
 
         return true;
+    }
+
+    /**
+     * @param int $transactionId
+     * @return bool
+     * @throws SqlException
+     */
+    public function isFeeTransaction(int $transactionId): bool
+    {
+        $stmt = $this->_pdo->prepare('SELECT transaction_id FROM transaction t
+                                                JOIN `order` o ON o.fee_transaction = t.transaction_id
+                                            WHERE t.transaction_id = :txId');
+        $stmt->bindParam(':txId', $transactionId, PDO::PARAM_INT);
+
+        if (!$stmt->execute()) {
+            throw new SqlException('Failed to execute statement');
+        }
+
+        return $stmt->rowCount() === 1;
     }
 
     /**
