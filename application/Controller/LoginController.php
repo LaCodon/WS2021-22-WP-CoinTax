@@ -50,6 +50,7 @@ final class LoginController extends Controller
             $resp->redirect($resp->getActionUrl('index'));
         }
 
+        Session::regenerateId(true);
         Session::setAuthorizedUser($user);
 
         $resp->redirect($resp->getActionUrl('index', 'dashboard'));

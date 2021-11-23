@@ -24,6 +24,7 @@
                 <a href="<?= $this->getActionUrl('index', 'dashboard'); ?>" class="nav-item <?= $this->_controllerName === 'Dashboard' ? 'active' : '' ?>">Übersicht</a>
                 <a href="<?= $this->getActionUrl('index', 'order'); ?>" class="nav-item <?= $this->_controllerName === 'Order' ? 'active' : '' ?>">Trades</a>
                 <a href="<?= $this->getActionUrl('index', 'transaction'); ?>" class="nav-item <?= $this->_controllerName === 'Transaction' ? 'active' : '' ?>">Transaktionen</a>
+                <a href="<?= $this->getActionUrl('index', 'report'); ?>" class="nav-item <?= $this->_controllerName === 'Report' ? 'active' : '' ?>">Gewinnreport</a>
             <?php endif; ?>
         </div>
         <div class="flexbox has-hover-child">

@@ -136,7 +136,7 @@ final class OrderController extends Controller
         if ($render) {
             $resp->setViewVar('back_filter', Session::getCurrentFilterQuery());
 
-            $resp->setHtmlTitle('Orderübersicht');
+            $resp->setHtmlTitle('Tradeübersicht');
             $resp->renderView('index');
         }
     }
@@ -303,7 +303,7 @@ final class OrderController extends Controller
         if ($edit) {
             $resp->redirect($resp->getActionUrl('details') . '?id=' . $input->getValue('id'));
         } else {
-            $resp->redirect($resp->getActionUrl('index'));
+            $resp->redirect($resp->getActionUrl('details') . '?id=' . $order->getId());
         }
     }
 

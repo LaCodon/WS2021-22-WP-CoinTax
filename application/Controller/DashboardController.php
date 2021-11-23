@@ -36,18 +36,7 @@ final class DashboardController extends Controller
 
         $coins = $coinRepo->getUniqueCoinsByUserId($currentUser->getId());
 
-        $input = InputValidator::parseAndValidate([
-            new Input(INPUT_GET, 'year', 'Jahr', false, FILTER_VALIDATE_INT)
-        ]);
-
-
-        $year = intval((new DateTime('now', new DateTimeZone('Europe/Berlin')))->format('Y'));
-        if ($input->getValue('year') !== '') {
-            $year = intval($input->getValue('year'));
-            $input->setValue('year', $year);
-        }
-
-        Session::setInputValidationResult($input);
+        $year = self::getCalcYear();
 
         try {
             $portfolioValue = $winLossCalculator->calculatePortfolioValue($currentUser, $coins);
@@ -68,6 +57,23 @@ final class DashboardController extends Controller
         } catch (Exception $e) {
             $resp->abort('error during tax calculation:' . $e->getMessage(), Framework::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public static function getCalcYear(): int
+    {
+        $input = InputValidator::parseAndValidate([
+            new Input(INPUT_GET, 'year', 'Jahr', false, FILTER_VALIDATE_INT)
+        ]);
+
+        $year = intval((new DateTime('now', new DateTimeZone('Europe/Berlin')))->format('Y'));
+        if ($input->getValue('year') !== '') {
+            $year = intval($input->getValue('year'));
+            $input->setValue('year', $year);
+        }
+
+        Session::setInputValidationResult($input);
+
+        return $year;
     }
 
 }

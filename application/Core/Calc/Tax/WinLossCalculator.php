@@ -157,7 +157,7 @@ final class WinLossCalculator
      * @param array $coins
      * @param int $year
      * @param bool $onlyTaxRelevant
-     * @return array
+     * @return array #[ArrayShape([self::ARRAY_ELEM_TOTAL => "string", self::ARRAY_ELEM_PER_COIN => "array"])]
      * @throws WinLossNotCalculableException
      */
     public function calculateTotalWinLossForYear(User $user, array $coins, int $year, bool $onlyTaxRelevant): array
@@ -176,6 +176,57 @@ final class WinLossCalculator
 
             $result[self::ARRAY_ELEM_PER_COIN][$coin->getSymbol()] = $winLoseForCoin;
             $result[self::ARRAY_ELEM_TOTAL] = bcadd($result[self::ARRAY_ELEM_TOTAL], $winLoseForCoin);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Coin $coin
+     * @param User $user
+     * @param int $year
+     * @return array #[ArrayShape([self::ARRAY_ELEM_TOTAL => "string", self::ARRAY_ELEM_COMPENSATIONS => "array"])]
+     * @throws WinLossNotCalculableException
+     */
+    public function calculateWinReport(Coin $coin, User $user, int $year): array
+    {
+        $transactionRepo = new TransactionRepository($this->_pdo);
+
+        $transactions = $transactionRepo->getByCoin($user->getId(), $coin->getId());
+
+        $receiveFifo = new Fifo(Fifo::RECEIVE_FIFO);
+        $sendFifo = new Fifo(FIFO::SEND_FIFO);
+
+        foreach ($transactions as $tx) {
+            if ($tx->getType() === Transaction::TYPE_RECEIVE) {
+                $receiveFifo->push($tx);
+            } else {
+                $sendFifo->push($tx);
+            }
+        }
+
+        $result = [];
+
+        try {
+            while (($fifoTx = $sendFifo->pop()) !== null) {
+                $compensation = $receiveFifo->compensate($fifoTx->getTransaction());
+
+                if (APPLICATION_DEBUG === true) {
+                    echo 'Sold ' . $fifoTx->getTransaction()->getValue() . $coin->getSymbol() . ' backed by<br>';
+                    foreach ($compensation[Fifo::ARRAY_ELEM_SALE]->getBackingFifoTransactions() as $tx) {
+                        echo '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
+                        echo $tx->getTransaction()->getValue() . ' (actual used: ' . $tx->getCurrentUsedAmount() . ')';
+                        echo '<br>';
+                    }
+                    echo '<br><br>';
+                }
+
+                if ($fifoTx->getTransaction()->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('Y') === sprintf('%d', $year)) {
+                    $result[] = $compensation;
+                }
+            }
+        } catch (InvalidFifoException $e) {
+            throw new WinLossNotCalculableException('error during win-loss-calculation: ' . $e->getMessage());
         }
 
         return $result;

@@ -85,6 +85,10 @@ final class PriceConverter
 
         $price = $this->_priceRepo->getTransactionEurValueFromOrder($transaction);
         if ($price !== null) {
+            if ($actualAmount !== $transaction->getValue()) {
+                $price = bcdiv($price, $transaction->getValue());
+                $price = bcmul($price, $actualAmount);
+            }
             return $price;
         }
 

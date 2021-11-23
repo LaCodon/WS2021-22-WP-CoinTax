@@ -107,7 +107,7 @@ use Model\Coin;
                     <td><?= $this->order_data['base']['coin']->getSymbol(); ?></td>
                     <td><?= format_number($this->order_data['base']['tx']->getValue()); ?></td>
                     <td><?= bcround($this->value_eur['base']); ?> EUR
-                        (<?= bcround(bcdiv($this->value_eur['base'], $this->order_data['base']['tx']->getValue())); ?>
+                        (<?= bccomp($this->order_data['base']['tx']->getValue(), '0.00') !== 0 ? bcround(bcdiv($this->value_eur['base'], $this->order_data['base']['tx']->getValue())) : '0.00'; ?>
                         EUR)
                     </td>
                     <?php if ($this->order_data['base']['coin']->getSymbol() === PriceConverter::EUR_COIN_SYMBOL): ?>
@@ -158,7 +158,7 @@ use Model\Coin;
                     <td><?= $this->order_data['quote']['coin']->getSymbol(); ?></td>
                     <td><?= format_number($this->order_data['quote']['tx']->getValue()); ?></td>
                     <td><?= bcround($this->value_eur['quote']); ?> EUR
-                        (<?= bcround(bcdiv($this->value_eur['quote'], $this->order_data['quote']['tx']->getValue())); ?>
+                        (<?= bccomp($this->order_data['quote']['tx']->getValue(), '0.00') !== 0 ? bcround(bcdiv($this->value_eur['quote'], $this->order_data['quote']['tx']->getValue())) : '0,00'; ?>
                         EUR)
                     </td>
                     <td></td>
@@ -169,10 +169,10 @@ use Model\Coin;
                         <td><?= $this->order_data['fee']['coin']->getSymbol(); ?></td>
                         <td><?= format_number($this->order_data['fee']['tx']->getValue()); ?></td>
                         <td><?= bcround($this->value_eur['fee']); ?> EUR
-                            (<?= bcround(bcdiv($this->value_eur['fee'], $this->order_data['fee']['tx']->getValue())); ?>
+                            (<?= bccomp($this->order_data['fee']['tx']->getValue(), '0.00') !== 0 ? bcround(bcdiv($this->value_eur['fee'], $this->order_data['fee']['tx']->getValue())) : '0,00'; ?>
                             EUR)
                         </td>
-                        <?php if ($this->order_data['base']['coin']->getSymbol() === PriceConverter::EUR_COIN_SYMBOL): ?>
+                        <?php if ($this->order_data['fee']['coin']->getSymbol() === PriceConverter::EUR_COIN_SYMBOL): ?>
                             <td class="hint">Für EUR werden keine Herkunftskäufe berechnet, da 1 EUR immer den Preis 1
                                 EUR
                                 hat.

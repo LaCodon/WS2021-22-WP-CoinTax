@@ -20,6 +20,14 @@ final class FifoSale
     }
 
     /**
+     * @return Transaction
+     */
+    public function getSellTransaction(): Transaction
+    {
+        return $this->_sellTransaction;
+    }
+
+    /**
      * @return array
      */
     public function getBackingFifoTransactions(): array

@@ -150,7 +150,7 @@ final class Fifo
                     $this->popInternal();
             }
 
-            $result[self::ARRAY_ELEM_SALE]->addBackingFifoTransaction($currenTransaction);
+            $result[self::ARRAY_ELEM_SALE]->addBackingFifoTransaction(clone $currenTransaction);
         }
 
         // compensation was only successful if whole given transaction is funded
