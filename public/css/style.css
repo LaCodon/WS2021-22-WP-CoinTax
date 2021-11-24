@@ -615,3 +615,42 @@ nav {
 .pointer {
     cursor: pointer;
 }
+
+@media print {
+    body {
+        font-size: 0.8em;
+    }
+
+    header, footer, .hide-on-print, .material-icons {
+        display: none !important;
+    }
+
+    .w12 {
+        width: 95vw;
+    }
+
+    .m02 {
+        margin-top: 0;
+    }
+
+    .h2 {
+        font-size: 1.2em;
+    }
+
+    .big-value {
+        font-size: 1.6em;
+    }
+
+    .table-head th, .table-body td  {
+        border-width: 0 1pt 1pt 0;
+    }
+
+    button, thead.table-head, td, tr {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+
+    button {
+        page-break-before: always;
+    }
+}

@@ -9,7 +9,7 @@ use Core\Calc\Fifo\Fifo;
         <div class="flexbox w9 flex-start flex-col">
             <h2 class="h2">Gewinnreport <?= $this->calc_year; ?></h2>
         </div>
-        <div class="w3 flexbox">
+        <div class="w3 flexbox hide-on-print">
             Jahr
             <?php for ($y = $this->calc_year - 2; $y <= $this->calc_year + 1; ++$y): ?>
                 <a href="<?= $this->getActionUrl('index') . '?year=' . $y; ?>">
@@ -72,7 +72,7 @@ use Core\Calc\Fifo\Fifo;
                     </h3>
                 </button>
 
-                <div id="report-toggle-<?= $key; ?>" data-hide="true">
+                <div id="report-toggle-<?= $key; ?>">
                     <?php foreach ($coinReport['compensationReports'] as $compensationReport): ?>
                         <?php
                         $compensation = $compensationReport['compensation'];
