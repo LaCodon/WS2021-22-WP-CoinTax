@@ -59,7 +59,7 @@ final class DashboardController extends Controller
         }
     }
 
-    public static function getCalcYear(): int
+    public static function getCalcYear(bool $setInputValidationResult = true): int
     {
         $input = InputValidator::parseAndValidate([
             new Input(INPUT_GET, 'year', 'Jahr', false, FILTER_VALIDATE_INT)
@@ -71,7 +71,8 @@ final class DashboardController extends Controller
             $input->setValue('year', $year);
         }
 
-        Session::setInputValidationResult($input);
+        if ($setInputValidationResult === true)
+            Session::setInputValidationResult($input);
 
         return $year;
     }

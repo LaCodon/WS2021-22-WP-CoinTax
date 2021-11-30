@@ -3,8 +3,6 @@
 namespace Controller;
 
 use Core\Calc\Fifo\Fifo;
-use Core\Calc\Fifo\FifoSale;
-use Core\Calc\Fifo\FifoTransaction;
 use Core\Calc\PriceConverter;
 use Core\Calc\Tax\WinLossCalculator;
 use Core\Exception\WinLossNotCalculableException;
@@ -15,6 +13,7 @@ use DateTime;
 use DateTimeZone;
 use Framework\Exception\ViewNotFound;
 use Framework\Framework;
+use Framework\Html\Paginator;
 use Framework\Response;
 use Framework\Session;
 use Framework\Validation\Input;
@@ -95,7 +94,14 @@ final class OrderController extends Controller
         }
         // ----------------------- END input validation -----------------------
 
-        $orders = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin);
+        $itemsPerPage = 10;
+        $page = Paginator::getCurrentPage();
+        $orders = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin, $page, $itemsPerPage);
+
+        $totalOrderCount = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin, countOnly: true);
+        if (!Paginator::makePagination($resp, $itemsPerPage, $totalOrderCount)) {
+            $resp->redirect($resp->getActionUrl('index') . '?' . Session::getCurrentFilterQuery());
+        }
 
         $enrichedOrders = [];
 

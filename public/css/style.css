@@ -169,6 +169,11 @@ option:hover, .active {
     row-gap: 5px;
 }
 
+.form-elem.check-elem {
+    flex-direction: row;
+    gap: 10px;
+}
+
 .search-elem > .form-elem {
     flex-direction: row !important;
     justify-content: space-between;
@@ -452,6 +457,40 @@ input.error {
     border-radius: .25rem;
 }
 
+.paginator {
+    position: relative;
+    border: 1px solid #e0e0e0;
+    align-items: center;
+}
+
+.paginator-item {
+    background-color: #fff;
+    padding: 10px 15px;
+    border-right: 1px solid #e0e0e0;
+}
+
+.paginator-item > .material-icons {
+    line-height: normal;
+}
+
+.paginator-item:last-of-type {
+    border-right: none;
+}
+
+.paginator-item:first-of-type, .paginator-item:last-of-type {
+    padding: 4.5px 15px;
+}
+
+.paginator-item:hover, .paginator-item.active {
+    background-color: #35baf6;
+    color: #fff !important;
+}
+
+.paginator-item.no-hover:hover {
+    background-color: #fff;
+    color: rgba(0, 0, 0, .6) !important;
+}
+
 /** Specific styling **/
 header {
     position: relative;
@@ -616,6 +655,15 @@ nav {
     cursor: pointer;
 }
 
+.hide {
+    display: none;
+}
+
+.link {
+    color: #35baf6 !important;
+    cursor: pointer;
+}
+
 @media print {
     body {
         font-size: 0.8em;
@@ -641,7 +689,7 @@ nav {
         font-size: 1.6em;
     }
 
-    .table-head th, .table-body td  {
+    .table-head th, .table-body td {
         border-width: 0 1pt 1pt 0;
     }
 

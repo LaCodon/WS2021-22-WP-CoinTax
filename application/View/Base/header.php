@@ -21,10 +21,14 @@
                 </a>
             </div>
             <?php if ($this->isAuthorized()): ?>
-                <a href="<?= $this->getActionUrl('index', 'dashboard'); ?>" class="nav-item <?= $this->_controllerName === 'Dashboard' ? 'active' : '' ?>">Übersicht</a>
-                <a href="<?= $this->getActionUrl('index', 'order'); ?>" class="nav-item <?= $this->_controllerName === 'Order' ? 'active' : '' ?>">Trades</a>
-                <a href="<?= $this->getActionUrl('index', 'transaction'); ?>" class="nav-item <?= $this->_controllerName === 'Transaction' ? 'active' : '' ?>">Transaktionen</a>
-                <a href="<?= $this->getActionUrl('index', 'report'); ?>" class="nav-item <?= $this->_controllerName === 'Report' ? 'active' : '' ?>">Gewinnreport</a>
+                <a href="<?= $this->getActionUrl('index', 'dashboard'); ?>"
+                   class="nav-item <?= $this->_controllerName === 'Dashboard' ? 'active' : '' ?>">Übersicht</a>
+                <a href="<?= $this->getActionUrl('index', 'order'); ?>"
+                   class="nav-item <?= $this->_controllerName === 'Order' ? 'active' : '' ?>">Trades</a>
+                <a href="<?= $this->getActionUrl('index', 'transaction'); ?>"
+                   class="nav-item <?= $this->_controllerName === 'Transaction' ? 'active' : '' ?>">Transaktionen</a>
+                <a href="<?= $this->getActionUrl('index', 'report'); ?>"
+                   class="nav-item <?= $this->_controllerName === 'Report' ? 'active' : '' ?>">Gewinnreport</a>
             <?php endif; ?>
         </div>
         <div class="flexbox has-hover-child">
@@ -34,6 +38,8 @@
             <div class="open-on-hover dropdown-menu">
                 <div class="flexbox flex-col">
                     <?php if ($this->isAuthorized()): ?>
+                        <a href="<?= $this->getActionUrl('invoice', 'user'); ?>" class="nav-item">Rechnungen</a>
+                        <hr>
                         <a href="<?= $this->getActionUrl('logout', 'login'); ?>" class="nav-item">Logout</a>
                     <?php else: ?>
                         <a href="<?= $this->getActionUrl('index', 'login'); ?>" class="nav-item">Login</a>

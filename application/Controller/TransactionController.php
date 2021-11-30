@@ -61,6 +61,7 @@ final class TransactionController extends Controller
         $resp->setViewVar('orders', $orders);
         $resp->setViewVar('tx_count', $txCount);
 
+        $resp->setHtmlTitle('Transaktionsübersicht');
         $resp->renderView('index');
     }
 

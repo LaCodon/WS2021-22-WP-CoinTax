@@ -168,12 +168,16 @@ final class OrderRepository
      * @param DateTime|null $from
      * @param DateTime|null $to
      * @param Coin|null $coin
+     * @param int|null $page
+     * @param int|null $maxResults
      * @return array
      */
-    public function getAllByUserIdWithFilter(int $userId, DateTime|null $from = null, DateTime|null $to = null, Coin|null $coin = null): array
+    public function getAllByUserIdWithFilter(int $userId, DateTime|null $from = null, DateTime|null $to = null, Coin|null $coin = null, int|null $page = null, int|null $maxResults = null, bool $countOnly = false): array|int
     {
         $filter = '';
         $extraJoin = '';
+        $limit = '';
+        $select = 'order_id, base_transaction, quote_transaction, fee_transaction';
 
         if ($from !== null && $to !== null) {
             $filter .= 'AND t.datetime_utc BETWEEN :from AND :to ';
@@ -189,12 +193,25 @@ final class OrderRepository
             $filter .= 'AND ( t.coin_id = :coinId OR t1.coin_id = :coinId OR t2.coin_id = :coinId )';
         }
 
-        $query = "SELECT order_id, base_transaction, quote_transaction, fee_transaction FROM `order` AS o
+        if ($maxResults !== null) {
+            $limit = 'LIMIT :limit ';
+            if ($page !== null) {
+                $limit .= 'OFFSET :offset ';
+                $page = $page * $maxResults;
+            }
+        }
+
+        if ($countOnly === true) {
+            $select = 'COUNT(order_id) as count';
+        }
+
+        $query = "SELECT $select FROM `order` AS o
                         JOIN `transaction` AS t ON o.base_transaction = t.transaction_id
                         $extraJoin
                     WHERE t.user_id = :userId
                     $filter
-                    ORDER BY t.datetime_utc DESC";
+                    ORDER BY t.datetime_utc DESC
+                    $limit";
         $stmt = $this->_pdo->prepare($query);
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
 
@@ -215,11 +232,22 @@ final class OrderRepository
             $stmt->bindParam(':coinId', $coinId, PDO::PARAM_INT);
         }
 
+        if ($maxResults !== null) {
+            $stmt->bindParam(':limit', $maxResults, PDO::PARAM_INT);
+            if ($page !== null) {
+                $stmt->bindParam(':offset', $page, PDO::PARAM_INT);
+            }
+        }
+
         if ($stmt->execute() === false) {
             return [];
         }
 
         $result = [];
+
+        if ($countOnly === true) {
+            return intval($stmt->fetchColumn());
+        }
 
         while (($obj = $stmt->fetchObject()) !== false) {
             $result[] = $this->makeOrder($obj);

@@ -2,12 +2,13 @@
 
 use Framework\Form\SelectInput;
 use Framework\Form\TextInput;
+use Framework\Html\Paginator;
 
 ?>
 <section class="flexbox flexbox-center">
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
-            <h2 class="h2">Tradeübersicht <span class="hint">(<?= count($this->orders); ?>)</span></h2>
+            <h2 class="h2">Tradeübersicht <span class="hint">(<?= $this->pagination_total_items; ?>)</span></h2>
             <a href="<?= $this->getActionUrl('add'); ?>">
                 <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp; Trade
                     hinzufügen
@@ -37,6 +38,12 @@ use Framework\Form\TextInput;
                 </button>
             </div>
         </form>
+    </div>
+</section>
+
+<section class="flexbox flexbox-center">
+    <div class="w12 flexbox flex-start flex-col flex-gap">
+        <?= Paginator::render($this->pagination_current_page, $this->pagination_items_per_page, $this->pagination_total_items); ?>
     </div>
 </section>
 
@@ -150,6 +157,8 @@ use Framework\Form\TextInput;
             <div class="flexbox w12 flex-center flex-top">
                 <div class="container" id="no-orders-yet">Keine Orders gefunden</div>
             </div>
+        <?php else: ?>
+            <?= Paginator::render($this->pagination_current_page, $this->pagination_items_per_page, $this->pagination_total_items); ?>
         <?php endif; ?>
 
     </div>

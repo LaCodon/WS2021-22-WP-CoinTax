@@ -177,6 +177,10 @@ use Core\Calc\Fifo\Fifo;
                     </tbody>
                 </table>
             <?php endforeach; ?>
+
+            <div class="hide-on-print">
+                <button class="btn grey" onclick="window.print()">Drucken</button>
+            </div>
         </div>
     </div>
 </section>
