@@ -5,7 +5,7 @@ use Core\Calc\PriceConverter;
 use Model\Coin;
 
 ?>
-<section class="flexbox flexbox-center">
+<section class="flexbox flexbox-center hide-on-print">
     <div class="w12 m05 flexbox flex-start flex-col">
         <div class="flexbox w12">
             <a href="<?= $this->getActionUrl('index'); ?>?<?= $this->back_filter; ?>" class="breadcrumb flexbox">
