@@ -491,6 +491,11 @@ input.error {
     color: rgba(0, 0, 0, .6) !important;
 }
 
+.wide-hr {
+    width: 90%;
+    border-width: 1px;
+}
+
 /** Specific styling **/
 header {
     position: relative;
@@ -637,6 +642,11 @@ nav {
 .m1 {
     margin-top: 100px;
     margin-bottom: 100px;
+}
+
+.m2 {
+    margin-top: 200px;
+    margin-bottom: 200px;
 }
 
 .no-padding {

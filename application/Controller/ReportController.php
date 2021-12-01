@@ -28,7 +28,7 @@ final class ReportController extends Controller
      */
     public function Action(Response $resp): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
 
         $currentUser = Session::getAuthorizedUser();
 
@@ -113,7 +113,7 @@ final class ReportController extends Controller
      */
     public function PaymentAction(Response $resp): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
 
         $currentUser = Session::getAuthorizedUser();
         $paymentInfoRepo = new PaymentInfoRepository($this->db());
@@ -142,7 +142,7 @@ final class ReportController extends Controller
 
     public function PaymentDoAction(Response $resp): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
         $this->expectMethodPost();
 
         $currentUser = Session::getAuthorizedUser();

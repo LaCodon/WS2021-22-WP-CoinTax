@@ -22,6 +22,8 @@ final class LoginController extends Controller
             $resp->redirect($resp->getActionUrl('index', 'dashboard'));
         }
 
+        $resp->setViewVar('require_login', isset($_GET['require_login']));
+
         $resp->setHtmlTitle('Login');
         $resp->renderView("index");
     }

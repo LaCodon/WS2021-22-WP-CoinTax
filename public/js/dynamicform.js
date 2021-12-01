@@ -1,5 +1,8 @@
 function enableDynamicForm() {
     const form = document.getElementById('js-dynamic-form')
+    if (form === null)
+        return;
+
     const nextBtn = document.getElementById('js-next-btn')
     const submitBtn = document.querySelector('button[type=submit]')
     const formElems = form.getElementsByClassName('form-elem')

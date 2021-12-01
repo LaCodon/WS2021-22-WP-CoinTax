@@ -8,6 +8,9 @@ use Framework\Form\TextInput;
     <div class="center-box">
         <div class="container">
             <h2 class="h2">Einloggen</h2>
+            <?php if ($this->require_login): ?>
+                <div class="warning-alert">Bitte loggen Sie sich ein</div>
+            <?php endif; ?>
             <div class="flexbox flexbox-center">
                 <form style="width: 90%;" class="form" action="<?= $this->getDoActionUrl("login") ?>" method="post">
                     <?= TextInput::render('E-Mail', 'email', placeholder: 'mail@domain.de'); ?>

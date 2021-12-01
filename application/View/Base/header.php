@@ -39,7 +39,7 @@
                 <div class="flexbox flex-col">
                     <?php if ($this->isAuthorized()): ?>
                         <a href="<?= $this->getActionUrl('invoice', 'user'); ?>" class="nav-item">Rechnungen</a>
-                        <hr>
+                        <hr class="wide-hr">
                         <a href="<?= $this->getActionUrl('logout', 'login'); ?>" class="nav-item">Logout</a>
                     <?php else: ?>
                         <a href="<?= $this->getActionUrl('index', 'login'); ?>" class="nav-item">Login</a>

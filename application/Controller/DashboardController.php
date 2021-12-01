@@ -28,7 +28,7 @@ final class DashboardController extends Controller
      */
     public function Action(Response $resp): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
 
         $currentUser = Session::getAuthorizedUser();
         $coinRepo = new CoinRepository($this->db());

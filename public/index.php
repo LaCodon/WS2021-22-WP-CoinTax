@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 const APPLICATION_DEBUG = false;
 
 use Config\Config;
@@ -10,7 +10,6 @@ use Framework\Exception\SessionsStartFailed;
 use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
-
 
 const APPLICATION_PATH = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR;
 

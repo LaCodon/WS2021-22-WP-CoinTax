@@ -31,7 +31,7 @@ final class OrderController extends Controller
      */
     public function Action(Response $resp, bool $render = true): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
 
         $currentUser = Session::getAuthorizedUser();
 
@@ -152,7 +152,7 @@ final class OrderController extends Controller
      */
     public function AddAction(Response $resp, bool $render = true): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
 
         $this->makeCoinOptions($resp);
 
@@ -184,7 +184,7 @@ final class OrderController extends Controller
 
     public function AddDoAction(Response $resp, bool $edit = false): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
         $this->expectMethodPost();
 
         $oderRepo = new OrderRepository($this->db());
@@ -315,7 +315,7 @@ final class OrderController extends Controller
 
     public function DeleteDoAction(Response $resp): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
 
         $input = InputValidator::parseAndValidate([
             new Input(INPUT_GET, 'id', 'id', _filter: FILTER_VALIDATE_INT),
@@ -349,7 +349,7 @@ final class OrderController extends Controller
      */
     public function DetailsAction(Response $resp, bool $render = true): void
     {
-        $this->abortIfUnauthorized();
+        $this->abortIfUnauthorized($resp);
 
         $input = InputValidator::parseAndValidate([
             new Input(INPUT_GET, 'id', 'id', _filter: FILTER_VALIDATE_INT)

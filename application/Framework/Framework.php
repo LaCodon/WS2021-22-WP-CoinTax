@@ -2,13 +2,13 @@
 
 namespace Framework;
 
+use Config\Config;
 use Controller\Controller;
 use Framework\Exception\ViewNotFound;
 
 final class Framework
 {
     const HTTP_BAD_REQUEST = 400;
-    const HTTP_UNAUTHORIZED = 401;
     const HTTP_NOT_FOUND = 404;
     const HTTP_METHOD_NOT_ALLOWED = 405;
     const HTTP_INTERNAL_SERVER_ERROR = 500;
@@ -94,7 +94,12 @@ final class Framework
     {
         http_response_code(self::HTTP_NOT_FOUND);
 
-        echo '404 - Page not found';
+        $resp = new Response('index', Config::baseUrl);
+        try {
+            $resp->renderView('404');
+        } catch (ViewNotFound $e) {
+            echo '<span style="color:red">404 - Page not found</span>';
+        }
     }
 
 }

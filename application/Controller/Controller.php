@@ -54,13 +54,11 @@ class Controller
     /**
      * Sends a HTTP 401 code to the user if not logged in
      */
-    protected function abortIfUnauthorized(): void
+    protected function abortIfUnauthorized(Response $resp): void
     {
         $user = Session::getAuthorizedUser();
         if ($user === null) {
-            http_response_code(Framework::HTTP_UNAUTHORIZED);
-            echo 'Unauthorized';
-            exit(0);
+            $resp->redirect($resp->getActionUrl('index', 'login') . '?require_login=1');
         }
     }
 }
