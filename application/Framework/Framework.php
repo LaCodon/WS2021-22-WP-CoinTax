@@ -95,6 +95,7 @@ final class Framework
         http_response_code(self::HTTP_NOT_FOUND);
 
         $resp = new Response('index', Config::baseUrl);
+        $resp->setHtmlTitle('Seite nicht gefunden');
         try {
             $resp->renderView('404');
         } catch (ViewNotFound $e) {

@@ -8,6 +8,7 @@ use Core\Calc\Tax\WinLossCalculator;
 use Core\Repository\CoinRepository;
 use Core\Repository\PaymentInfoRepository;
 use Core\Repository\TransactionRepository;
+use Core\Repository\UserRepository;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -147,6 +148,7 @@ final class ReportController extends Controller
 
         $currentUser = Session::getAuthorizedUser();
         $paymentInfoRepo = new PaymentInfoRepository($this->db());
+        $userRepo = new UserRepository($this->db());
 
         $year = DashboardController::getCalcYear(false);
         $thisYear = intval((new DateTime('now', new DateTimeZone('Europe/Berlin')))->format('Y'));
@@ -195,11 +197,22 @@ final class ReportController extends Controller
         }
         // ----------------------------- END input validation -----------------------------
 
+        $currentUser->setFirstName(htmlspecialchars(trim($input->getValue('first_name'))));
+        $currentUser->setLastName(htmlspecialchars(trim($input->getValue('last_name'))));
+
+
         try {
+            if ($userRepo->update($currentUser) === false) {
+                // failed to update user name
+                $input->setError('first_name', 'Unbekannter Fehler aufgetreten');
+                Session::setInputValidationResult($input);
+                $resp->redirect($resp->getActionUrl('payment') . '`?year=' . $year);
+            }
+
             $paymentInfoRepo->insert(new PaymentInfo(
                 $currentUser->getId(),
-                $input->getValue('iban'),
-                $input->getValue('bic'),
+                str_replace(' ', '', $input->getValue('iban')),
+                str_replace(' ', '', $input->getValue('bic')),
                 $year,
             ));
         } catch (Exception $e) {

@@ -71,7 +71,7 @@ abstract class Paginator
             return true;
         }
 
-        if ($page > intval(ceil($totalItems / $itemsPerPage))) {
+        if ($page > intval(ceil($totalItems / $itemsPerPage)) + 1) {
             return false;
         }
 

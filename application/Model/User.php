@@ -75,4 +75,20 @@ final class User
     {
         return $this->_passwordHash;
     }
+
+    /**
+     * @param string $firstName
+     */
+    public function setFirstName(string $firstName): void
+    {
+        $this->_firstName = $firstName;
+    }
+
+    /**
+     * @param string $lastName
+     */
+    public function setLastName(string $lastName): void
+    {
+        $this->_lastName = $lastName;
+    }
 }

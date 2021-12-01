@@ -124,4 +124,48 @@ final class PaymentInfoRepository
 
         return $res;
     }
+
+    /**
+     * Get all payments for the given userId ordered by year
+     * @param int $userId
+     * @return array|null
+     */
+    public function getAllByUserId(int $userId): array|null
+    {
+        $stmt = $this->_pdo->prepare('SELECT * FROM payment_info WHERE user_id = :userId ORDER BY year DESC');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+
+        if ($stmt->execute() === false) {
+            return null;
+        }
+
+        $result = [];
+
+        while (($obj = $stmt->fetchObject()) !== false) {
+            $result[] = $this->makePaymentInfo($obj);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param object|bool $resultObj
+     * @return PaymentInfo|null
+     */
+    private function makePaymentInfo(object|bool $resultObj): PaymentInfo|null
+    {
+        if ($resultObj === false) {
+            return null;
+        }
+
+        return new PaymentInfo(
+            $resultObj->user_id,
+            $resultObj->iban,
+            $resultObj->bic,
+            $resultObj->year,
+            intval($resultObj->fulfilled) === 1,
+            intval($resultObj->failed) === 1,
+            $resultObj->payment_info_id,
+        );
+    }
 }

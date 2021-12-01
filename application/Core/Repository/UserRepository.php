@@ -55,6 +55,46 @@ final class UserRepository
     }
 
     /**
+     * Update the given user in the database via its id
+     * @param User $user
+     * @return bool
+     * @throws UniqueConstraintViolation
+     */
+    public function update(User $user): bool
+    {
+        if ($user->getId() === -1) {
+            // user has to be inserted at first
+            return false;
+        }
+
+        $userId = $user->getId();
+        $email = $user->getEmail();
+        $firstname = $user->getFirstName();
+        $lastname = $user->getLastName();
+        $passwordHash = $user->getPasswordHash();
+
+        $stmt = $this->_pdo->prepare('UPDATE user SET email = :email, first_name = :first_name, last_name = :last_name, password = :password WHERE user_id = :userId');
+        $stmt->bindParam(":userId", $userId, PDO::PARAM_INT);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":first_name", $firstname);
+        $stmt->bindParam(":last_name", $lastname);
+        $stmt->bindParam(":password", $passwordHash);
+
+        try {
+            $res = $stmt->execute();
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                // violation against unique constraint aka email already exists for another user
+                throw new UniqueConstraintViolation();
+            } else {
+                throw $e;
+            }
+        }
+
+        return $res;
+    }
+
+    /**
      * Load user with given id from database
      * @param int $id
      * @return User|null

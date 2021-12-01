@@ -66,7 +66,7 @@
 
                 <?php else: ?>
                     <div class="flexbox flex-col flex-center">
-                        <div id="no-orders-yet">Füge zuerst deine Trades hinzu</div>
+                        <div id="no-orders-yet">Fügen Sie zuerst Ihre Trades hinzu</div>
                         <a href="<?= $this->getActionUrl('add', 'order'); ?>">
                             <button class="btn flexbox"><span class="material-icons">add_circle_outline</span>&nbsp;Trade
                                 hinzufügen

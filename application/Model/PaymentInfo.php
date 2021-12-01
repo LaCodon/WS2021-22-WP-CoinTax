@@ -7,6 +7,15 @@ use Framework\Exception\IdOverrideDisallowed;
 final class PaymentInfo
 {
 
+    /**
+     * @param int $_userId
+     * @param string $_iban
+     * @param string $_bic
+     * @param int $_year
+     * @param bool $_fulfilled
+     * @param bool $_failed
+     * @param int $_id
+     */
     public function __construct(
         private int    $_userId,
         private string $_iban,

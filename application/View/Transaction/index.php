@@ -141,7 +141,7 @@ use Model\Transaction;
 
         <?php if (count($this->orders) === 0): ?>
             <div class="flexbox w12 flex-center flex-top">
-                <div class="container" id="no-orders-yet">Füge zuerst deine Orders hinzu</div>
+                <div class="container" id="no-orders-yet">Fügen Sie zuerst Ihre Orders hinzu</div>
             </div>
         <?php else: ?>
             <?= Paginator::render($this->pagination_current_page, $this->pagination_items_per_page, $this->pagination_total_items); ?>
