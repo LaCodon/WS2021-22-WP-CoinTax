@@ -29,7 +29,7 @@
         <div class="w2 flexbox flexbox-center flex-col">
             <div><span class="material-icons huge">savings</span></div>
             <div class="text-center">
-                Vollständigen Steuerreport erstellen
+                Vollständigen Gewinnreport erstellen
             </div>
         </div>
 

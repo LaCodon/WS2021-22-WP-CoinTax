@@ -5,6 +5,7 @@ namespace Core\Calc;
 use Core\Repository\CoinRepository;
 use Core\Repository\PriceRepository;
 use DateTime;
+use Framework\Context;
 use Model\Coin;
 use Model\Transaction;
 
@@ -16,14 +17,14 @@ final class PriceConverter
     private CoinRepository $_coinRepo;
 
     /**
-     * @param \PDO $_pdo
+     * @param Context $_context
      */
     public function __construct(
-        private \PDO $_pdo,
+        private Context $_context
     )
     {
-        $this->_priceRepo = new PriceRepository($this->_pdo);
-        $this->_coinRepo = new CoinRepository($this->_pdo);
+        $this->_priceRepo = $this->_context->getPriceRepo();
+        $this->_coinRepo = $this->_context->getCoinRepo();
     }
 
     /**

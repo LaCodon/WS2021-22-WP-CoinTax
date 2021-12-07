@@ -42,7 +42,7 @@ final class LoginController extends Controller
             $resp->redirect($resp->getActionUrl('index'));
         }
 
-        $userRepo = new UserRepository($this->db());
+        $userRepo = $this->_context->getUserRepo();
         $user = $userRepo->getByEmail($inputValidationResult->getValue('email'));
 
         if ($user === null

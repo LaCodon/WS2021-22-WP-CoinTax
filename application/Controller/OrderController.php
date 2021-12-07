@@ -35,10 +35,10 @@ final class OrderController extends Controller
 
         $currentUser = Session::getAuthorizedUser();
 
-        $orderRepo = new OrderRepository($this->db());
-        $priceConverter = new PriceConverter($this->db());
-        $transactionRepo = new TransactionRepository($this->db());
-        $coinRepo = new CoinRepository($this->db());
+        $orderRepo = $this->_context->getOrderRepo();
+        $priceConverter = new PriceConverter($this->_context);
+        $transactionRepo = $this->_context->getTransactionRepo();
+        $coinRepo = $this->_context->getCoinRepo();
 
         // ----------------------- BEGIN input validation -----------------------
         $input = InputValidator::parseAndValidate([
@@ -167,7 +167,7 @@ final class OrderController extends Controller
 
     private function makeCoinOptions(Response $resp): void
     {
-        $coinRepo = new CoinRepository($this->db());
+        $coinRepo = $this->_context->getCoinRepo();
         $coins = $coinRepo->getAll();
 
         $coinOptions = [];
@@ -187,8 +187,8 @@ final class OrderController extends Controller
         $this->abortIfUnauthorized($resp);
         $this->expectMethodPost();
 
-        $oderRepo = new OrderRepository($this->db());
-        $coinRepo = new CoinRepository($this->db());
+        $oderRepo = $this->_context->getOrderRepo();
+        $coinRepo = $this->_context->getCoinRepo();
         $currentUser = Session::getAuthorizedUser();
 
         // ----------------------- BEGIN validation -----------------------
@@ -331,7 +331,7 @@ final class OrderController extends Controller
         }
 
         $currentUser = Session::getAuthorizedUser();
-        $orderRepo = new OrderRepository($this->db());
+        $orderRepo = $this->_context->getOrderRepo();
 
         if (!$orderRepo->delete($input->getValue('id'), $currentUser->getId())) {
             if ($input->getValue('xhr') === '1') {
@@ -362,7 +362,7 @@ final class OrderController extends Controller
         $orderId = $input->getValue('id');
 
         $currentUser = Session::getAuthorizedUser();
-        $orderRepo = new OrderRepository($this->db());
+        $orderRepo = $this->_context->getOrderRepo();
 
         if (!$orderRepo->isOwnedByUser($orderId, $currentUser->getId())) {
             $resp->redirect($resp->getActionUrl('index'));
@@ -381,8 +381,8 @@ final class OrderController extends Controller
 
         // render is false if we are in OrderController.EditAction
         if ($render) {
-            $priceConverter = new PriceConverter($this->db());
-            $winLossCalculator = new WinLossCalculator($this->db());
+            $priceConverter = new PriceConverter($this->_context);
+            $winLossCalculator = new WinLossCalculator($this->_context);
 
             $valueEur = [
                 'base' => $priceConverter->getEurValueApiOptionalSingle($orderData['base']['tx'], $orderData['base']['coin']),

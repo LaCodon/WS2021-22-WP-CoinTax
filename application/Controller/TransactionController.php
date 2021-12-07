@@ -16,7 +16,7 @@ final class TransactionController extends Controller
     {
         $this->abortIfUnauthorized($resp);
 
-        $priceConverter = new PriceConverter($this->db());
+        $priceConverter = new PriceConverter($this->_context);
 
         $orderController = new OrderController($this->_context);
         $orderController->Action($resp, false);

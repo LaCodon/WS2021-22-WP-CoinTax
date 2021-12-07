@@ -31,8 +31,8 @@ final class DashboardController extends Controller
         $this->abortIfUnauthorized($resp);
 
         $currentUser = Session::getAuthorizedUser();
-        $coinRepo = new CoinRepository($this->db());
-        $winLossCalculator = new WinLossCalculator($this->db());
+        $coinRepo = $this->_context->getCoinRepo();
+        $winLossCalculator = new WinLossCalculator($this->_context);
 
         $coins = $coinRepo->getUniqueCoinsByUserId($currentUser->getId());
 

@@ -18,7 +18,7 @@ final class UserController extends Controller
         $this->abortIfUnauthorized($resp);
 
         $currentUser = Session::getAuthorizedUser();
-        $paymentInfoRepo = new PaymentInfoRepository($this->db());
+        $paymentInfoRepo = $this->_context->getPaymentInfoRepo();
 
         $payments = $paymentInfoRepo->getAllByUserId($currentUser->getId());
 

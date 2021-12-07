@@ -37,7 +37,7 @@ abstract class SelectInput
 
         foreach ($options as $value => $option) {
             $name = $option['name'];
-            $thumbnail = isset($option['thumbnail']) ? '<img class="token-symbol-small" src="' . $option['thumbnail'] . '" alt="$value">' : '';
+            $thumbnail = isset($option['thumbnail']) ? '<img class="token-symbol-small" src="' . $option['thumbnail'] . '" alt="' . $value . '">' : '';
             $result .= <<<EOF
                 <option value="$value">
                     <div class="flexbox flex-start flex-center flex-gap">

@@ -6,14 +6,13 @@ use Core\Calc\Fifo\Fifo;
 use Core\Calc\PriceConverter;
 use Core\Exception\InvalidFifoException;
 use Core\Exception\WinLossNotCalculableException;
-use Core\Repository\TransactionRepository;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Framework\Context;
 use Model\Coin;
 use Model\Transaction;
 use Model\User;
-use PDO;
 
 final class WinLossCalculator
 {
@@ -27,7 +26,7 @@ final class WinLossCalculator
     const ARRAY_ELEM_PER_COIN = 'per_coin';
 
     public function __construct(
-        private PDO $_pdo,
+        private Context $_context,
     )
     {
     }
@@ -49,8 +48,8 @@ final class WinLossCalculator
             throw new WinLossNotCalculableException('cannot calculate win loss for non-send transactions');
         }
 
-        $transactionRepo = new TransactionRepository($this->_pdo);
-        $priceConverter = new PriceConverter($this->_pdo);
+        $transactionRepo = $this->_context->getTransactionRepo();
+        $priceConverter = new PriceConverter($this->_context);
 
         $transactions = $transactionRepo->getByCoin($owner->getId(), $coin->getId());
 
@@ -118,8 +117,8 @@ final class WinLossCalculator
      */
     public function calculatePortfolioValue(User $user, array $coins): array
     {
-        $transactionRepo = new TransactionRepository($this->_pdo);
-        $priceConverter = new PriceConverter($this->_pdo);
+        $transactionRepo = $this->_context->getTransactionRepo();
+        $priceConverter = new PriceConverter($this->_context);
 
         $result = [
             self::ARRAY_ELEM_EUR_SUM => '0.0',
@@ -190,7 +189,7 @@ final class WinLossCalculator
      */
     public function calculateWinReport(Coin $coin, User $user, int $year): array
     {
-        $transactionRepo = new TransactionRepository($this->_pdo);
+        $transactionRepo = $this->_context->getTransactionRepo();
 
         $transactions = $transactionRepo->getByCoin($user->getId(), $coin->getId());
 

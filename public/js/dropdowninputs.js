@@ -64,8 +64,8 @@ function enableDropdownInputs() {
 
             for (let i = 0; i < x.length * 2; ++i) {
                 currentFocus += direction
-                currentFocus = Math.abs(currentFocus % x.length)
-                if (x[currentFocus].style.display === 'block') break
+                currentFocus = Math.abs(((currentFocus % x.length) + x.length) % x.length)
+                if (x[currentFocus].style.display === 'block' || x[currentFocus].style.display === '') break
             }
 
             x[currentFocus].classList.add("active")

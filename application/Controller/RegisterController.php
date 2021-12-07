@@ -61,7 +61,7 @@ final class RegisterController extends Controller
             htmlspecialchars($inputValidationResult->getValue("email")),
             password_hash($inputValidationResult->getValue("password"), PASSWORD_DEFAULT));
 
-        $userRepo = new UserRepository($this->db());
+        $userRepo = $this->_context->getUserRepo();
 
         try {
             if ($userRepo->insert($user) !== true) {

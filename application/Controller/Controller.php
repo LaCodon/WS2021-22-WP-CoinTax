@@ -7,7 +7,6 @@ use Framework\Exception\ViewNotFound;
 use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
-use PDO;
 
 class Controller
 {
@@ -28,15 +27,6 @@ class Controller
         } catch (ViewNotFound $e) {
             echo 'No "index" view or "Action()" method defined for this controller (' . $resp->getControllerName() . 'Controller)';
         }
-    }
-
-    /**
-     * Get the DB connection
-     * @return PDO
-     */
-    protected function db(): PDO
-    {
-        return $this->_context->_database->get();
     }
 
     /**

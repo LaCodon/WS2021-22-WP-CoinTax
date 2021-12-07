@@ -4,6 +4,12 @@ declare(strict_types=1);
 const APPLICATION_DEBUG = false;
 
 use Config\Config;
+use Core\Repository\CoinRepository;
+use Core\Repository\OrderRepository;
+use Core\Repository\PaymentInfoRepository;
+use Core\Repository\PriceRepository;
+use Core\Repository\TransactionRepository;
+use Core\Repository\UserRepository;
 use Framework\Context;
 use Framework\Database;
 use Framework\Exception\SessionsStartFailed;
@@ -37,7 +43,16 @@ try {
     exit(0);
 }
 
-$framework = new Framework(new Context($database));
+$context = new Context(
+    new CoinRepository($database->get()),
+    new OrderRepository($database->get()),
+    new PaymentInfoRepository($database->get()),
+    new PriceRepository($database->get()),
+    new TransactionRepository($database->get()),
+    new UserRepository($database->get()),
+);
+
+$framework = new Framework($context);
 
 if (!$framework->parseRequest()) {
     // abort request if parsing failed

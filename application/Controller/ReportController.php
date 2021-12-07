@@ -33,11 +33,11 @@ final class ReportController extends Controller
 
         $currentUser = Session::getAuthorizedUser();
 
-        $paymentInfoRepo = new PaymentInfoRepository($this->db());
-        $coinRepo = new CoinRepository($this->db());
-        $transactionRepo = new TransactionRepository($this->db());
-        $priceConverter = new PriceConverter($this->db());
-        $winLossCalculator = new WinLossCalculator($this->db());
+        $paymentInfoRepo = $this->_context->getPaymentInfoRepo();
+        $coinRepo = $this->_context->getCoinRepo();
+        $transactionRepo = $this->_context->getTransactionRepo();
+        $priceConverter = new PriceConverter($this->_context);
+        $winLossCalculator = new WinLossCalculator($this->_context);
 
         $year = DashboardController::getCalcYear();
 
@@ -117,7 +117,7 @@ final class ReportController extends Controller
         $this->abortIfUnauthorized($resp);
 
         $currentUser = Session::getAuthorizedUser();
-        $paymentInfoRepo = new PaymentInfoRepository($this->db());
+        $paymentInfoRepo = $this->_context->getPaymentInfoRepo();
 
         $input = Session::getInputValidationResult();
         $input->setValue('first_name', $currentUser->getFirstName());
@@ -147,8 +147,8 @@ final class ReportController extends Controller
         $this->expectMethodPost();
 
         $currentUser = Session::getAuthorizedUser();
-        $paymentInfoRepo = new PaymentInfoRepository($this->db());
-        $userRepo = new UserRepository($this->db());
+        $paymentInfoRepo = $this->_context->getPaymentInfoRepo();
+        $userRepo = $this->_context->getUserRepo();
 
         $year = DashboardController::getCalcYear(false);
         $thisYear = intval((new DateTime('now', new DateTimeZone('Europe/Berlin')))->format('Y'));
