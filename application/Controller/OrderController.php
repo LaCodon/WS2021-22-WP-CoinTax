@@ -168,16 +168,22 @@ final class OrderController extends Controller
     private function makeCoinOptions(Response $resp): void
     {
         $coinRepo = $this->_context->getCoinRepo();
-        $coins = $coinRepo->getAll();
+        $eur = $coinRepo->getBySymbol('EUR');
+        $btc = $coinRepo->getBySymbol('BTC');
 
-        $coinOptions = [];
-
-        foreach ($coins as $coin) {
-            $coinOptions[$coin->getSymbol()] = [
-                'name' => $coin->getName(),
-                'thumbnail' => $coin->getThumbnailUrl(),
-            ];
-        }
+        $coinOptions = [
+            $eur->getSymbol() => [
+                'name' => $eur->getName(),
+                'thumbnail' => $eur->getThumbnailUrl(),
+            ],
+            $btc->getSymbol() => [
+                'name' => $btc->getName(),
+                'thumbnail' => $btc->getThumbnailUrl(),
+            ],
+            '' => [
+                'name' => '<span class="hint">Name oder Symbol zum Suchen eingeben...</span>'
+            ]
+        ];
 
         $resp->setViewVar('coin_options', $coinOptions);
     }

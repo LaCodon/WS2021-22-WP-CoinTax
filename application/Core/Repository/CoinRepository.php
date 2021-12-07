@@ -110,6 +110,35 @@ final class CoinRepository
     }
 
     /**
+     * Returns an array of coins which symbol or name contains the given partial symbol
+     * @param string $partialSymbol
+     * @return array
+     */
+    public function getByQuery(string $partialSymbol): array
+    {
+        str_replace('%', '', $partialSymbol);
+        $partialSymbol = "%$partialSymbol%";
+
+        $partialSymbolLower = strtolower($partialSymbol);
+
+        $stmt = $this->_pdo->prepare('SELECT * FROM coin WHERE symbol LIKE :symbol OR coingecko_id LIKE :lowerSymbol ORDER BY symbol');
+        $stmt->bindParam(':symbol', $partialSymbol);
+        $stmt->bindParam(':lowerSymbol', $partialSymbolLower);
+
+        if ($stmt->execute() === false) {
+            return [];
+        }
+
+        $result = [];
+
+        while (($obj = $stmt->fetchObject()) !== false) {
+            $result[] = $this->makeCoin($obj);
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns a list of all coins ever used by the given user over all transactions
      * @param int $userId
      * @return array|null

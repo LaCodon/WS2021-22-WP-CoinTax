@@ -2,6 +2,19 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+function getParent(el, type) {
+    type = type.toUpperCase()
+    let parent = el.parentNode
+
+    while (parent !== document) {
+        if (parent.tagName === type)
+            return parent
+        parent = parent.parentNode
+    }
+
+    return undefined
+}
+
 function enableDropdownInputs() {
     const dropdownInputs = document.querySelectorAll("[data-js=enable-dropdown]")
 
@@ -21,24 +34,15 @@ function enableDropdownInputs() {
             })
         }
 
-        dropdownInput.oninput = function () {
-            const text = dropdownInput.value.toUpperCase()
-            for (let option of dropdownData.options) {
-                if (option.value.toUpperCase().indexOf(text) > -1
-                    || option.innerText.toUpperCase().indexOf(text) > -1) {
-                    option.style.display = "block"
-                } else {
-                    option.style.display = "none"
-                }
-            }
-        }
-
-        for (const option of dropdownData.options) {
-            option.onclick = function () {
-                dropdownInput.value = option.value
+        dropdownData.addEventListener('click', function (e) {
+            if (e.target.tagName !== 'OPTION') {
+                dropdownInput.value = getParent(e.target, 'option').value
+                dropdownData.style.display = 'none'
+            } else {
+                dropdownInput.value = e.target.value
                 dropdownData.style.display = 'none'
             }
-        }
+        })
 
         let currentFocus = -1
         dropdownInput.onkeydown = function (e) {

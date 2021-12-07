@@ -1,3 +1,5 @@
+import {showInputError, clearInputError} from "./inputError.js";
+
 function enableDynamicForm() {
     const form = document.getElementById('js-dynamic-form')
     if (form === null)
@@ -23,7 +25,7 @@ function enableDynamicForm() {
         const currentInput = formElems[currentActiveElement].getElementsByTagName('input')[0]
 
         if (currentInput.value === '') {
-            showError(formElems[currentActiveElement], 'Das Feld darf nicht leer sein')
+            showInputError(formElems[currentActiveElement], 'Das Feld darf nicht leer sein')
             return
         }
 
@@ -31,19 +33,19 @@ function enableDynamicForm() {
         if (regexPattern !== null) {
             const match = currentInput.value.match(regexPattern)
             if (match === null || match[0] !== currentInput.value) {
-                showError(formElems[currentActiveElement], 'Der eingegebene Wert hat das falsche Format')
+                showInputError(formElems[currentActiveElement], 'Der eingegebene Wert hat das falsche Format')
                 return
             }
         }
 
         if (currentInput.getAttribute('type') === 'checkbox') {
             if (currentInput.checked !== true) {
-                showError(formElems[currentActiveElement], 'Bestätigen Sie durch setzen des Hakens')
+                showInputError(formElems[currentActiveElement], 'Bestätigen Sie durch setzen des Hakens')
                 return
             }
         }
 
-        clearError(formElems[currentActiveElement])
+        clearInputError(formElems[currentActiveElement])
         currentInput.disabled = true
         currentActiveElement++
         formElems[currentActiveElement].classList.remove('hide')
@@ -64,6 +66,7 @@ function enableDynamicForm() {
     }
 }
 
+/*
 function showError(elem, message) {
     const span = elem.getElementsByTagName('span')[0]
     const input = elem.getElementsByTagName('input')[0]
@@ -81,5 +84,6 @@ function clearError(elem) {
     span.classList.remove('error')
     span.innerHTML = ''
 }
+*/
 
 export const run = () => enableDynamicForm()
