@@ -1,3 +1,5 @@
+"use strict"
+
 function showError(elem, message) {
     const span = elem.getElementsByTagName('span')[0]
     const input = elem.getElementsByTagName('input')[0]

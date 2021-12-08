@@ -1,3 +1,5 @@
+"use strict"
+
 import {showInputError, clearInputError} from "./inputError.js";
 
 function loadCoinsAsync() {

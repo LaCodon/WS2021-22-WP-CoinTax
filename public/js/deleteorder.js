@@ -1,3 +1,5 @@
+"use strict"
+
 function deleteOrderAction() {
     const deleteButtons = document.querySelectorAll('[data-delete-order]')
     for (const deleteBtn of deleteButtons) {

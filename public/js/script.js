@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 import * as enableDropdownInputs from './dropdowninputs.js'
 import * as enableToggles from './toggle.js'

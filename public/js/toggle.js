@@ -1,3 +1,5 @@
+"use strict"
+
 function enableToggles() {
     const hideToggles = document.querySelectorAll("[data-hide='true']")
     for (const hideToggle of hideToggles) {
