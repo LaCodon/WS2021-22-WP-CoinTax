@@ -3,8 +3,9 @@
 namespace Model;
 
 use Framework\Exception\IdOverrideDisallowed;
+use JsonSerializable;
 
-final class Coin
+final class Coin implements JsonSerializable
 {
     /**
      * @param string $_symbol
@@ -75,4 +76,17 @@ final class Coin
 
         $this->_id = $id;
     }
+
+    public function jsonSerialize(): array
+    {
+        $json = array();
+
+        foreach ($this as $key => $value) {
+            $key = str_replace('_', '', $key);
+            $json[$key] = $value;
+        }
+
+        return $json;
+    }
+
 }

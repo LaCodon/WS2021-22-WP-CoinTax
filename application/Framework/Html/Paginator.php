@@ -9,7 +9,7 @@ use Framework\Validation\InputValidator;
 
 abstract class Paginator
 {
-    public static function render(int $currentPage = 1, int $itemsPerPage = 10, int $totalItems = 0): string
+    public static function render(int $currentPage = 1, int $itemsPerPage = 10, int $totalItems = 0, bool $enableAjaxPagination = false): string
     {
         $filterQuery = Session::getCurrentFilterQuery();
 
@@ -36,9 +36,15 @@ abstract class Paginator
             $pagesAfter .= "<a class='paginator-item no-hover text-light'>...</a>";
         }
 
+        $ajaxPagination = '';
+        if ($enableAjaxPagination) {
+            $ajaxPagination = 'data-js="enable-ajax-pagination"';
+        }
+
         return <<<EOF
             <div class="flexbox w12 m02 flex-center flex-top">
-                <div class="paginator flexbox flex-stretch">
+                <div class="paginator flexbox flex-stretch" $ajaxPagination
+                    data-js-filter="$filterQuery" data-js-page="$currentPage" data-js-maxpage="$totalPages">
                    <a href="./?$filterQuery" class="paginator-item text-light"><span class="material-icons">first_page</span></a>
                    $pagesBefore
                    <a class="paginator-item text-light active">$currentPage</a>

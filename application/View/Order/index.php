@@ -153,13 +153,17 @@ use Framework\Html\Paginator;
             </div>
         <?php endforeach; ?>
 
+        <div id="ajax-content" class="w12 flexbox flex-start flex-col flex-gap"></div>
+
         <?php if (count($this->orders) === 0): ?>
             <div class="flexbox w12 flex-center flex-top">
                 <div class="container" id="no-orders-yet">Keine Orders gefunden</div>
             </div>
         <?php else: ?>
-            <?= Paginator::render($this->pagination_current_page, $this->pagination_items_per_page, $this->pagination_total_items); ?>
+            <?= Paginator::render($this->pagination_current_page, $this->pagination_items_per_page, $this->pagination_total_items, true); ?>
         <?php endif; ?>
+
+        <div id="card-loading" class="w12 flexbox card"></div>
 
     </div>
 </section>

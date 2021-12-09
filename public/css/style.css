@@ -539,6 +539,28 @@ nav {
     margin: 160px;
 }
 
+@keyframes placeHolderShimmer {
+    0% {
+        background-position: -800px 0
+    }
+    100% {
+        background-position: 800px 0
+    }
+}
+
+#card-loading {
+    display: none;
+    height: 77px;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeHolderShimmer;
+    animation-timing-function: linear;
+    background: linear-gradient(to right, #fff 8%, #eee 18%, #fff 33%);
+    background-size: 800px 104px;
+    position: relative;
+}
+
 /** Helper **/
 .w1 {
     width: 100px;

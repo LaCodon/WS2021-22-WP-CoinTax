@@ -5,8 +5,9 @@ namespace Model;
 use DateTime;
 use DateTimeZone;
 use Framework\Exception\IdOverrideDisallowed;
+use JsonSerializable;
 
-final class Transaction
+final class Transaction implements JsonSerializable
 {
     const TYPE_RECEIVE = 'receive';
     const TYPE_SEND = 'send';
@@ -94,6 +95,18 @@ final class Transaction
         }
 
         $this->_id = $id;
+    }
+
+    public function jsonSerialize(): array
+    {
+        $json = array();
+
+        foreach ($this as $key => $value) {
+            $key = str_replace('_', '', $key);
+            $json[$key] = $value;
+        }
+
+        return $json;
     }
     
 }
