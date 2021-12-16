@@ -3,6 +3,7 @@
 import {run as enableToggles} from './toggle.js'
 import {run as enableDeleteOrderBtns} from './deleteorder.js'
 import {formatNumber} from './numberformat.js'
+import {formatDate} from './dateformat.js'
 
 function enableAjaxPagination() {
     ajaxPagination.paginator = document.querySelector('[data-js=enable-ajax-pagination]')
@@ -14,6 +15,7 @@ function enableAjaxPagination() {
     ajaxPagination.currentPage = ajaxPagination.paginator.getAttribute('data-js-page')
     ajaxPagination.maxPage = ajaxPagination.paginator.getAttribute('data-js-maxpage')
     ajaxPagination.filter = ajaxPagination.paginator.getAttribute('data-js-filter')
+    ajaxPagination.endpoint = ajaxPagination.paginator.getAttribute('data-ajax-endpoint')
 
     window.onscroll = ajaxPagination
 }
@@ -26,14 +28,14 @@ function ajaxPagination() {
     if (!shouldFetch) return
     if (++ajaxPagination.currentPage > ajaxPagination.maxPage) return
 
-    console.log('fetching more trades...')
+    console.log('fetching more list items...')
 
     // the following code only runs if there is no other current fetch
     ajaxPagination.enabled = false
     ajaxPagination.loader.style.display = 'block'
 
     const xhr = new XMLHttpRequest()
-    xhr.open('GET', `../api/queryorders?${ajaxPagination.filter}&page=${ajaxPagination.currentPage}`)
+    xhr.open('GET', `${ajaxPagination.endpoint}?${ajaxPagination.filter}&page=${ajaxPagination.currentPage}`)
 
     xhr.onerror = function (e) {
         console.log(e)
@@ -47,9 +49,12 @@ function ajaxPagination() {
             printPaginator()
 
             const result = JSON.parse(xhr.response)
-            Object.keys(result).forEach((key) => {
-                printOrder(key, result[key])
-            })
+            for (const order of result) {
+                if (ajaxPagination.endpoint.includes('orders') === true)
+                    printOrder(order.orderId, order)
+                else if (ajaxPagination.endpoint.includes('transactions') === true)
+                    printTransactions(order.orderId, order)
+            }
 
             enableToggles()
             enableDeleteOrderBtns()
@@ -66,14 +71,6 @@ function ajaxPagination() {
     xhr.send()
 }
 
-function padNumber(x) {
-    if (x < 10) {
-        return `0${x}`
-    }
-
-    return x
-}
-
 function printOrder(id, order) {
     let feeHtml = ''
     if (order.fee !== null) {
@@ -83,8 +80,7 @@ function printOrder(id, order) {
             <td>${formatNumber(order.feeValue, 2)} EUR</td>`
     }
 
-    let date = new Date(order.base.datetimeUtc.date.replace(' ', 'T') + 'Z')
-    date = `${padNumber(date.getDate())}.${padNumber(date.getMonth() + 1)}.${date.getFullYear()} ${padNumber(date.getHours())}:${padNumber(date.getMinutes())}`
+    let date = formatDate(order.base.datetimeUtc.date)
 
     const orderNode = document.createElement('div')
     orderNode.setAttribute('id', 'order-' + id)
@@ -185,6 +181,69 @@ function printOrder(id, order) {
         </div>`
 
     document.getElementById('ajax-content').appendChild(orderNode)
+}
+
+function printTransactions(id, order) {
+    let date = ''
+    if (order.base !== null)
+        date = formatDate(order.base.datetimeUtc.date)
+    else if (order.quote !== null)
+        date = formatDate(order.quote.datetimeUtc.date)
+    else
+        date = formatDate(order.fee.datetimeUtc.date)
+
+    if (order.fee !== null) {
+        const feeNode = document.createElement('div')
+        feeNode.setAttribute('class', 'w12 flexbox card')
+        feeNode.innerHTML += makeTransactionHtml(id, date, order.fee, order.feeCoin, order.feeValue, true)
+        document.getElementById('ajax-content').appendChild(feeNode)
+    }
+
+    if (order.quote !== null) {
+        const quoteNode = document.createElement('div')
+        quoteNode.setAttribute('class', 'w12 flexbox card')
+        quoteNode.innerHTML += makeTransactionHtml(id, date, order.quote, order.quoteCoin, order.fiatValue)
+        document.getElementById('ajax-content').appendChild(quoteNode)
+    }
+
+    if (order.base !== null) {
+        const baseNode = document.createElement('div')
+        baseNode.setAttribute('class', 'w12 flexbox card')
+        baseNode.innerHTML += makeTransactionHtml(id, date, order.base, order.baseCoin, order.fiatValue)
+        document.getElementById('ajax-content').appendChild(baseNode)
+    }
+
+    const separatorNode = document.createElement('div')
+    separatorNode.setAttribute('class', 'm01')
+    document.getElementById('ajax-content').appendChild(separatorNode)
+}
+
+function makeTransactionHtml(orderId, date, transaction, coin, value, isFee = false) {
+    return `<div class="flexbox w2 flex-col flex-gap">
+            <a href="../order/details?id=${orderId}">
+                <span class="material-icons swap-icon ${transaction.type === 'send' ? 'red' : 'green'}">${transaction.type === 'send' ? 'arrow_upward' : 'arrow_downward'}</span>
+            </a>
+            <span class="text-light">${date} Uhr</span>
+        </div>
+
+        <div class="flexbox w8 flexbox-center">
+            <div class="flexbox flexbox-center flex-col w2 flex-gap">
+                <div><img class="token-symbol"
+                          src="${coin.thumbnailurl}"
+                          alt="${coin.name}"></div>
+                <div class="text-light text-center">
+                    ${formatNumber(transaction.value, 8)}
+                    ${coin.symbol}<br>
+                    ${isFee ? '<span class="hint">Gebühr</span>' : ''} 
+                </div>
+            </div>
+        </div>
+
+        <div class="w2">
+            <div class="text-light">
+                Wert: ${formatNumber(value, 2)} EUR
+            </div>
+        </div>`
 }
 
 function printPaginator() {

@@ -50,7 +50,8 @@ use Framework\Html\Paginator;
 <section class="flexbox flexbox-center">
     <div class="w12 flexbox flex-start flex-col flex-gap">
 
-        <?php foreach ($this->orders as $orderId => $order): ?>
+        <?php foreach ($this->orders as $order): ?>
+            <?php $orderId = $order['orderId'] ?>
             <div id="order-<?= $orderId; ?>" class="w12 flexbox card">
                 <div class="flexbox w2 flex-col flex-gap">
                     <span class="material-icons swap-icon">swap_horiz</span>
@@ -157,10 +158,10 @@ use Framework\Html\Paginator;
 
         <?php if (count($this->orders) === 0): ?>
             <div class="flexbox w12 flex-center flex-top">
-                <div class="container" id="no-orders-yet">Keine Orders gefunden</div>
+                <div class="container" id="no-orders-yet">Keine Trades gefunden</div>
             </div>
         <?php else: ?>
-            <?= Paginator::render($this->pagination_current_page, $this->pagination_items_per_page, $this->pagination_total_items, true); ?>
+            <?= Paginator::render($this->pagination_current_page, $this->pagination_items_per_page, $this->pagination_total_items, true, $this->getActionUrl('queryorders', 'api')); ?>
         <?php endif; ?>
 
         <div id="card-loading" class="w12 flexbox card"></div>

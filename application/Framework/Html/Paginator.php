@@ -9,7 +9,7 @@ use Framework\Validation\InputValidator;
 
 abstract class Paginator
 {
-    public static function render(int $currentPage = 1, int $itemsPerPage = 10, int $totalItems = 0, bool $enableAjaxPagination = false): string
+    public static function render(int $currentPage = 1, int $itemsPerPage = 10, int $totalItems = 0, bool $enableAjaxPagination = false, string $ajaxEndpoint = ''): string
     {
         $filterQuery = Session::getCurrentFilterQuery();
 
@@ -38,7 +38,7 @@ abstract class Paginator
 
         $ajaxPagination = '';
         if ($enableAjaxPagination) {
-            $ajaxPagination = 'data-js="enable-ajax-pagination"';
+            $ajaxPagination = 'data-js="enable-ajax-pagination" data-ajax-endpoint="' . $ajaxEndpoint . '"';
         }
 
         return <<<EOF

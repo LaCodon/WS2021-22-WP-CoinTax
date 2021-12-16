@@ -10,6 +10,9 @@ use Framework\Session;
 
 class Controller
 {
+    /**
+     * @param Context $_context
+     */
     public function __construct(
         protected Context $_context
     )

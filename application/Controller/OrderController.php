@@ -6,14 +6,10 @@ use Core\Calc\Fifo\Fifo;
 use Core\Calc\PriceConverter;
 use Core\Calc\Tax\WinLossCalculator;
 use Core\Exception\WinLossNotCalculableException;
-use Core\Repository\CoinRepository;
-use Core\Repository\OrderRepository;
-use Core\Repository\TransactionRepository;
 use DateTime;
 use DateTimeZone;
 use Framework\Exception\ViewNotFound;
 use Framework\Framework;
-use Framework\Html\Paginator;
 use Framework\Response;
 use Framework\Session;
 use Framework\Validation\Input;
@@ -29,7 +25,7 @@ final class OrderController extends Controller
     /**
      * @throws ViewNotFound
      */
-    public function Action(Response $resp, bool $render = true): void
+    public function Action(Response $resp): void
     {
         $this->abortIfUnauthorized($resp);
 
@@ -37,14 +33,10 @@ final class OrderController extends Controller
         $apiController->QueryordersAction($resp, false);
 
         $this->makeCoinOptions($resp);
+        $resp->setViewVar('back_filter', Session::getCurrentFilterQuery());
 
-        // $render is false if called from TransactionController
-        if ($render) {
-            $resp->setViewVar('back_filter', Session::getCurrentFilterQuery());
-
-            $resp->setHtmlTitle('Tradeübersicht');
-            $resp->renderView('index');
-        }
+        $resp->setHtmlTitle('Tradeübersicht');
+        $resp->renderView('index');
     }
 
     /**
@@ -65,7 +57,7 @@ final class OrderController extends Controller
         }
     }
 
-    private function makeCoinOptions(Response $resp): void
+    public function makeCoinOptions(Response $resp): void
     {
         $coinRepo = $this->_context->getCoinRepo();
         $eur = $coinRepo->getBySymbol('EUR');

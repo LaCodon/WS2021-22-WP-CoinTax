@@ -132,7 +132,8 @@ final class ApiController extends Controller
             $quoteCoin = $coinRepo->get($quote->getCoinId());
             $feeCoin = $coinRepo->get($fee?->getCoinId());
 
-            $enrichedOrders[$order->getId()] = [
+            $enrichedOrders[] = [
+                'orderId' => $order->getId(),
                 'base' => $base,
                 'quote' => $quote,
                 'fee' => $fee,
@@ -154,6 +155,60 @@ final class ApiController extends Controller
             'to' => $input->getValue('to'),
             'token' => $input->getValue('token'),
         ]);
+
+        if ($render) {
+            header('Content-Type: application/json');
+            echo json_encode($resp->getViewVar('orders'));
+        }
+    }
+
+    public function QuerytransactionsAction(Response $resp, bool $render = true): void
+    {
+        $this->abortIfNotLoggedIn();
+
+        $priceConverter = new PriceConverter($this->_context);
+
+        $this->QueryordersAction($resp, false);
+
+        $filterCoin = $resp->getViewVar('filterCoin');
+
+        $txCount = 0;
+        $orders = $resp->getViewVar('orders');
+        foreach ($orders as &$order) {
+            $txCount += 2;
+
+            if ($filterCoin !== null) {
+                // order controller filters whole order after given coin but we have to filter the single transactions too
+                if ($order['baseCoin']->getSymbol() !== $filterCoin->getSymbol()) {
+                    $order['base'] = null;
+                    $order['baseCoin'] = null;
+                    --$txCount;
+                }
+
+                if ($order['quoteCoin']->getSymbol() !== $filterCoin->getSymbol()) {
+                    $order['quote'] = null;
+                    $order['quoteCoin'] = null;
+                    --$txCount;
+                } else {
+                    // In the OrderController, we fetch the price for the quoteCoin but only if the baseCoin is not EUR.
+                    // To ensure the correct price for this single transaction, we re-fetch the price for the quote
+                    // transaction at this point.
+                    $order['fiatValue'] = $priceConverter->getEurValueApiOptionalSingle($order['quote'], $order['quoteCoin']);
+                }
+
+                if ($order['fee'] !== null && $order['feeCoin']->getSymbol() !== $filterCoin->getSymbol()) {
+                    $order['fee'] = null;
+                    $order['feeCoin'] = null;
+                }
+            }
+
+            if ($order['fee'] !== null) {
+                ++$txCount;
+            }
+        }
+
+        $resp->setViewVar('orders', $orders);
+        $resp->setViewVar('tx_count', $txCount);
 
         if ($render) {
             header('Content-Type: application/json');
