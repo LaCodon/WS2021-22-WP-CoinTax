@@ -174,6 +174,10 @@ option:hover, .active {
     gap: 10px;
 }
 
+.search-elem {
+    position: relative;
+}
+
 .search-elem > .form-elem {
     flex-direction: row !important;
     justify-content: space-between;
@@ -187,6 +191,53 @@ option:hover, .active {
 
 .search-elem > .form-elem > datalist {
     top: 40px;
+}
+
+.input-group-radio {
+    margin-left: -10px;
+}
+
+.input-group-radio:first-of-type {
+    margin-left: 5px;
+}
+
+.input-group-radio:last-of-type {
+    margin-right: -10px;
+}
+
+.input-group-radio input {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+}
+
+.input-group-radio label {
+    position: relative;
+    background-color: #ddd;
+    border: 0;
+    color: #000;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 0.9em;
+    user-select: none;
+}
+
+.input-group-radio:first-of-type label {
+    border-radius: 2px 0 0 2px;
+}
+
+.input-group-radio:last-of-type label {
+    border-radius: 0 2px 2px 0;
+}
+
+.input-group-radio input:checked + label {
+    background-color: #35baf6;
+    color: #fff;
+}
+
+.material-icons.label-icon {
+    position: relative;
+    font-size: 15px;
 }
 
 span.error {

@@ -2,17 +2,22 @@
 
 namespace Core\Repository;
 
-use Cassandra\Date;
 use DateTime;
 use DateTimeZone;
 use Framework\Exception\IdOverrideDisallowed;
 use Model\Coin;
 use Model\Order;
 use Model\Transaction;
-use \PDO;
+use PDO;
 
 final class OrderRepository
 {
+    const SORT_DATE = 1;
+    const SORT_SEND_AMOUNT = 2;
+    const SORT_RECEIVE_AMOUNT = 3;
+    const SORT_ASC = 1;
+    const SORT_DESC = 2;
+
     public function __construct(
         private PDO $_pdo,
     )
@@ -172,11 +177,12 @@ final class OrderRepository
      * @param int|null $maxResults
      * @return array
      */
-    public function getAllByUserIdWithFilter(int $userId, DateTime|null $from = null, DateTime|null $to = null, Coin|null $coin = null, int|null $page = null, int|null $maxResults = null, bool $countOnly = false): array|int
+    public function getAllByUserIdWithFilter(int $userId, DateTime|null $from = null, DateTime|null $to = null, Coin|null $coin = null, int $sortAfter = self::SORT_DATE, int $sortDirection = self::SORT_DESC, int|null $page = null, int|null $maxResults = null, bool $countOnly = false): array|int
     {
         $filter = '';
         $extraJoin = '';
         $limit = '';
+        $orderBy = '';
         $select = 'order_id, base_transaction, quote_transaction, fee_transaction';
 
         if ($from !== null && $to !== null) {
@@ -188,7 +194,6 @@ final class OrderRepository
         }
 
         if ($coin !== null) {
-            $extraJoin .= 'JOIN `transaction` AS t1 ON o.quote_transaction = t1.transaction_id ';
             $extraJoin .= 'LEFT JOIN `transaction` AS t2 ON o.fee_transaction = t2.transaction_id ';
             $filter .= 'AND ( t.coin_id = :coinId OR t1.coin_id = :coinId OR t2.coin_id = :coinId )';
         }
@@ -205,12 +210,24 @@ final class OrderRepository
             $select = 'COUNT(order_id) as count';
         }
 
+        $orderBy = match ($sortAfter) {
+            self::SORT_SEND_AMOUNT => 'ORDER BY t.coin_value * 1 ',
+            self::SORT_RECEIVE_AMOUNT => 'ORDER BY t1.coin_value * 1 ',
+            default => 'ORDER BY t.datetime_utc ',
+        };
+
+        $orderBy .= match ($sortDirection) {
+            self::SORT_ASC => 'ASC',
+            default => 'DESC',
+        };
+
         $query = "SELECT $select FROM `order` AS o
                         JOIN `transaction` AS t ON o.base_transaction = t.transaction_id
+                        JOIN `transaction` AS t1 ON o.quote_transaction = t1.transaction_id
                         $extraJoin
                     WHERE t.user_id = :userId
                     $filter
-                    ORDER BY t.datetime_utc DESC
+                    $orderBy
                     $limit";
         $stmt = $this->_pdo->prepare($query);
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);

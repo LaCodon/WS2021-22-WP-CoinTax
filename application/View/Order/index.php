@@ -1,8 +1,7 @@
 <?php
 
-use Framework\Form\SelectInput;
-use Framework\Form\TextInput;
 use Framework\Html\Paginator;
+use Framework\Html\TradeFilterForm;
 
 ?>
 <section class="flexbox flexbox-center">
@@ -18,28 +17,7 @@ use Framework\Html\Paginator;
     </div>
 </section>
 
-<section class="flexbox flexbox-center">
-    <div class="w12 flexbox flex-start flex-col">
-        <form method="GET" action="<?= $this->getActionUrl('index'); ?>" class="flexbox w12">
-            <div class="flexbox m01 flex-gap">
-                <div class="search-elem w3">
-                    <?= TextInput::render('Von:', 'from', 'datetime-local', false); ?>
-                </div>
-                <div class="search-elem w3">
-                    <?= TextInput::render('Bis:', 'to', 'datetime-local', false); ?>
-                </div>
-                <div class="search-elem w4">
-                    <?= SelectInput::render('Token:', 'token', $this->coin_options, false); ?>
-                </div>
-            </div>
-            <div class="flexbox flex-end w1">
-                <button class="btn grey flexbox" type="submit"><span class="material-icons">filter_alt</span>&nbsp;
-                    Filtern
-                </button>
-            </div>
-        </form>
-    </div>
-</section>
+<?= TradeFilterForm::render($this); ?>
 
 <section class="flexbox flexbox-center">
     <div class="w12 flexbox flex-start flex-col flex-gap">

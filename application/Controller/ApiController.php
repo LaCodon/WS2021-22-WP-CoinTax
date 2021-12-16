@@ -3,6 +3,7 @@
 namespace Controller;
 
 use Core\Calc\PriceConverter;
+use Core\Repository\OrderRepository;
 use DateTime;
 use DateTimeZone;
 use Framework\Framework;
@@ -63,11 +64,15 @@ final class ApiController extends Controller
             new Input(INPUT_GET, 'from', 'Von', false),
             new Input(INPUT_GET, 'to', 'Bis', false),
             new Input(INPUT_GET, 'token', 'Token', false),
+            new Input(INPUT_GET, 'sortAfter', 'Sortieren nach', false),
+            new Input(INPUT_GET, 'sortDirection', 'Reihenfolge', false),
         ]);
 
         $filterFrom = null;
         $filterTo = null;
         $filterCoin = null;
+        $sortAfter = OrderRepository::SORT_DATE;
+        $sortDirection = OrderRepository::SORT_DESC;
 
         if ($input->getValue('from') !== '') {
             $filterFrom = DateTime::createFromFormat('Y-m-d\TH:i', $input->getValue('from'),
@@ -98,12 +103,32 @@ final class ApiController extends Controller
             }
         }
 
+        if ($input->getValue('sortAfter') !== '') {
+            if ($input->getValue('sortAfter') != OrderRepository::SORT_DATE
+                && $input->getValue('sortAfter') != OrderRepository::SORT_SEND_AMOUNT
+                && $input->getValue('sortAfter') != OrderRepository::SORT_RECEIVE_AMOUNT) {
+                $input->setError('sortAfter', 'Ungültige Auswahl');
+            } else {
+                $sortAfter = intval($input->getValue('sortAfter'));
+            }
+        }
+
+        if ($input->getValue('sortDirection') !== '') {
+            if ($input->getValue('sortDirection') != OrderRepository::SORT_ASC && $input->getValue('sortDirection') != OrderRepository::SORT_DESC) {
+                $input->setError('sortDirection', 'Ungültige Auswahl');
+            } else {
+                $sortDirection = intval($input->getValue('sortDirection'));
+            }
+        }
+
         if (!Session::hasNonEmptyInputValidationResult()) {
             // only set data if this request is not a response to an invalid form submission
             Session::setInputValidationResult(new ValidationResult([], [
                 'from' => $filterFrom !== null ? $filterFrom->setTimezone(new DateTimeZone('Europe/Berlin'))->format('Y-m-d\TH:i') : '',
                 'to' => $filterTo !== null ? $filterTo->setTimezone(new DateTimeZone('Europe/Berlin'))->format('Y-m-d\TH:i') : '',
                 'token' => $filterCoin !== null ? $filterCoin->getSymbol() : '',
+                'sortAfter' => $sortAfter,
+                'sortDirection' => $sortDirection,
             ]));
         }
 
@@ -114,9 +139,9 @@ final class ApiController extends Controller
 
         $itemsPerPage = 10;
         $page = Paginator::getCurrentPage();
-        $orders = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin, $page, $itemsPerPage);
+        $orders = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin, $sortAfter, $sortDirection, $page, $itemsPerPage);
 
-        $totalOrderCount = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin, countOnly: true);
+        $totalOrderCount = $orderRepo->getAllByUserIdWithFilter($currentUser->getId(), $filterFrom, $filterTo, $filterCoin, $sortAfter, $sortDirection, countOnly: true);
         if (!Paginator::makePagination($resp, $itemsPerPage, $totalOrderCount)) {
             $resp->redirect($resp->getActionUrl('index') . '?' . Session::getCurrentFilterQuery());
         }
@@ -154,6 +179,8 @@ final class ApiController extends Controller
             'from' => $input->getValue('from'),
             'to' => $input->getValue('to'),
             'token' => $input->getValue('token'),
+            'sortAfter' => $input->getValue('sortAfter'),
+            'sortDirection' => $input->getValue('sortDirection'),
         ]);
 
         if ($render) {
