@@ -7,6 +7,10 @@ function numberFormat(numberStr, decimalCount = 8) {
 
     decimals = decimals.replace(new RegExp("[0]+$"), "")
 
+    if (decimals.length === 1) {
+        decimals += '0'
+    }
+
     if (decimals === '') {
         decimals = '00'
     }

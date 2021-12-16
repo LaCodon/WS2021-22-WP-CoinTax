@@ -57,7 +57,12 @@ final class FifoSale
         $taxableBoughtEurSum = '0.0';
 
         foreach ($this->_backingFifoTransactions as $backedBy) {
-            $usedQuota = bcdiv($backedBy->getCurrentUsedAmount(), $backedBy->getTransaction()->getValue());
+            // prevent from dividing by zero
+            $usedQuota = '1.0';
+            if (bccomp($backedBy->getTransaction()->getValue(), '0.0') !== 0) {
+                $usedQuota = bcdiv($backedBy->getCurrentUsedAmount(), $backedBy->getTransaction()->getValue());
+            }
+
             $totalTxEurValue = $priceConverter->getEurValueApiOptionalSingle($backedBy->getTransaction(), $coin);
             $usedEurValue = bcmul($usedQuota, $totalTxEurValue);
             $totalBoughtEurSum = bcadd($totalBoughtEurSum, $usedEurValue);
