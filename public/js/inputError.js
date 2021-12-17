@@ -19,4 +19,4 @@ function clearError(elem) {
 }
 
 export const showInputError = (elem, message) => showError(elem, message)
-export const clearInputError = (elem, message) => clearError(elem, message)
+export const clearInputError = (elem) => clearError(elem)

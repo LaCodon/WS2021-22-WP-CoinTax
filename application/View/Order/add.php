@@ -54,28 +54,28 @@ use Framework\Form\TextInput;
 
                                 <div class="flexbox">
                                     <div class="w3">
-                                        <?= SelectInput::render('Gesendetes Token', 'send_token', $this->coin_options); ?>
+                                        <?= TextInput::render('Menge', 'send_amount', placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
                                     </div>
                                     <div class="w3">
-                                        <?= TextInput::render('Menge', 'send_amount', placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
+                                        <?= SelectInput::render('Gesendetes Token', 'send_token', $this->coin_options); ?>
                                     </div>
                                 </div>
 
                                 <div class="flexbox">
-                                    <div class="w3">
-                                        <?= SelectInput::render('Empfangenes Token', 'receive_token', $this->coin_options); ?>
-                                    </div>
                                     <div class="w3">
                                         <?= TextInput::render('Menge', 'receive_amount', placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
                                     </div>
+                                    <div class="w3">
+                                        <?= SelectInput::render('Empfangenes Token', 'receive_token', $this->coin_options); ?>
+                                    </div>
                                 </div>
 
                                 <div class="flexbox">
                                     <div class="w3">
-                                        <?= SelectInput::render('Gebühren Token', 'fee_token', $this->coin_options, false); ?>
+                                        <?= TextInput::render('Menge', 'fee_amount', required: false, placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
                                     </div>
                                     <div class="w3">
-                                        <?= TextInput::render('Menge', 'fee_amount', required: false, placeholder: '11,5', pattern: '^[0-9]+([,.]{1}[0-9]+){0,1}$'); ?>
+                                        <?= SelectInput::render('Gebühren Token', 'fee_token', $this->coin_options, false); ?>
                                     </div>
                                 </div>
 

@@ -30,11 +30,11 @@ function enableDropdownInputs() {
             dropdownData.style.display = 'block'
         }
 
-        dropdownInput.onblur = function (e) {
+        dropdownInput.addEventListener('blur', function (e) {
             sleep(100).then(() => {
                 dropdownData.style.display = 'none'
             })
-        }
+        })
 
         dropdownData.addEventListener('click', function (e) {
             if (e.target.tagName !== 'OPTION') {

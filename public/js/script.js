@@ -6,6 +6,7 @@ import * as deleteOrderButtons from './deleteorder.js'
 import * as dynamicForm from './dynamicform.js'
 import * as loadCoinsAsync from './loadcoinsasync.js'
 import * as ajaxPagination from './pagination.js'
+import * as formValidation from './formvalidation.js'
 
 enableDropdownInputs.run()
 enableToggles.run()
@@ -13,3 +14,4 @@ deleteOrderButtons.run()
 dynamicForm.run()
 loadCoinsAsync.run()
 ajaxPagination.run()
+formValidation.run()
