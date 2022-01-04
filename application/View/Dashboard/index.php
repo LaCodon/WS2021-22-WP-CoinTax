@@ -3,7 +3,7 @@
         <div class="flexbox w9 flex-start flex-col">
             <h2 class="h2">Hallo <?= $this->firstname; ?>,</h2>
             <p>
-                Willkommen bei deiner Portfolio-Übersicht!
+                Willkommen bei Ihrer Portfolio-Übersicht!
             </p>
         </div>
         <div class="w3 flexbox">

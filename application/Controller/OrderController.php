@@ -348,7 +348,7 @@ final class OrderController extends Controller
 
         $resp->setViewVar('edit_order', true);
 
-        $resp->setHtmlTitle('Order bearbeiten');
+        $resp->setHtmlTitle('Trade bearbeiten');
         $resp->renderView('add');
     }
 

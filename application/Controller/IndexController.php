@@ -21,4 +21,21 @@ final class IndexController extends Controller
         $resp->renderView('index');
     }
 
+    public function ImpressumAction(Response $resp): void
+    {
+        $resp->setHtmlTitle('Impressum');
+        $resp->renderView('impressum');
+    }
+
+    public function PrivacyAction(Response $resp): void
+    {
+        $resp->setHtmlTitle('Datenschutz');
+        $resp->renderView('privacy');
+    }
+
+    public function DocumentationAction(Response $resp): void
+    {
+        $resp->setHtmlTitle('Dokumentation');
+        $resp->renderView('documentation');
+    }
 }

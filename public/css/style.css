@@ -299,6 +299,7 @@ input.error {
 
 .open-on-hover {
     display: none;
+    z-index: 100;
 }
 
 .has-hover-child:hover > .open-on-hover {
@@ -610,6 +611,49 @@ nav {
     background: linear-gradient(to right, #fff 8%, #eee 18%, #fff 33%);
     background-size: 800px 104px;
     position: relative;
+}
+
+.richtext {
+    position: relative;
+}
+
+.richtext h2 {
+    margin-bottom: 20px;
+}
+
+.richtext h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.richtext h4 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.richtext p {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.richtext ul, .richtext ol {
+    margin-top: 10px;
+    padding-left: 30px;
+    margin-bottom: 20px;
+}
+
+.richtext img {
+    display: block;
+    max-width: 100%;
+    margin: 20px auto 10px auto;
+}
+
+.richtext ul li, .richtext ol li {
+    margin-bottom: 5px;
+}
+
+.richtext code, .richtext pre {
+    font-family: "monospace";
 }
 
 /** Helper **/

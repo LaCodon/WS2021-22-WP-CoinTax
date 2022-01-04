@@ -9,8 +9,9 @@
             <p>Matrikelnummer: 120054321</p>
         </div>
         <div>
-            <p><a class="text-white" href=".">Impressum</a></p>
-            <p><a class="text-white" href=".">Datenschutzerklärung</a></p>
+            <p><a class="text-white" href="<?= $this->getActionUrl('impressum', 'index'); ?>">Impressum</a></p>
+            <p><a class="text-white" href="<?= $this->getActionUrl('privacy', 'index'); ?>">Datenschutzerklärung</a></p>
+            <p><a class="text-white" href="<?= $this->getActionUrl('documentation', 'index'); ?>">Dokumentation</a></p>
         </div>
     </div>
 </footer>

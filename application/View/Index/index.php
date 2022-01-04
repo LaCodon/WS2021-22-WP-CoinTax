@@ -9,6 +9,13 @@
     </div>
 </section>
 
+<noscript>
+    <section class="warning-alert">
+        Diese Seite funktioniert am besten mit aktiviertem JavaScript. Bitte aktivieren Sie JavaScript, um das beste
+        Nutzererlebnis zu erhalten.
+    </section>
+</noscript>
+
 <section class="flexbox flex-top">
     <div class="flexbox w12 m1">
 
