@@ -753,7 +753,13 @@
 
                 <h3 id="reflexion">11. Reflektion</h3>
 
+                * Runden von BcMath zahlen -> eigener Algorithmus
+                * Eigenes Framework hat sich sehr bewährt
+                * Frontendtexte teilweise in PHP hart-codiert (vor allem bei der Validierung)
+
                 * Steuerberechnungen cachen, um Ladezeiten zu verkürzen
+                * Passwort vergessen Funktion
+                * E-Mail Bestätigungscode
                 * mehr Zahlungsoptionen
                 * differenziertere Preisstruktur
                 * Anbindung eines Zahlungsdienstleisters

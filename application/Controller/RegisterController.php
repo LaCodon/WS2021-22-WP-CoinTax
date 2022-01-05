@@ -2,7 +2,6 @@
 
 namespace Controller;
 
-use Core\Repository\UserRepository;
 use Framework\Exception\UniqueConstraintViolation;
 use Framework\Exception\ViewNotFound;
 use Framework\Response;
@@ -13,6 +12,10 @@ use Model\User;
 
 final class RegisterController extends Controller
 {
+    const RESULT_SUCCESS = 0;
+    const RESULT_EMAIL_TAKEN = 1;
+    const RESULT_INVALID_INPUT = 2;
+    const RESULT_UNKNOWN_ERROR = 3;
 
     /**
      * @throws ViewNotFound
@@ -27,8 +30,10 @@ final class RegisterController extends Controller
         $resp->renderView("index");
     }
 
-    public function RegisterDoAction(Response $resp): void
+    public function RegisterDoAction(Response $resp, bool $redirect = true): int
     {
+        // redirect is false if called from the ApiController
+
         $this->expectMethodPost();
 
         $inputValidationResult = InputValidator::parseAndValidate([
@@ -52,7 +57,11 @@ final class RegisterController extends Controller
 
         if ($inputValidationResult->hasErrors()) {
             Session::setInputValidationResult($inputValidationResult);
-            $resp->redirect($resp->getActionUrl('index'));
+            if ($redirect === true) {
+                $resp->redirect($resp->getActionUrl('index'));
+            } else {
+                return self::RESULT_INVALID_INPUT;
+            }
         }
 
         $user = new User(
@@ -67,15 +76,27 @@ final class RegisterController extends Controller
             if ($userRepo->insert($user) !== true) {
                 $inputValidationResult->setError('firstname', 'Unbekannter Fehler beim Registrieren');
                 Session::setInputValidationResult($inputValidationResult);
-                $resp->redirect($resp->getActionUrl('index'));
+                if ($redirect === true) {
+                    $resp->redirect($resp->getActionUrl('index'));
+                } else {
+                    return self::RESULT_UNKNOWN_ERROR;
+                }
             }
         } catch (UniqueConstraintViolation $e) {
             $inputValidationResult->setError('email', 'Es existiert bereits ein Account mit dieser E-Mail');
             Session::setInputValidationResult($inputValidationResult);
-            $resp->redirect($resp->getActionUrl('index'));
+            if ($redirect === true) {
+                $resp->redirect($resp->getActionUrl('index'));
+            } else {
+                return self::RESULT_EMAIL_TAKEN;
+            }
         }
 
-        $resp->redirect($resp->getActionUrl('index', 'login'));
+        if ($redirect === true) {
+            $resp->redirect($resp->getActionUrl('index', 'login'));
+        }
+
+        return self::RESULT_SUCCESS;
     }
 
 }

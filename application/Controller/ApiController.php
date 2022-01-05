@@ -243,6 +243,38 @@ final class ApiController extends Controller
         }
     }
 
+    public function registerAction(Response $resp): void
+    {
+        $this->expectMethodPost();
+
+
+        $registerController = new RegisterController($this->_context);
+        $status = $registerController->RegisterDoAction($resp, false);
+
+        header('Content-Type: application/json');
+
+        switch ($status) {
+            case RegisterController::RESULT_EMAIL_TAKEN:
+                http_response_code(Framework::HTTP_BAD_REQUEST);
+                echo json_encode(['result' => 'email_taken']);
+                break;
+            case RegisterController::RESULT_INVALID_INPUT:
+                http_response_code(Framework::HTTP_BAD_REQUEST);
+                echo json_encode(['result' => 'invalid_input', 'validation' => Session::getInputValidationResult()]);
+                break;
+            case RegisterController::RESULT_UNKNOWN_ERROR:
+                http_response_code(Framework::HTTP_INTERNAL_SERVER_ERROR);
+                echo json_encode(['result' => 'unknown_error']);
+                break;
+            case RegisterController::RESULT_SUCCESS:
+                echo json_encode(['result' => 'success']);
+                break;
+        }
+
+        // clear session because we sent it already as response
+        Session::clearInputValidationResult();
+    }
+
     private function abortIfNotLoggedIn(): void
     {
         $user = Session::getAuthorizedUser();

@@ -17,7 +17,7 @@ use Framework\Form\TextInput;
                     <?= TextInput::render('Passwort wiederholen', 'password-repeat', type: 'password', placeholder: 'Passwort wiederholen'); ?>
                     <hr>
                     <div class="form-elem">
-                        <button class="btn" type="submit">Registrieren</button>
+                        <button class="btn" type="submit" id="register">Registrieren</button>
                     </div>
                 </form>
             </div>
@@ -25,3 +25,5 @@ use Framework\Form\TextInput;
     </div>
 
 </div>
+
+<script type="module" src="<?= $this->_baseUrl; ?>js/registerform.js"></script>

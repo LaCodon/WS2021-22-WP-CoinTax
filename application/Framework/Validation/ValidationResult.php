@@ -2,7 +2,9 @@
 
 namespace Framework\Validation;
 
-final class ValidationResult
+use JsonSerializable;
+
+final class ValidationResult implements JsonSerializable
 {
     /**
      * @param array $_errors
@@ -67,5 +69,10 @@ final class ValidationResult
         }
 
         return '';
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->getErrors();
     }
 }
