@@ -5,8 +5,8 @@ import {showInputError, clearInputError} from "./inputError.js";
 function formValidation() {
     const forms = document.getElementsByTagName('form')
 
-    validatePatternInputs()
     validateRequiredInputs()
+    validatePatternInputs()
 
     for (const form of forms) {
         const inputs = form.elements;
@@ -40,7 +40,7 @@ function validatePatternInputs() {
     const patternInputs = document.querySelectorAll('input[pattern]')
 
     for (const input of patternInputs) {
-        input.addEventListener('blur', function () {
+        input.addEventListener('blur', function (e) {
             const regexPattern = input.getAttribute('pattern')
             if (regexPattern !== null) {
                 const match = input.value.match(regexPattern)
@@ -58,9 +58,14 @@ function validateRequiredInputs() {
     const requiredInputs = document.querySelectorAll('input[required]')
 
     for (const input of requiredInputs) {
-        input.addEventListener('blur', function () {
+        if (input.getAttribute('data-js') === 'enable-dropdown') {
+            continue
+        }
+
+        input.addEventListener('blur', function (e) {
             if (input.value === '') {
                 showInputError(input.parentElement, 'Dieses Feld muss ausgefüllt sein.')
+                e.stopImmediatePropagation()
             } else {
                 clearInputError(input.parentElement)
             }

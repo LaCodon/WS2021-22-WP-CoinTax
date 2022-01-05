@@ -174,8 +174,7 @@ use Model\Coin;
                         </td>
                         <?php if ($this->order_data['fee']['coin']->getSymbol() === PriceConverter::EUR_COIN_SYMBOL): ?>
                             <td class="hint">Für EUR werden keine Herkunftskäufe berechnet, da 1 EUR immer den Preis 1
-                                EUR
-                                hat.
+                                EUR hat.
                             </td>
                         <?php else: ?>
                             <td class="no-padding">
