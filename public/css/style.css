@@ -614,6 +614,7 @@ nav {
 }
 
 .richtext {
+    box-sizing: border-box;
     position: relative;
 }
 
@@ -654,6 +655,25 @@ nav {
 
 .richtext code, .richtext pre {
     font-family: "monospace";
+}
+
+.richtext table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.richtext table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    padding: .75rem;
+    border-top: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.richtext table tbody td {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
 }
 
 /** Helper **/

@@ -183,6 +183,18 @@
                     <label class="hint">Abbildung: Screenshot der Registrierung</label>
                 </div>
 
+                <p>
+                    Auf dieser Seite kann sich ein Nutzer registrieren. CoinTax nutzt den Vornamen und den Nachnamen des
+                    Nutzers um diesen auf der Startseite persönlich zu begrüßen. Außerdem werden die Namensfelder bei
+                    der Eingabe der Zahlungsdaten für den Kauf eines Gewinnreports mit den Daten automatisch
+                    vorausgefüllt.
+                </p>
+
+                <p>
+                    Mittels JavaScript findet eine einfach validierung der Eingabefelder statt (alle Felder müssen
+                    ausgefüllt sein). Solange nicht alle Felder ausgefüllt sind, lässt sich das Formular nicht absenden.
+                </p>
+
                 <h4>Login</h4>
 
                 <div class="text-center">
@@ -190,6 +202,11 @@
                          alt="Screenshot Login">
                     <label class="hint">Abbildung: Screenshot des Logins</label>
                 </div>
+
+                <p>
+                    Das ist die Loginseite. Mittels JavaScript wird verhindert, dass eine leere Form an den Server
+                    gesendet wird.
+                </p>
 
                 <h4>Dashboard</h4>
 
@@ -199,6 +216,35 @@
                     <label class="hint">Abbildung: Screenshot des Dashboards</label>
                 </div>
 
+                <p>
+                    Nach dem Login landet der Nutzer zuerst auf dem Dashboard. Das Dashboard zeigt eine Übersicht aller
+                    Tokens im Portfolio des Nutzers. Diese Daten ergeben sich durch die Summe der Transaktionen des
+                    Nutzers. Neben dem aktuellen Wert des Portfolios wird auch der im ausgewählten Jahr bereits
+                    realisierte Gewinn (abzüglich Gebühren) angezeigt. Dabei wird jedoch noch nicht berücksichtigt, ob
+                    bestimmte Verkäufe aufgrund der Haltedauer der Token steuerfrei sind. Diese Daten erhält der Nutzer
+                    erst durch den Kauf eines Gewinnreports.
+                </p>
+
+                <p>
+                    Oben rechts kann der Nutzer das Jahr für die Gewinnberechnung auswählen. Der aktuelle Wert des
+                    Portfolios ändert sich durch anpassen der Jahresauswahl nicht. Es ändern sich nur die Gewinne, da
+                    diese jahresabhängig sind. Standardmäßig ist das aktuelle Jahr vorausgewählt.
+                </p>
+
+                <p>
+                    Die aktuellen Preisdaten werden von <a href="https://www.coingecko.com/" target="_blank"
+                                                           class="link">CoinGecko</a> per API Request geladen (kostenlos
+                    und ohne API-Key möglich). Wenn ein Nutzer sehr viele Transaktionen hat, steigt entsprechend die
+                    Ladezeit des Dashboards. Falls die PHP Erweiterung APCu aktiviert ist, wird diese verwendet, um die
+                    Antworten der CoinGecko API für eine begrenze Zeit zu cachen. Standardmäßig ist diese Erweiterung
+                    in PHP allerdings nicht aktiviert.
+                </p>
+
+                <p>
+                    Wenn der Nutzer in der Tabelle auf eine Kryptowährung klickt, öffnet sich die Liste der
+                    Transaktionen, gefiltert nach dem angeklickten Token.
+                </p>
+
                 <h4>Trades anzeigen</h4>
 
                 <div class="text-center">
@@ -207,7 +253,98 @@
                     <label class="hint">Abbildung: Screenshot der Tradeübersicht</label>
                 </div>
 
-                <h4>Trades bearbeiten</h4>
+                <p>
+                    Diese Seite zeigt alle vorhandenen Trades des Nutzers. Standardmäßig sind diese absteigend nach
+                    Ihrem Ausführungszeitpunkt sortiert. Pro Seite werden zehn Trades angezeigt. Wenn ein Nutzer mehr
+                    als zehn Trades besitzt, erscheint eine Paginierung. Wenn der Nutzer die Seite nach unten scrollt,
+                    wird die jeweils nächste Seite automatisch per Ajax nachgeladen. Dafür erscheint während der
+                    Ladezeit auch eine Ladeanimation.
+                </p>
+
+                <p>
+                    Durch einen Klick auf den rechten Pfeil bei einem Trade, können Detailinformationen eingeblendet
+                    werden. Dazu zählt die exakte Menge der transferierten Token (nicht gerundet) und deren Wert in Euro
+                    zum Zeitpunkt der Transaktion. Ggf. wird auch die gezahlte Gebühr angezeigt. Durch einen weiteren
+                    Klick auf den blauen "Details" Button, öffnet sich die Detailseite des Trades mit steuerlichen
+                    Detailinformationen.
+                </p>
+
+                <p>
+                    Über der Liste der Trades kann der Nutzer eine Filterung vornehmen. Es können Transaktionen nach,
+                    vor bzw. zwischen bestimmten Zeitpunkten gefiltert werden. Außerdem kann nach Transaktionen
+                    gefiltert werden, die ein bestimmtes Token enthalten. Alle möglichen Filter werden UND verknüpft.
+                    Der Nutzer kann zusätzlich zum Filtern auch noch die Sortierung anpassen.
+                </p>
+
+                <p>
+                    Hinweis: Beim Sortieren nach Gesendeter oder Empfangener Menge, wird tatsächlich nach der Menge des
+                    jeweiligen Tokens sortiert und nicht etwa nach dem Wert in Euro.
+                </p>
+
+                <p>
+                    Ein neuer Trade kann oben rechts über den grünen Button hinzugefügt werden. Das Löschen von Trades
+                    ist in der ausgeklappten Ansicht durch einen Klick auf den roten Button möglich. Dabei muss der
+                    Nutzer den Löschvorgang in einem Popup zunächst noch einmal bestätigen. Das Löschkommando wird dann
+                    per Ajax an den Server gesendet.
+                </p>
+
+                <h4>Trade Details</h4>
+
+                <div class="text-center">
+                    <img src="<?= $this->_baseUrl ?>img/doc/ScreenshotTradedetails.png"
+                         alt="Screenshot Trade Details">
+                    <label class="hint">Abbildung: Screenshot der Detailseite für Trades</label>
+                </div>
+
+                <p>
+                    Auf dieser Seite sind alle steuerlich relevanten Details eines Trades aufgelistet. Über die Buttons
+                    oben rechts kann der Trade außerdem gelöscht oder Bearbeitet werden.
+                </p>
+
+                <p>
+                    Ein Trade besteht immer aus einem Token, das erworben wird, ein Token mit dem bezahlt wird und ggf.
+                    einem Token mit dem die Gebühr des Handelsplatzes beglichen wird. Dementsprechend ist die Tabelle
+                    auf dieser Seite auch in drei Zeilen unterteilt: Verkauf des Zahlungstokens, Kauf des erworbenen
+                    Tokens und Verkauf des Gebührtokens. Pro Token ist die in diesem Trade verkaufte bzw. gekaufte Menge
+                    angegeben sowie der Preis von einer Einheit des Tokens bzw. der Gesamtmenge zum Zeitpunkt des
+                    Trades.
+                </p>
+
+                <p>
+                    Außerdem wird zu jedem Verkauf auch angezeigt, wann die jeweils Verkauften Token gekauft wurden, zu
+                    welchen Preisen dies der Fall war und ob der Kauf länger als ein Jahr her ist und dementsprechend
+                    der Verkauf steuerfrei ist.
+                </p>
+
+                <p>
+                    Es kann passieren, dass ein Nutzer seine Trades falsch eingibt. CoinTax kann diesen Umstand daran
+                    erkennen, dass es eine Transaktion gibt, die mehr Tokens verkauft als noch im Portfolio waren. Auf
+                    der Detailsseite der betroffenen Transaktion wird dann der unten stehende Hinweis eingeblendet. Der
+                    Fehler wird außerdem auch im Gewinnreport deutlich gemacht.
+                </p>
+
+                <div class="text-center">
+                    <img src="<?= $this->_baseUrl ?>img/doc/ScreenshotWrongTrades.png"
+                         alt="Screenshot fehlende Trades">
+                    <label class="hint">Abbildung: Screenshot der Warnung bei fehlenden Tokenkäufen</label>
+                </div>
+
+                <p>
+                    Am Ende der Detailseite ist dann noch eine Übersicht der Steuerdetails dargestellt. Dort wird
+                    vorgerechnet, wie hoch der steuerrechtlich relevante Gewinn ist. Sowohl für den Trade selbst als
+                    ggf. auch für den Verkauf des Gebührtokens.
+                </p>
+
+                <p>
+                    Hinweis: Historische Preisdaten erhält CoinTax ebenfalls über die API von CoinGecko. Die API von
+                    CoinGecko liefert pro Tag pro Währung den durchschnittlichen Marktpreis zurück (Beispiel: Bitcoin
+                    hat am 22.04.2021 40.000 Euro gekostet). Da sich diese historischen Daten nicht mehr ändern, werden
+                    sie von CoinTax nach dem ersten Abruf von CoinGecko in der Datenbank gespeichert und zukünftig immer
+                    von dort ausgelesen. Dies entlastet die CoinGecko API erheblich und führt zu deutlich schnelleren
+                    Ladezeiten von CoinTax.
+                </p>
+
+                <h4>Trades hinzufügen und bearbeiten</h4>
 
                 <div class="text-center">
                     <img src="<?= $this->_baseUrl ?>img/doc/ScreenshotTradeBearbeiten.png"
@@ -215,7 +352,30 @@
                     <label class="hint">Abbildung: Screenshot der Bearbeitungsseite für Trades</label>
                 </div>
 
-                <h4>Trade hinzufügen</h4>
+                <p>
+                    Die Seiten für das Hinzufügen und Bearbeiten von Trades sind im Aufbau identisch. Der Nutzer muss
+                    den Ausführungszeitpunkt des Trades angeben, die gesendete Menge und den Tokentyp sowie das
+                    empfangene Token und dessen Tokentyp. Optional kann auch die gezahlte Gebühr und deren Tokentyp
+                    angegeben werden.
+                </p>
+
+                <p>
+                    Die Textfelder für den Tokentyp besitzen eine Suchfunktion, die über JavaScript und Ajax realisiert
+                    ist: Wenn der Nutzer einen Buchstaben in das Feld eingibt, werden alle Token angezeigt, die von
+                    CoinTax unterstützt werden und die eingegebene Zeichenkette enthalten. Die Suchergebnisse werden als
+                    Drop-Down unter dem Textfeld angezeigt. Im Drop-Down kann mit den Pfeiltasten nach oben und unten
+                    navigiert werden. Ein Druck auf die Eingabetaste füllt das Textfeld mit dem gewählten Token.
+                    Alternativ kann auch mit der Maus auf das gewünschte Ergebnis geklickt werden. Im Textfeld kann
+                    entweder nach dem Namen des Tokens (z.B. "Bitcoin") oder nach dessen Symbol (z.B. "BTC") sowohl in
+                    Klein- als auch Großschreibung gesucht werden.
+                </p>
+
+                <p>
+                    Die Mengenfelder müssen mit Zahlen gefüllt werden. Dabei ist sowohl der Punkt als auch das Komma als
+                    Dezimaltrennzeichen erlaubt. Es können auch keine Dezimalstellen angegeben werden. Die maximale
+                    Genauigkeit von CoinTax beträgt 25 Stellen hinter dem Komma. Die Nutzereingabe wird auch
+                    clientseitig mittels JavaScript geprüft.
+                </p>
 
                 <h4>Transaktionen</h4>
 
@@ -225,6 +385,28 @@
                     <label class="hint">Abbildung: Screenshot der Transaktionsübersicht</label>
                 </div>
 
+                <p>
+                    Neben der Übersichtsseite für die Trades gibts es zusätzlich noch diese extra Seite für eine
+                    granularere Auflistung der einzelnen Transaktionen. Vom Aufbau entspricht die Seite im Großen und
+                    Ganzen der Trades Übersicht. Alle Transaktionen eines Trades werden untereinander stehend angezeigt.
+                    Zu den Transaktionen des nächsten Trades ist er Abstand etwas vergrößert, um eine visuelle
+                    Unterscheidung zu ermöglichen. Gebührentransaktionen sind gesondert markiert. Grüne Pfeile bedeuten,
+                    dass die Transaktion eingehen war. Rote Pfeile markieren ausgehende Transaktionen. Ein Klick auf
+                    einen Pfeil bringt den Nutzer zur Detailseite des zugehörigen Trades.
+                </p>
+
+                <p>
+                    Diese Seite kann vor allem genutzt werden, wenn nach Transaktionen bestimmter Token gesucht wird,
+                    weil hier wirklich nur die einzelne Transaktion mit ihrem Wert und nicht direkt der ganze Trade
+                    gefiltert wird.
+                </p>
+
+                <p>
+                    Auf einer Seite werden die Transaktionen von bis zu zehn Trades gleichzeitig angezeigt. Danach
+                    erscheint eine Paginierung. Auch hier werden weitere Transaktionen beim scrollen automatisch per
+                    Ajax nachgeladen.
+                </p>
+
                 <h4>Gewinnreports</h4>
 
                 <div class="text-center">
@@ -233,11 +415,71 @@
                     <label class="hint">Abbildung: Screenshot der Gewinnreport-Kaufseite</label>
                 </div>
 
+                <p>
+                    Wenn der Nutzer die Seite eines jährlichen Gewinnreports zum ersten Mal aufruft, wird er zunächst
+                    aufgefordert den Report für das ausgewählte Jahr käuflich zu erwerben. Eine Änderung des Jahres kann
+                    über die Buttons oben rechts erfolgen.
+                </p>
+
+                <p>
+                    Die Form auf dieser Seite ist "mehrseitig": Der Nutzer muss nacheinander der einzelnen Felder
+                    ausfüllen und kann jeweils nur zum nächsten Schritt übergehen, wenn die Eingabevalidierung per
+                    JavaScript erfolgreich war. Bei den Feldern für die IBAN und die BIC stehen kleine Beispieldaten
+                    neben dem Inputlabel, damit man beim testen direkt eine IBAN in das Eingabefeld kopieren kann. Im
+                    produktiven Betrieb würden diese "Kopiervorlagen" noch entfernt werden.
+                </p>
+
+                <p>
+                    Nachdem alle Felder vom Nutzer ausgefüllt wurden, kann der kostenpflichtige Kauf durch betätigen des
+                    entsprechenden Buttons erfolgen. <b>Wichtig: CoinTax ist nicht an einen echten Zahlungsdienstleister
+                        angebunden. Daher stehen angestoßene Käufe danach dauerhaft auf dem Status "ausstehend". Eine
+                        Zahlung muss daher aktuell noch manuell in der Datenbank auf abgeschlossen umgestellt
+                        werden.</b> Dazu muss in der Tabelle <code>payment_info</code> der Wert <code>fulfilled</code>
+                    auf "<code>1</code>" gesetzte werden. Wenn die Spalte <code>failed</code> auf "<code>1</code>"
+                    gesetzte wird, ist die Zahlung fehlgeschlagen und der Nutzer bekommt einen entsprechenden Hinweis im
+                    Frontend.
+                </p>
+
+                <p>
+                    In einem realen Umfeld würde man CoinTax an einen Zahlungsdienstleister wie <a
+                            href="https://stripe.com/de" target="_blank" class="link">Stripe.com</a> anbinden. Dieser
+                    würde dann bei erfolgreicher oder fehlgeschlagener Zahlung einen Webhook bei CoinTax triggern, der
+                    die Werte in der Datenbank entsprechend setzt. Dies zu implementieren hätte aber den Umfang der
+                    Projektarbeit gesprengt.
+                </p>
+
                 <div class="text-center">
                     <img src="<?= $this->_baseUrl ?>img/doc/ScreenshotGewinnreport.png"
                          alt="Screenshot Gewinnreport">
                     <label class="hint">Abbildung: Screenshot eines Gewinnreports</label>
                 </div>
+
+                <p>
+                    Wenn ein Nutzer einen Gewinnreport erfolgreich erworben hat, kann er von nun an den Report jederzeit
+                    auf dieser Seite einsehen. Bei jedem Neuladen der Seite wird der Report neu generiert. Wenn also
+                    nachträglich Trades zum entsprechenden Jahr hinzugefügt werden, werden diese dann ebenfalls im
+                    Report berücksichtigt und angezeigt.
+                </p>
+
+                <p>
+                    Der Kopf des Reports zeigt die berechneten steuerlich relevanten Gewinne und gezahlte Gebühren im
+                    jeweiligen Steuerjahr. Diese Informationen kann ein Nutzer in seiner Steuererklärung eintragen.
+                </p>
+
+                <p>
+                    Darunter sind dann die Berechnungen pro Kryptowährung aufgeschlüsselt. (Kryptowährungsblöcke können
+                    durch einen Klick auf den kleinen Pfeil neben dem Namen der Währung aus- und eingeklappt werden).
+                    Jede Verkaufstransaktion wird hier einzeln aufgeschlüsselt und es wird aufgezeigt, wie die jeweilige
+                    Gewinnsumme zustande kommt. Dafür wird der Kaufpreis der verkauften Token angezeigt, der
+                    Verkaufspreis der Token und der dadurch erzielte Gewinn. Gebührenzahlungen sind gesondert markiert.
+                    Auch nicht steuerpflichtige Verkäufe werden hier aufgeführt und sind gesondert markiert. Diese
+                    fließen in die Berechnung der steuerlich relevanten Gewinne selbstverständlich nicht mit ein.
+                </p>
+
+                <p>
+                    Am Ende des Gewinnreports ist Button für die erzeugung einer Druck-Version zu finden. Diese ist über
+                    ein spezielles Druck-CSS realisiert.
+                </p>
 
                 <h4>Rechnungen</h4>
 
@@ -247,8 +489,36 @@
                     <label class="hint">Abbildung: Screenshot der Rechnungsübersicht</label>
                 </div>
 
+                <p>
+                    Die Rechnungsübersicht zu den erworbenen Gewinnreports kann über die Kopfleiste > Account >
+                    Rechnungen erreicht werden. Auf dieser Seite sieht der Nutzer eine Übersicht aller gekauften
+                    Gewinnreports und ob die Zahlung erfolgreich abgeschlossen wurde, noch ausstehen oder ein Fehler
+                    aufgetreten ist. Ein Klick auf das jeweilige Icon links öffnet den zugehörigen Gewinnreport.
+                </p>
 
                 <h3 id="datenmodell">7. ER-Modell und relationales Modell</h3>
+
+                <div class="text-center">
+                    <img width="700" src="<?= $this->_baseUrl ?>img/doc/ERModell.svg"
+                         alt="ER-Modell">
+                    <label class="hint">Abbildung: ER-Modell</label>
+                </div>
+
+                <div class="text-center">
+                    <img src="<?= $this->_baseUrl ?>img/doc/db_schema.png"
+                         alt="Relationales Modell">
+                    <label class="hint">Abbildung: Relationales Modell</label>
+                </div>
+
+                <p>
+                    Für die Abbildung der beschriebenen Anwendungslogik hätte man theoretisch die Tabellen Order und
+                    Transaction auch zusammenlegen können. Allerdings plant der Autor dieser Arbeit, das Projekt nach
+                    Abschluss des Semesters weiterzuführen. Zum Beispiel soll auch die Berechnung von Gewinnen aus dem
+                    Krypto-Staking implementiert werden. Beim Staking gibt es jedoch keine Orders (bzw. Trades) sondern
+                    nur einzelne Transaktionen. Daher macht es mehr Sinn, die Datenbank direkt so zu strukturieren, dass
+                    Transaktionen auch ohne eine Order existieren könnten. Dementsprechend unterscheiden sich das
+                    ursprüngliche ER-Modell und das implementierte relationale Modell in dieser Hinsicht auch.
+                </p>
 
                 <h3 id="rollenmodell">8. Rollenmodell</h3>
 
@@ -279,7 +549,217 @@
 
                 <h3 id="checkliste">10. Abgleich mit Anforderungscheckliste</h3>
 
+                <p>
+                    Die Punkte in den folgenden Tabellen stammen aus der "Checkliste zum Erfolg", die sich in Moodle
+                    befindet. Der GWP-Teil wurde ausgelassen, da dieses Projekt nur für DWP abgegeben wird.
+                </p>
+
+                <h4>Allgemein für beide Kurse GWP/DWP</h4>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Kriterium</th>
+                        <th>Umgesetzt?</th>
+                        <th>Beschreibung</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>mind. 6 Seiten</td>
+                        <td>ja</td>
+                        <td>siehe <a class="link" href="#navigation">4. Navigationsstruktur</a>: Startseite, Dashboard,
+                            Trades, Transaktionen, Gewinnreport, Rechnungen, ...
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>mind. 3 Unterseiten</td>
+                        <td>ja</td>
+                        <td>siehe <a class="link" href="#navigation">4. Navigationsstruktur</a>: Jahresauswahl, Trade
+                            Details, Trade hinzufügen, ...
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Einheitliche Navigation über alle Seiten</td>
+                        <td>ja</td>
+                        <td>Es gibt einen Header und einen Footer, die überall gleich aussehen und eine einheitliche
+                            Navigation gewährleisten.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Navigation mit Untermenü (2. Ebene)</td>
+                        <td>ja</td>
+                        <td>Wenn der Nutzer im Header über "Account" hovert, öffnet sich ein DropDown mit dem
+                            Untermenü. Das Untermenü arbeitet mit CSS und funktioniert auch mit deaktiviertem
+                            JavaScript.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>mind. 3 Formulare (Login, Registrierung, Kontakt)</td>
+                        <td>ja</td>
+                        <td>Zum Beispiel: Login, Registrierung, Anlegen eines neuen Trades, ...</td>
+                    </tr>
+                    <tr>
+                        <td>Vermeidung von doppelten Code (Wiederverwendung)</td>
+                        <td>ja</td>
+                        <td>CoinTax nutzt das MVC Patter um Code zu strukturieren und Codedopplungen zu vermeiden.
+                            Häufig verwendete View-Elemente (z.B. Textboxen) werden ebenfalls durch eigene Klassen
+                            repräsentiert. So werden auch Coderedundanzen in den Views reduziert.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Codestyle und Code-Dokumentation</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    <tr>
+                        <td>Keine Verwendung von Frameworks</td>
+                        <td>ja</td>
+                        <td>Es gibt zwar eine Klasse "Framework", diese und alle dazugehörigen Komponenten wurden jedoch
+                            extra für dieses Projekt von Fabian Maier selbst ausgedacht implementiert.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Projektdokumentation</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    <tr>
+                        <td>Installationshinweise</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    <tr>
+                        <td>Datenbank-Export</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    <tr>
+                        <td>Test</td>
+                        <td>ja</td>
+                        <td>Die Seite wurde vor der Abgabe auf einem weiteren Rechner erfolgreich installiert. Zudem
+                            gibt es vereinzelte Unittests unter <code>/application/tests.php</code>. Die Unittests
+                            werden bei jedem Seiten-Reload ausgeführt, wenn in der Datei <code>/public/index.php</code>
+                            die Konstante <code>APPLICATION_DEBUG</code> in Zeile vier auf <code>true</code> gesetzt
+                            wird.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <h4>Allgemein für DWP</h4>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Kriterium</th>
+                        <th>Umgesetzt?</th>
+                        <th>Beschreibung</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Formulare werden mittels PHP/JavaScript behandelt und Fehler angezeigt</td>
+                        <td>ja</td>
+                        <td>Clientseitig wird vor allem geprüft, ob "required" Felder ausgefüllt sind und ob Felder, die
+                            ein Pattern-Attribut haben entsprechend dieses Patterns ausgefüllt wurden. Erst wenn die
+                            JS-Validierung erfolgreich war, kann das Formular abgesendet werden. Serverseitig
+                            finden alle komplexeren Validierungen statt. Dafür gibt es eine eigene Klasse unter
+                            <code>/application/Framework/Validation/InputValidator.php</code>. Fehler werden in der
+                            Session des Nutzers gespeichert und anschließend im Formular angezeigt. Dabei bleiben
+                            bisherige Eingaben des Nutzers erhalten (ebenfalls in der Session zwischengespeichert).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Nutzeranmeldung</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    <tr>
+                        <td>Nutzerregistrierung (Vorname, Nachname, E-Mail, Passwort, Telefonnummer, ...)</td>
+                        <td>ja</td>
+                        <td>Die Telefonnummer des Nutzers wird nicht extra abgefragt, da sie für CoinTax nicht von
+                            Relevanz ist.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Validierung der Formulare mit JavaScript</td>
+                        <td>ja</td>
+                        <td>Die Validierung eines Formularfelds erfolgt beim Verlassen des Cursors. Fehlermeldungen
+                            erscheinen schlicht aber sichtbar unter oder neben dem Eingabefeld. Das Eingabefeld wird
+                            außerdem rot umrandet. Die Validierung ist maßgeblich in
+                            <code>/public/js/formvalidation.js</code> implementiert.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Validierung der Formulare serverseitig mit PHP</td>
+                        <td>ja</td>
+                        <td>siehe auch Punkt "Formulare werden mittels PHP/JavaScript behandelt und Fehler angezeigt"
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Funktionsbereitstellung mit und ohne JavaScript</td>
+                        <td>ja</td>
+                        <td>Die Seite wurde mit und ohne JavaScript getestet und ist in beiden Fällen funktionsfähig.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Absenden von Formularen mit AJAX (außer LOGIN) ermöglichen</td>
+                        <td>beispielhaft</td>
+                        <td>Das Löschen von Trades aus der Trade-Übersicht (Listenansicht) heraus erfolgt über Ajax. Die
+                            Registrierung erfolgt über Ajax.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Seiten bauen sich dynamisch anhand von Daten aus der Datenbank auf (mind. eine Liste von
+                            Daten)
+                        </td>
+                        <td>ja</td>
+                        <td>Transaktionsliste, Tradeliste und zugehörige Filter- und Sortiermöglichkeiten. Es kann nach
+                            Startdatum, Enddatum und Token gefiltert werden. Es kann nach Datum, gesendetem Wert und
+                            empfangenem Wert sortiert werden.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Seiten können Inhalte dynamisch über JavaScript nachladen</td>
+                        <td>ja</td>
+                        <td>Die Pagination ist über scrollen in der Trade- und Transaktionsübersicht möglich. Außerdem
+                            werden Token gemäß der eingegebenen Zeichenkette im Suchfeld der Transaktions- und
+                            Tradeübersichtsseite dynamisch per Ajax vom Server geladen.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Fehlerbehandlung auch für nicht bekannte Seiten (404 Error)</td>
+                        <td>ja</td>
+                        <td>Weiterleitung auf eine dedizierte Fehlerseite</td>
+                    </tr>
+                    <tr>
+                        <td>Es ist eine Datenbank angebunden</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    <tr>
+                        <td>Daten aus der Datenbank werden gelesen</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    <tr>
+                        <td>Daten aus der Datenbank werden geschrieben</td>
+                        <td>ja</td>
+                        <td>-/-</td>
+                    </tr>
+                    </tbody>
+                </table>
+
                 <h3 id="reflexion">11. Reflektion</h3>
+
+                * Steuerberechnungen cachen, um Ladezeiten zu verkürzen
+                * mehr Zahlungsoptionen
+                * differenziertere Preisstruktur
+                * Anbindung eines Zahlungsdienstleisters
+                * Rechtskonforme Rechnungen
+                * Unterstützung von Staking und Lending
+                * Import von Handelsplattformen ermöglichen
 
             </div>
         </div>
