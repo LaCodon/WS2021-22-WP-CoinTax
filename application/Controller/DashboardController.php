@@ -2,12 +2,7 @@
 
 namespace Controller;
 
-use Core\Calc\Fifo\Fifo;
-use Core\Calc\PriceConverter;
 use Core\Calc\Tax\WinLossCalculator;
-use Core\Exception\InvalidFifoException;
-use Core\Repository\CoinRepository;
-use Core\Repository\TransactionRepository;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -16,14 +11,15 @@ use Framework\Response;
 use Framework\Session;
 use Framework\Validation\Input;
 use Framework\Validation\InputValidator;
-use Framework\Validation\ValidationResult;
-use Model\Transaction;
-use Model\User;
 
+/**
+ * Controller for /dashboard
+ */
 final class DashboardController extends Controller
 {
 
     /**
+     * Endpoint for /dashboard/
      * @param Response $resp
      */
     public function Action(Response $resp): void
@@ -59,6 +55,10 @@ final class DashboardController extends Controller
         }
     }
 
+    /**
+     * @param bool $setInputValidationResult
+     * @return int The year selected by the user or the current year if none was selected
+     */
     public static function getCalcYear(bool $setInputValidationResult = true): int
     {
         $input = InputValidator::parseAndValidate([

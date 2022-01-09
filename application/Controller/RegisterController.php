@@ -10,6 +10,9 @@ use Framework\Validation\Input;
 use Framework\Validation\InputValidator;
 use Model\User;
 
+/**
+ * Controller for /register
+ */
 final class RegisterController extends Controller
 {
     const RESULT_SUCCESS = 0;
@@ -18,6 +21,7 @@ final class RegisterController extends Controller
     const RESULT_UNKNOWN_ERROR = 3;
 
     /**
+     * Endpoint for GET /register/
      * @throws ViewNotFound
      */
     public function Action(Response $resp): void
@@ -30,9 +34,16 @@ final class RegisterController extends Controller
         $resp->renderView("index");
     }
 
+    /**
+     * Endpoint for POST /register/register.do
+     * @param Response $resp
+     * @param bool $redirect
+     * @return int status code indicating the success or failure of the registration (see RESULT_* constants of this class)
+     * The status code gets used by the ApiController
+     */
     public function RegisterDoAction(Response $resp, bool $redirect = true): int
     {
-        // redirect is false if called from the ApiController
+        // $redirect is false if called from the ApiController
 
         $this->expectMethodPost();
 

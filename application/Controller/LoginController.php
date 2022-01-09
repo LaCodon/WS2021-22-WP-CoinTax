@@ -2,18 +2,20 @@
 
 namespace Controller;
 
-use Core\Repository\UserRepository;
 use Framework\Exception\ViewNotFound;
-use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
 use Framework\Validation\Input;
 use Framework\Validation\InputValidator;
 
+/**
+ * Controller for /login
+ */
 final class LoginController extends Controller
 {
 
     /**
+     * Endpoint for GET /login/
      * @throws ViewNotFound
      */
     public function Action(Response $resp): void
@@ -28,6 +30,10 @@ final class LoginController extends Controller
         $resp->renderView("index");
     }
 
+    /**
+     * Endpoint for POST /login/login.do
+     * @param Response $resp
+     */
     public function LoginDoAction(Response $resp): void
     {
         $this->expectMethodPost();
@@ -58,6 +64,10 @@ final class LoginController extends Controller
         $resp->redirect($resp->getActionUrl('index', 'dashboard'));
     }
 
+    /**
+     * Endpoint for GET /login/logout
+     * @param Response $resp
+     */
     public function LogoutAction(Response $resp): void
     {
         Session::destroySession();

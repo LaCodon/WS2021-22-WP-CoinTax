@@ -6,10 +6,15 @@ use Framework\Exception\ViewNotFound;
 use Framework\Response;
 use Framework\Session;
 
+/**
+ * Controller for /transaction
+ */
 final class TransactionController extends Controller
 {
 
     /**
+     * Endpoint for GET /transaction/
+     * List all transactions
      * @throws ViewNotFound
      */
     public function Action(Response $resp): void

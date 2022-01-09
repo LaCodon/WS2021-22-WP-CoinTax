@@ -8,6 +8,9 @@ use Framework\Framework;
 use Framework\Response;
 use Framework\Session;
 
+/**
+ * Base class for all controllers
+ */
 class Controller
 {
     /**
@@ -20,7 +23,7 @@ class Controller
     }
 
     /**
-     * Default action for rendering index views
+     * Default action for rendering index views. This will get called if no index action is defined in a child controller
      * @param Response $resp
      */
     public function Action(Response $resp): void
@@ -33,7 +36,7 @@ class Controller
     }
 
     /**
-     * Sends an http error code to the user if the HTTP method is not POST
+     * Sends an http error code to the user if the HTTP method is not POST and aborts the request
      */
     protected function expectMethodPost(): void
     {
@@ -45,7 +48,7 @@ class Controller
     }
 
     /**
-     * Sends a HTTP 401 code to the user if not logged in
+     * Sends an HTTP 401 code to the user if not logged in and redirects the user to the login page immediately
      */
     protected function abortIfUnauthorized(Response $resp): void
     {

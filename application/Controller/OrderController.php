@@ -19,10 +19,14 @@ use Model\Transaction;
 use PDOException;
 use ValueError;
 
+/**
+ * Controller for /order
+ */
 final class OrderController extends Controller
 {
 
     /**
+     * Endpoint for /order/
      * @throws ViewNotFound
      */
     public function Action(Response $resp): void
@@ -40,6 +44,7 @@ final class OrderController extends Controller
     }
 
     /**
+     * Endpoint for GET /order/add
      * @throws ViewNotFound
      */
     public function AddAction(Response $resp, bool $render = true): void
@@ -57,6 +62,10 @@ final class OrderController extends Controller
         }
     }
 
+    /**
+     * Sets the coin_options view var required for the select token input dropdowns
+     * @param Response $resp
+     */
     public function makeCoinOptions(Response $resp): void
     {
         $coinRepo = $this->_context->getCoinRepo();
@@ -80,6 +89,11 @@ final class OrderController extends Controller
         $resp->setViewVar('coin_options', $coinOptions);
     }
 
+    /**
+     * Endpoint for POST /order/add.do
+     * @param Response $resp
+     * @param bool $edit true if editing a trade instead of adding it
+     */
     public function AddDoAction(Response $resp, bool $edit = false): void
     {
         $this->abortIfUnauthorized($resp);
@@ -211,6 +225,10 @@ final class OrderController extends Controller
         }
     }
 
+    /**
+     * Endpoint for POST /order/delete.do
+     * @param Response $resp
+     */
     public function DeleteDoAction(Response $resp): void
     {
         $this->abortIfUnauthorized($resp);
@@ -237,12 +255,14 @@ final class OrderController extends Controller
             }
         }
 
+        // if xhr is not empty, the request was sent via ajax and we don't have to redirect
         if ($input->getValue('xhr') === '') {
             $resp->redirect($resp->getActionUrl('index') . '?' . Session::getCurrentFilterQuery());
         }
     }
 
     /**
+     * Endpoint for /order/details
      * @throws ViewNotFound
      */
     public function DetailsAction(Response $resp, bool $render = true): void
@@ -323,18 +343,21 @@ final class OrderController extends Controller
     }
 
     /**
+     * Endpoint for /order/edit
      * @throws ViewNotFound
      */
     public function EditAction(Response $resp): void
     {
         $this->AddAction($resp, false);
 
+        // load order details
         $this->DetailsAction($resp, false);
 
         $orderData = $resp->getViewVar('order_data');
 
         if (!Session::hasNonEmptyInputValidationResult()) {
             // only set data if this request is not a response to an invalid form submission
+            // -> prefill form for editing
             Session::setInputValidationResult(new ValidationResult([], [
                 'datetime' => $orderData['base']['tx']->getDatetimeUtc()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('Y-m-d\TH:i'),
                 'send_token' => $orderData['base']['coin']->getSymbol(),
@@ -352,6 +375,10 @@ final class OrderController extends Controller
         $resp->renderView('add');
     }
 
+    /**
+     * Endpoint for POST /order/edit.do
+     * @param Response $resp
+     */
     public function EditDoAction(Response $resp): void
     {
         $this->AddDoAction($resp, true);

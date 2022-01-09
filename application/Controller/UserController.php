@@ -2,15 +2,19 @@
 
 namespace Controller;
 
-use Core\Repository\PaymentInfoRepository;
 use Framework\Exception\ViewNotFound;
 use Framework\Response;
 use Framework\Session;
 
+/**
+ * Controller for /user
+ */
 final class UserController extends Controller
 {
 
     /**
+     * Endpoint for GET /user/invoice
+     * List all bought tax reports and their payment status
      * @throws ViewNotFound
      */
     public function InvoiceAction(Response $resp): void

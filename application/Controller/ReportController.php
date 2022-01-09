@@ -5,15 +5,9 @@ namespace Controller;
 use Core\Calc\Fifo\Fifo;
 use Core\Calc\PriceConverter;
 use Core\Calc\Tax\WinLossCalculator;
-use Core\Repository\CoinRepository;
-use Core\Repository\PaymentInfoRepository;
-use Core\Repository\TransactionRepository;
-use Core\Repository\UserRepository;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Framework\Exception\IdOverrideDisallowed;
-use Framework\Exception\UniqueConstraintViolation;
 use Framework\Exception\ViewNotFound;
 use Framework\Response;
 use Framework\Session;
@@ -21,10 +15,16 @@ use Framework\Validation\Input;
 use Framework\Validation\InputValidator;
 use Model\PaymentInfo;
 
+/**
+ * Controller for /report
+ * Tax reports get generated here
+ */
 final class ReportController extends Controller
 {
 
     /**
+     * Endpoint for GET /report/
+     * Generation of tax reports
      * @throws ViewNotFound
      */
     public function Action(Response $resp): void
@@ -54,6 +54,7 @@ final class ReportController extends Controller
             'cleanedWinLoss' => '0.0',
         ];
 
+        // make one partial tax report per coin
         foreach ($coins as $coin) {
             if ($coin->getSymbol() === PriceConverter::EUR_COIN_SYMBOL) {
                 continue;
@@ -67,11 +68,14 @@ final class ReportController extends Controller
             ];
 
             try {
+                // get list of sell transactions and their compensations (corresponding buy transactions)
                 $data = $winLossCalculator->calculateWinReport($coin, $currentUser, $year);
                 if (count($data) !== 0) {
                     $compensationReports = [];
 
+                    // for every buy transaction: calculate how much profit we made by selling the bought coins
                     foreach ($data as $compensation) {
+                        // $compensation is of type Core\Calc\Fifo\FifoSale
                         $winLoss = $compensation[Fifo::ARRAY_ELEM_SALE]->calculateWinLoss($priceConverter, $coin);
                         $coinReport['totalTaxRelevantWinLoss'] = bcadd($coinReport['totalTaxRelevantWinLoss'], $winLoss->getTaxRelevantWinLoss());
                         $isFee = $transactionRepo->isFeeTransaction($compensation[Fifo::ARRAY_ELEM_SALE]->getSellTransaction()->getId());
@@ -90,6 +94,7 @@ final class ReportController extends Controller
 
                     $coinReport['compensationReports'] = $compensationReports;
 
+                    // add the profits made with the current coin to the total made profits
                     $report['totalTaxRelevantWinLoss'] = bcadd($report['totalTaxRelevantWinLoss'], $coinReport['totalTaxRelevantWinLoss']);
                 }
             } catch (Exception $e) {
@@ -99,6 +104,7 @@ final class ReportController extends Controller
             $report['coinReports'][] = $coinReport;
         }
 
+        // subtract payed fees from the total profit to get the tax relevant profit
         $report['cleanedWinLoss'] = bcsub($report['totalTaxRelevantWinLoss'], $report['totalPaidFeesEur']);
 
         $resp->setViewVar('calc_year', $year);
@@ -110,6 +116,8 @@ final class ReportController extends Controller
     }
 
     /**
+     * Endpoint for GET /report/payment
+     * Buy a tax report
      * @throws ViewNotFound
      */
     public function PaymentAction(Response $resp): void
@@ -141,6 +149,11 @@ final class ReportController extends Controller
         $resp->renderView('payment');
     }
 
+    /**
+     * Endpoint for POST /report/payment.do
+     * @param Response $resp
+     * @throws Exception
+     */
     public function PaymentDoAction(Response $resp): void
     {
         $this->abortIfUnauthorized($resp);
@@ -216,7 +229,7 @@ final class ReportController extends Controller
                 $year,
             ));
         } catch (Exception $e) {
-            // already hat payment
+            // already hat payment, do nothing
         }
 
         $resp->redirect($resp->getActionUrl('index') . '?year=' . $year);

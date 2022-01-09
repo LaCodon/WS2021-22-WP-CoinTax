@@ -76,7 +76,7 @@ final class Response
     }
 
     /**
-     * Set the value between the HTML <title> tag
+     * Set the value between the HTML title-tag
      * @param string $title
      */
     public function setHtmlTitle(string $title)

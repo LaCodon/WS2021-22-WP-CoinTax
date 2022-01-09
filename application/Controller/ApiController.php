@@ -14,8 +14,16 @@ use Framework\Validation\Input;
 use Framework\Validation\InputValidator;
 use Framework\Validation\ValidationResult;
 
+/**
+ * This Controller handles api requests under /api
+ */
 final class ApiController extends Controller
 {
+    /**
+     * Endpoint for GET /api/querycoins
+     * Used for token select input suggestions
+     * @param Response $resp
+     */
     public function QuerycoinsAction(Response $resp): void
     {
         $this->abortIfNotLoggedIn();
@@ -48,6 +56,12 @@ final class ApiController extends Controller
         echo json_encode($coinOptions);
     }
 
+    /**
+     * Endpoint for GET /api/queryorders
+     * Used for loading transactions via ajax pagination
+     * @param Response $resp
+     * @param bool $render true if a response should be sent to the client, false if only view vars should be set in $resp
+     */
     public function QueryordersAction(Response $resp, bool $render = true): void
     {
         $this->abortIfNotLoggedIn();
@@ -146,6 +160,7 @@ final class ApiController extends Controller
             $resp->redirect($resp->getActionUrl('index') . '?' . Session::getCurrentFilterQuery());
         }
 
+        // add more information / data to the orders: transactions, used coins, fiat values, ...
         $enrichedOrders = [];
 
         foreach ($orders as $order) {
@@ -183,18 +198,26 @@ final class ApiController extends Controller
             'sortDirection' => $input->getValue('sortDirection'),
         ]);
 
+        // render is false if actions gets called from order controller
         if ($render) {
             header('Content-Type: application/json');
             echo json_encode($resp->getViewVar('orders'));
         }
     }
 
+    /**
+     * Ednpoint for GET /api/querytransactions
+     * Used for transaction pagination with ajax
+     * @param Response $resp
+     * @param bool $render true if response should be send to client, false if only view vars should be set in $resp
+     */
     public function QuerytransactionsAction(Response $resp, bool $render = true): void
     {
         $this->abortIfNotLoggedIn();
 
         $priceConverter = new PriceConverter($this->_context);
 
+        // get orders from other api endpoint
         $this->QueryordersAction($resp, false);
 
         $filterCoin = $resp->getViewVar('filterCoin');
@@ -243,11 +266,16 @@ final class ApiController extends Controller
         }
     }
 
+    /**
+     * Endpoint for POST /api/register
+     * Used for registering new users via ajax call
+     * @param Response $resp
+     */
     public function registerAction(Response $resp): void
     {
         $this->expectMethodPost();
 
-
+        // use RegisterController for actual logic execution
         $registerController = new RegisterController($this->_context);
         $status = $registerController->RegisterDoAction($resp, false);
 
@@ -275,6 +303,9 @@ final class ApiController extends Controller
         Session::clearInputValidationResult();
     }
 
+    /**
+     * Responds with 401 unauthorized if no user is logged in and aborts the request
+     */
     private function abortIfNotLoggedIn(): void
     {
         $user = Session::getAuthorizedUser();
@@ -285,6 +316,10 @@ final class ApiController extends Controller
         }
     }
 
+    /**
+     * Responds with 400 bad request and aborts the request
+     * @param string $error
+     */
     private function abortWithError(string $error): void
     {
         http_response_code(Framework::HTTP_BAD_REQUEST);
