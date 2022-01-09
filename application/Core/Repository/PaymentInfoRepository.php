@@ -8,6 +8,9 @@ use Model\PaymentInfo;
 use PDO;
 use PDOException;
 
+/**
+ * Repository for accessing the payment_info SQL table
+ */
 final class PaymentInfoRepository
 {
     const PAYMENT_PENDING = 0;

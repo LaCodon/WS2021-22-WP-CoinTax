@@ -10,6 +10,9 @@ use Model\Coin;
 use Model\Transaction;
 use PDO;
 
+/**
+ * Repository for accessing the coin_valu SQL table
+ */
 final class PriceRepository
 {
     public function __construct(

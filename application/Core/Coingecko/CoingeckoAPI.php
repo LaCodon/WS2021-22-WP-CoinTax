@@ -7,6 +7,9 @@ use DateTimeZone;
 use Model\Coin;
 use ValueError;
 
+/**
+ * Wrapper for the coingecko api
+ */
 final class CoingeckoAPI
 {
     public function __construct(

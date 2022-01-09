@@ -10,6 +10,9 @@ use Model\Order;
 use Model\Transaction;
 use PDO;
 
+/**
+ * Repository for accessing the order SQL table
+ */
 final class OrderRepository
 {
     const SORT_DATE = 1;

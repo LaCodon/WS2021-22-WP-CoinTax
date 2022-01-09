@@ -10,6 +10,9 @@ use Framework\Exception\IdOverrideDisallowed;
 use Model\Transaction;
 use \PDO;
 
+/**
+ * Repository for accessing the transaction SQL table
+ */
 final class TransactionRepository
 {
     public function __construct(

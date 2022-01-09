@@ -8,6 +8,9 @@ use Model\Coin;
 use PDO;
 use PDOException;
 
+/**
+ * Repository for accessing the SQL coin table
+ */
 final class CoinRepository
 {
     public function __construct(

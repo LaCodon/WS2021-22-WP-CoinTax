@@ -8,6 +8,9 @@ use \PDO;
 use Model\User;
 use PDOException;
 
+/**
+ * Repository for accessing the user SQL table
+ */
 final class UserRepository
 {
     public function __construct(
