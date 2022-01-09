@@ -9,6 +9,10 @@ use Framework\Context;
 use Model\Coin;
 use Model\Transaction;
 
+/**
+ * A PriceConverter can be used to get the EUR value of a given amount of crypto coins. It uses the cached price data
+ * from the local database and the CoinGecko API for calculating exchange rates.
+ */
 final class PriceConverter
 {
     const EUR_COIN_SYMBOL = 'EUR';

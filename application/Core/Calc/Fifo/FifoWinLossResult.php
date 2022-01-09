@@ -2,16 +2,21 @@
 
 namespace Core\Calc\Fifo;
 
+/**
+ * Wrapper class for the calculation results of a fifo sale
+ */
 final class FifoWinLossResult
 {
     /**
      * @param string $_totalWinLoss
      * @param string $_taxRelevantWinLoss
      * @param string $_taxableAmount
+     * @param string $_totalAmount
      * @param string $_totalBoughtEurSum
+     * @param string $_taxableBoughtEurSum
      * @param string $_totalSoldEurSum
+     * @param string $_taxableSoldEurSum
      */
-
     public function __construct(
         private string $_totalWinLoss,
         private string $_taxRelevantWinLoss,

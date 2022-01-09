@@ -14,6 +14,10 @@ use Model\Coin;
 use Model\Transaction;
 use Model\User;
 
+/**
+ * A WinLossCalculator can be used to calculate how much profit we made with buying and selling a specific coin or with
+ * a certain transaction.
+ */
 final class WinLossCalculator
 {
 
@@ -110,6 +114,7 @@ final class WinLossCalculator
     }
 
     /**
+     * Calculate how much of the given $coins a $user owns currently and what they are worth at the moment.
      * @param User $user
      * @param array $coins
      * @return array #[ArrayShape(['eur_sum' => "string", 'coin_sums' => "array", 'coin_values' => "array", 'coins' => "array(Coins)"])]
@@ -152,10 +157,11 @@ final class WinLossCalculator
     }
 
     /**
+     * Calculate how much profit the $user made by buying and selling $coins in the given $year
      * @param User $user
      * @param array $coins
      * @param int $year
-     * @param bool $onlyTaxRelevant
+     * @param bool $onlyTaxRelevant true if only tax relevant sales should be considered for the profit calculation
      * @return array #[ArrayShape([self::ARRAY_ELEM_TOTAL => "string", self::ARRAY_ELEM_PER_COIN => "array"])]
      * @throws WinLossNotCalculableException
      */
@@ -181,6 +187,7 @@ final class WinLossCalculator
     }
 
     /**
+     * Returns a list of all sells (as FifoSale objects) of $coin in a given $year and also their backing buy transactions
      * @param Coin $coin
      * @param User $user
      * @param int $year

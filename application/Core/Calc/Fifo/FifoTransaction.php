@@ -6,10 +6,20 @@ use Core\Calc\PriceConverter;
 use Model\Coin;
 use Model\Transaction;
 
+/**
+ * Represents a transaction in a fifo queue. This class is a wrapper for a transaction in order to remember some extra
+ * attributes for it. Those extra attributes are required for profit (winloss) calculations
+ */
 final class FifoTransaction
 {
+    /**
+     * @var string how much of the current buy transaction was already used to back another sell transaction
+     */
     private string $_currentUsedAmount = '0.0';
 
+    /**
+     * @var bool true if this buy transaction is tax relevant because it was sold within one year after purchase
+     */
     public bool $_isTaxRelevant = true;
 
     /**

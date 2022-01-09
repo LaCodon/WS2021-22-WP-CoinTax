@@ -2,6 +2,9 @@
 
 namespace Core\Binance;
 
+/**
+ * Class for importing transactions from Binance.com via a CSV file
+ */
 final class CsvImport
 {
     private $_handle;

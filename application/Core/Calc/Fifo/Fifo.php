@@ -6,18 +6,34 @@ use Core\Exception\InvalidFifoException;
 use DateInterval;
 use Model\Transaction;
 
+/**
+ * Fifo represents a fifo (first in first out) queue for transactions. It is required because taxes are calculated by
+ * sell price minus buy price and the buy price has to be the price which has been payed for the first buy transaction
+ * in the users transaction history.
+ * In other words: Coins which have been bought first, get sold first.
+ */
 final class Fifo
 {
+    // a send fifo only holds outgoing transactions
     const SEND_FIFO = 1;
+    // a receive fifo only holds incoming transactions
     const RECEIVE_FIFO = 2;
 
     const ARRAY_ELEM_SALE = 'sale';
     const ARRAY_ELEM_SUCCESS = 'success';
 
+    /**
+     * @var array List of FifoTransaction objects
+     */
     private array $_list = [];
+
+    /**
+     * @var bool Are the transactions in $_list sorted after their date?
+     */
     private bool $_sorted = false;
 
     public function __construct(
+        // either self::SEND_FIFO or self::RECEIVE_FIFO
         private int $_type
     )
     {
@@ -52,7 +68,7 @@ final class Fifo
     }
 
     /**
-     * Pops the last element from this fifo
+     * Pops the last element (aka the first purchase) from this fifo
      * @return FifoTransaction|null
      * @throws InvalidFifoException
      */
@@ -78,7 +94,7 @@ final class Fifo
     }
 
     /**
-     * Return last element of the fifo but don't pop it
+     * Return last element (aka the first purchase or sell) of the fifo but don't pop it
      * @return FifoTransaction|null
      */
     private function peek(): FifoTransaction|null
@@ -91,7 +107,7 @@ final class Fifo
     }
 
     /**
-     * Return a list of receive transactions that fund the given send transaction. Also returns an indicator
+     * Return a list of receive-transactions that fund the given send transaction. Also returns an indicator
      * about whether the funds sufficed or not
      * @param Transaction $compensateMeTx
      * @return array #[ArrayShape(['success' => "bool", 'sale' => "FifoSale"])]
@@ -128,6 +144,7 @@ final class Fifo
             $currenTransaction->setCurrentUsedAmount($remaining);
 
             // only tax relevant if purchase and sale happen within time range of one year
+            // clone DateTime because adding 1 year in the next line of code will mutate the original $transaction if we don't clone (it's a reference)
             $currentTxDateTime = clone $currenTransaction->getTransaction()->getDatetimeUtc();
             $currenTransaction->_isTaxRelevant = $currentTxDateTime->add(new DateInterval('P1Y')) > $compensateMeTx->getDatetimeUtc();
 
