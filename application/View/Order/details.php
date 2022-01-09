@@ -38,7 +38,7 @@ use Model\Coin;
 </section>
 
 <?php if (($this->base_data['success'] === false && $this->order_data['base']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL)
-    || ($this->fee_data !== null && $this->fee_data['success'] === false)): ?>
+    || ($this->fee_data !== null && $this->fee_data['success'] === false && $this->order_data['fee']['coin']->getSymbol() !== PriceConverter::EUR_COIN_SYMBOL)): ?>
     <section class="flexbox flexbox-center m01">
         <div class="flexbox flexbox-center flex-col flex-gap w12">
             <div class="w11 container flexbox warning-alert">
