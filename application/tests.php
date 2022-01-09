@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * test the global self-written bcround function from globalFunctions.php
+ * @throws Exception
+ */
 function testBcround()
 {
     echo '-> testing bcround() ...<br>';

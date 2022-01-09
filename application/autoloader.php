@@ -1,9 +1,14 @@
 <?php
 
+/**
+ * Autoload PHP files if a class is used but not yet required
+ * This autoloader works by splitting a class into its name and its namespace. The namespace is then used
+ * as file path and the class name as file name.
+ */
 spl_autoload_register(function ($class) {
     $classPath = $class;
 
-    if (strpos($class, '\\') !== false) {
+    if (str_contains($class, '\\')) {
         $classPath = '';
 
         $split = explode('/', str_replace('\\', '/', $class));
