@@ -3,6 +3,9 @@
 ## Voraussetzungen für den Betrieb
 
 * XAMPP (PHP 8.0.11, MariaDB 10.6.4)
+* PHP [BCMath Erweiterung](https://www.php.net/manual/en/book.bc.php) (ist standardmäßig installiert und aktiviert)
+* Ggf. PHP [APCu Erweiterung](https://www.php.net/manual/en/book.apcu.php) (muss extra installiert und aktiviert werden,
+  ist aber optional für CoinTax → CoinTax funktioniert auch ohne, nur etwas langsamer)
 
 ## Installation
 
