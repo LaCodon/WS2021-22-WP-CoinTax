@@ -6,6 +6,13 @@ use Config\Config;
 use Controller\Controller;
 use Framework\Exception\ViewNotFound;
 
+/**
+ * MVC Framework
+ *
+ * It works by extracting the controller and action names from the requested http route. After extraction, the correct
+ * action will be executed and optional view rendering may happen. The Framework also injects dependencies into
+ * controllers.
+ */
 final class Framework
 {
     const HTTP_BAD_REQUEST = 400;
@@ -27,11 +34,19 @@ final class Framework
         $this->_context = $context;
     }
 
+    /**
+     * @return string The name of the currently executed controller
+     */
     public function getControllerName(): string
     {
         return $this->_controllerName;
     }
 
+    /**
+     * Parses the to be executed controller and action from the http request. If the requested route does not exist,
+     * a 404 page will be rendered immediately
+     * @return bool true if the requested route was found
+     */
     public function parseRequest(): bool
     {
         $requestUri = filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL);
@@ -79,6 +94,10 @@ final class Framework
         return true;
     }
 
+    /**
+     * Execute the action for the current route (and implicitly render the view)
+     * @param Response $response The response template
+     */
     public function runAction(Response $response): void
     {
         $actionMethod = $this->_actionName;
@@ -91,6 +110,9 @@ final class Framework
         }
     }
 
+    /**
+     * Helper method for rendering a nice 404 page view
+     */
     private function routeNotFound(): void
     {
         http_response_code(self::HTTP_NOT_FOUND);

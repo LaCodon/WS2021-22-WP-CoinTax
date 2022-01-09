@@ -4,6 +4,10 @@ namespace Framework;
 
 use Framework\Exception\ViewNotFound;
 
+/**
+ * Container for http responses. It is uses to pass variables from the action to the view.
+ * It also offers some nice helper functions for redirection and the like.
+ */
 final class Response
 {
     public string $htmlTitle = '';

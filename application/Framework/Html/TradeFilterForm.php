@@ -10,6 +10,11 @@ use Framework\Response;
 
 abstract class TradeFilterForm
 {
+    /**
+     * Render a search bar for trades and transactions
+     * @param Response $resp
+     * @return string The HTML
+     */
     public static function render(Response $resp): string
     {
         $fromInput = TextInput::render('Von:', 'from', 'datetime-local', false);

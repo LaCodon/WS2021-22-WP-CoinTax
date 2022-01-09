@@ -8,10 +8,13 @@ use Model\Coin;
 abstract class Transaction
 {
     /**
+     * Render a single transaction in a card element
+     * @param int $orderId
      * @param \Model\Transaction $transaction
      * @param Coin $coin
      * @param string $eurValue
-     * @return string
+     * @param bool $isFee
+     * @return string The HTML
      */
     public static function render(int $orderId, \Model\Transaction $transaction, Coin $coin, string $eurValue, bool $isFee = false): string
     {

@@ -6,6 +6,13 @@ use Framework\Session;
 
 abstract class CheckInput
 {
+    /**
+     * Render an HTML input element with type=checkbox
+     * @param string $label
+     * @param string $name
+     * @param bool $required
+     * @return string The HTML
+     */
     public static function render(string $label, string $name, bool $required = true): string
     {
         $inputValidation = Session::getInputValidationResult();

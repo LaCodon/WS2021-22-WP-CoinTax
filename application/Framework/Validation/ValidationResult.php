@@ -4,6 +4,10 @@ namespace Framework\Validation;
 
 use JsonSerializable;
 
+/**
+ * This class holds the results of user input validations. There can be one validation error string per input. The values
+ * of the inputs are also held by this class
+ */
 final class ValidationResult implements JsonSerializable
 {
     /**

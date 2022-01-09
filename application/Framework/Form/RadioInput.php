@@ -6,6 +6,13 @@ use Framework\Session;
 
 abstract class RadioInput
 {
+    /**
+     * Render a list of HTML input elements with type=radio
+     * @param string $label
+     * @param string $name
+     * @param array $options an array in the shape of [{label, value}]
+     * @return string The HTML
+     */
     public static function render(string $label, string $name, array $options): string
     {
         $inputValidation = Session::getInputValidationResult();

@@ -4,6 +4,9 @@ namespace Framework\Validation;
 
 use Framework\Exception\ValidationFailure;
 
+/**
+ * This class parses user inputs from the request and validates them according to given rules
+ */
 abstract class InputValidator
 {
     public static function parseAndValidate($inputs): ValidationResult

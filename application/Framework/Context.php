@@ -9,6 +9,9 @@ use Core\Repository\PriceRepository;
 use Core\Repository\TransactionRepository;
 use Core\Repository\UserRepository;
 
+/**
+ * Dependency injection wrapper for injecting repositories into controllers
+ */
 final class Context
 {
     /**

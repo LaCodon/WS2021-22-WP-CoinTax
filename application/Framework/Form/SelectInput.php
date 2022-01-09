@@ -6,6 +6,14 @@ use Framework\Session;
 
 abstract class SelectInput
 {
+    /**
+     * Renders an HTML input element and a drop down list with input suggestions
+     * @param string $label
+     * @param string $name
+     * @param array $options an array in the shape of [value => {label, thumbnail}], thumbnail is optional
+     * @param bool $required
+     * @return string The HTML
+     */
     public static function render(string $label, string $name, array $options = [], bool $required = true): string
     {
         $inputValidation = Session::getInputValidationResult();

@@ -9,6 +9,15 @@ use Framework\Validation\InputValidator;
 
 abstract class Paginator
 {
+    /**
+     * Renders a paginator
+     * @param int $currentPage
+     * @param int $itemsPerPage
+     * @param int $totalItems
+     * @param bool $enableAjaxPagination
+     * @param string $ajaxEndpoint api endpoint for pagination via ajax
+     * @return string The HTML
+     */
     public static function render(int $currentPage = 1, int $itemsPerPage = 10, int $totalItems = 0, bool $enableAjaxPagination = false, string $ajaxEndpoint = ''): string
     {
         $filterQuery = Session::getCurrentFilterQuery();

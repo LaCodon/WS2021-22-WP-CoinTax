@@ -5,6 +5,9 @@ namespace Framework;
 use PDO;
 use PDOException;
 
+/**
+ * Simple PDO wrapper
+ */
 final class Database
 {
 

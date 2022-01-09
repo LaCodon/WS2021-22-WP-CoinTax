@@ -2,15 +2,18 @@
 
 namespace Framework\Validation;
 
+/**
+ * This class represents user inputs on the server side
+ */
 final class Input
 {
     /**
-     * @param int $_method
-     * @param string $_name
-     * @param string $_readableName
-     * @param bool $_required
-     * @param int $_filter
-     * @param array|int $_options
+     * @param int $_method one of INPUT_GET, INPUT_POST, INPUT_SERVER, ...
+     * @param string $_name name of the input
+     * @param string $_readableName readable name which gets shown to users in error messages etc.
+     * @param bool $_required true if the input must be given
+     * @param int $_filter any php nativ filter
+     * @param array|int $_options any filter options
      */
     public function __construct(
         public int       $_method,

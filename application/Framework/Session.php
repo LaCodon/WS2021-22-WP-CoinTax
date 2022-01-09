@@ -6,6 +6,9 @@ use Framework\Exception\SessionsStartFailed;
 use Framework\Validation\ValidationResult;
 use Model\User;
 
+/**
+ * Class for session handling and recreation
+ */
 abstract class Session
 {
     /**
@@ -84,16 +87,25 @@ abstract class Session
         $_SESSION['framework_input_validation'] = new ValidationResult();
     }
 
+    /**
+     * @param User $user
+     */
     public static function setAuthorizedUser(User $user): void
     {
         $_SESSION['framework_authorized_user'] = $user;
     }
 
+    /**
+     * @param array $filter
+     */
     public static function setCurrentFilter(array $filter): void
     {
         $_SESSION['cointax_filter'] = http_build_query($filter);
     }
 
+    /**
+     * @return string
+     */
     public static function getCurrentFilterQuery(): string
     {
         if (isset($_SESSION['cointax_filter'])) {
@@ -103,6 +115,9 @@ abstract class Session
         return '';
     }
 
+    /**
+     * @return User|null
+     */
     public static function getAuthorizedUser(): User|null
     {
         if (isset($_SESSION['framework_authorized_user'])) {
