@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This script imports a Binance Transaction CSV export for a given user
+ */
+
 use Config\Config;
 use Core\Binance\CsvImport;
 use Core\Repository\CoinRepository;

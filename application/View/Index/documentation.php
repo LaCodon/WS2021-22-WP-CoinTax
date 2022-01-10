@@ -547,6 +547,64 @@
 
                 <h3 id="codedoc">9. Codestruktur</h3>
 
+                <p>
+                    CoinTax nutzt das MVC (Model-View-Controller) Pattern. Für das Projekt wurde ein eigenes Framework
+                    implementiert, dass die Aufteilung des Codes in Models, Views und Controllers erzwingt. So konnte
+                    eine einheitliche, verständliche und erweiterbare Codestruktur erreicht werden. Im Folgenden wird
+                    zunächst der Verzeichnisbaum kurz erläutert und anschließend auf die grobe Funktionsweise des
+                    Frameworks eingegangen.
+                </p>
+
+                <pre>
+                    ├─ application/
+                    │   ├─ Config/
+                    │   │   └─ Config.php   => muss während der Installation manuell angelegt werden
+                    │   ├─ Controller/      => enthält alle Controller Klassen
+                    │   ├─ Core/            => enthält Anwendungslogik
+                    │   │   ├─ Calc         => Klassen zur Gewinnberechnung
+                    │   │   ├─ Coingecko    => Schnittstelle zur CoinGecko API
+                    │   │   ├─ Exception    => Selbstdefinierte Ausnahmetypen
+                    │   │   └─ Repository   => Repositoryklassen für den Datenbankzugriff
+                    │   ├─ Framework/       => das Framework; das Framework ist generisch implementiert und kann für andere Projekte wiederverwendet werden
+                    │   ├─ Model/           => alle Model Klassen
+                    │   ├─ View/            => alle Views, sortiert nach Controller
+                    │   │   └─ Base/        => generische Views für Header und Footer
+                    │   ├─ autoloader.php   => PHP Autoloader zum automatischen inkludieren von Klassen
+                    │   ├─ globalFunctions.php => enthält Funktionen, die global verwendet werden können (zum Beispiel Debugging Helper Funktionen)
+                    │   └─ tests.php        => Unittests die ausgeführt werden, wenn APPLICATION_DEBUG=true in der index.php
+                    ├─ doc/                 => Dokumente und Planungsunterlagen
+                    ├─ public/              => Dieses Verzeichnis ist am Ende auf einem Webserver öffentlich zugänglich
+                    │   ├─ index.php        => Der Haupteinstiegspunkt
+                    │   └─ .htaccess        => Diese Apache Konfiguration stellt sicher, dass alle Requests an die index.php weitergeleitet werden
+                    └─ scripts/             => Skripte zum Ausführen auf der Kommandozeile
+                </pre>
+
+                <p>
+                    Das Framework ist so aufgebaut, dass alle Requests zunächst von der <code>index.php</code>
+                    bearbeitet werden. Dies wird mittels einer Apache Konfigurationsdatei erreicht
+                    (<code>.htaccess</code>).
+                </p>
+
+                <p>
+                    Alle eingehenden Requests werden zunächst geparsed und ihre Zielroute extrahiert. Anhand der Route
+                    entscheidet das Framework dann, welcher Controller geladen und welche Action darin ausgeführt werden
+                    soll. Beispielsweise würde für die Route <code>/order/add</code> der <code>OrderController</code>
+                    geladen und die <code>AddAction</code> ausgeführt werden.
+                </p>
+
+                <p>
+                    Jede Action bekommt ein Objekt vom Typ <code>Response</code> übergeben. Dieses stellt Methoden zum
+                    Weiterleiten des Nutzers zur Verfügung. Außerdem dient es als Transportobjekt für Variablen zwischen
+                    Action und View. Am Ende einer Action kann optional eine View gerendert werden. Die View wird im
+                    Kontext der Response ausgeführt. Dementsprechend kann darin mittels <code>$this->XXX</code> auf
+                    Membervariablen der Response zugegriffen werden.
+                </p>
+
+                <p>
+                    Beim Laden eines Controllers injiziert das Framework außerdem noch Abhängigkeiten in den jeweiligen
+                    Controller. Zu den Abhängigkeiten zählen die Repositoryklassen und implizit die Datenbankverbindung.
+                </p>
+
                 <h3 id="checkliste">10. Abgleich mit Anforderungscheckliste</h3>
 
                 <p>
@@ -561,7 +619,7 @@
                     <tr>
                         <th>Kriterium</th>
                         <th>Umgesetzt?</th>
-                        <th>Beschreibung</th>
+                        <th>Beschreibung / Details</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -654,7 +712,7 @@
                     <tr>
                         <th>Kriterium</th>
                         <th>Umgesetzt?</th>
-                        <th>Beschreibung</th>
+                        <th>Beschreibung / Details</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -753,19 +811,83 @@
 
                 <h3 id="reflexion">11. Reflektion</h3>
 
-                * Runden von BcMath zahlen -> eigener Algorithmus
-                * Eigenes Framework hat sich sehr bewährt
-                * Frontendtexte teilweise in PHP hart-codiert (vor allem bei der Validierung)
+                <p>
+                    Das Projekt wurde im Bearbeitungszeitraum erfolgreich alleine von Fabian Maier geplant und
+                    implementiert. Während der Umsetzung traten einige kleinere und größere Hürden auf, die im Folgenden
+                    kurz dargelegt werden. Anschließend folgt ein Ausblick zu Weiterentwicklungsmöglichkeiten von
+                    CoinTax.
+                </p>
 
-                * Steuerberechnungen cachen, um Ladezeiten zu verkürzen
-                * Passwort vergessen Funktion
-                * E-Mail Bestätigungscode
-                * mehr Zahlungsoptionen
-                * differenziertere Preisstruktur
-                * Anbindung eines Zahlungsdienstleisters
-                * Rechtskonforme Rechnungen
-                * Unterstützung von Staking und Lending
-                * Import von Handelsplattformen ermöglichen
+                <p>
+                    Am aufwändigsten war die Implementierung der Gewinnberechnung. Es gibt in Deutschland zwei
+                    Möglichkeiten Gewinne zu berechnen. Das ist zum Einen die FIFO und zum Anderen die LIFO Methode.
+                    Beide haben ihre Vor- und Nachteile für den jeweiligen Einzelfall. Zu Beginn des Projekts war
+                    geplant, dass beide Berechnungsmethoden von CoinTax unterstützt werden sollen. Es hat sich
+                    allerdings schnell herausgestellt, dass dies den Umfang der Projektarbeit sprengen würden. Da
+                    meistens sowieso die FIFO-Methode gewählt wird, weil durch sie vor allem im Kryptobereich eine
+                    geringere Steuerlast anfällt hat sich der Autor dieses Projekt schließlich dazu entschieden nur die
+                    FIFO-Methode zu implementieren.
+                </p>
+
+                <p>
+                    Das Debugging der Kalkulationslogik war nicht immer ganz leicht, da zunächst bestimmte Sonderfälle
+                    überlegt, händisch durchgerechnet und anschließend mit CoinTax verifiziert werden mussten. Um die
+                    Berechnungen von CoinTax während der Entwicklung nachvollziehen zu können, wurden an einigen Stellen
+                    Debug-Ausgaben eingebaut. Diese können mit der globalen Konstante <code>APPLICATION_DEBUG</code> an-
+                    und ausgeschaltet werden. Das hat den Entwicklungsprozess erheblich vereinfacht.
+                </p>
+
+                <p>
+                    Bereits zu Beginn des Projekts war klar, dass die Standarddatentypen von PHP nicht den
+                    Genauigkeitsansprüchen zur Berechnungen von Gewinnen entsprechen (Rundungsfehler bei float,
+                    Ungenauigkeit bei der maschinellen Darstellung nach IEEE 754). Daher wurde auf die PHP Erweiterung
+                    BCMath gesetzt. Diese erlaubt u.a. die Durchführung von beliebig genauen Berechnungen im
+                    Gleitkommabereich. BCMath funktioniert sehr gut und einfach. Allerdings gibt es keine Funktion, die
+                    das mathematisch korrekte Runden von Gleitkommazahlen auf eine feste Stellenanzahl erlaubt. Da genau
+                    so eine Rundung aber für die Ausgabe von Zahlen im Frontend von großer Bedeutung ist, musste eine
+                    eigene Funktion zum korrekten Runden der Zahlen implementiert werden. Dies war aufwändiger als
+                    erwartet, konnte aber in <code>globalFunctions.php</code> bewerkstelligt werden. Ein Unittest in
+                    <code>tests.php</code> beweist außerdem die korrekte Arbeitsweise der Funktion.
+                </p>
+
+                <p>
+                    Das am Anfang der Arbeit implementierte Framework hat sich im Projektverlauf sehr bewährt. Neben dem
+                    Request Routing wurde es noch um Komponenten für die Inputvalidierung und für das Rendern von
+                    Viewelementen erweitert.
+                </p>
+
+                <p>
+                    An einigen Stellen wurden im Backend Code Texte hart codiert, die beispielsweise bei fehlerhaftem
+                    Input an das Frontend gesendet werden. Dieses Design ist nicht sehr robust, falls später einmal
+                    Mehrsprachigkeit eingebaut werden soll. Außerdem ist für die Korrektur von Schreibfehlern o. Ä.
+                    immer eine Anpassung des Backend Codes notwendig. Dies sollte in zukünftigen Projekten mehr
+                    entkoppelt werden.
+                </p>
+
+                <p>
+                    Weitere Ideen für die zukünftige Weiterentwicklung von CoinTax umfassen die folgenden Punkte (die zu
+                    umfangreich für den aktuellen Projektscope waren):
+                </p>
+
+                <ul>
+                    <li>Steuerberechnungen / Gewinnreports cachen, um Ladezeiten zu verkürzen: Aktuell werden alle
+                        Berechnungen beim Neuladen der Seite erneut ausgeführt. Dies verlangsamt die Webseite bei einer
+                        großen Anzahl an Transaktionen pro Jahr erheblich
+                    </li>
+                    <li>"Passwort vergessen"-Funktion</li>
+                    <li>E-Mail Bestätigungscode nach der Registrierung zum Aktivieren des Accounts</li>
+                    <li>Unterstützung von Staking und Lending: Nur so kann eine Konkurrenzfähigkeit mit anderen
+                        Anbietern
+                        von Gewinnberechnungssoftware erreicht werden
+                    </li>
+                    <li>Transaktionsimporte von Handelsplattformen für den Nutzer ermöglichen</li>
+                    <li>Differenziertere Preisstruktur (beispielsweise gestaffelt nach Zahl der Transaktionen im
+                        Gewinnreport)
+                    </li>
+                    <li>Mehr Zahlungsoptionen</li>
+                    <li>Anbindung eines Zahlungsdienstleisters</li>
+                    <li>Rechtskonforme Rechnungen</li>
+                </ul>
 
             </div>
         </div>

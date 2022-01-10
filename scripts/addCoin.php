@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This script imports a coin from coingecko into the local database and thus makes the coin available for
+ * usage within CoinTax.
+ */
+
 use Config\Config;
 use Core\Coingecko\CoingeckoAPI;
 use Core\Repository\CoinRepository;
