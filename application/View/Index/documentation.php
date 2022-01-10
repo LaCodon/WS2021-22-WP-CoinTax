@@ -820,12 +820,12 @@
 
                 <p>
                     Am aufwändigsten war die Implementierung der Gewinnberechnung. Es gibt in Deutschland zwei
-                    Möglichkeiten Gewinne zu berechnen. Das ist zum Einen die FIFO und zum Anderen die LIFO Methode.
+                    Möglichkeiten Gewinne zu berechnen. Das ist zum Einen die FIFO- und zum Anderen die LIFO-Methode.
                     Beide haben ihre Vor- und Nachteile für den jeweiligen Einzelfall. Zu Beginn des Projekts war
                     geplant, dass beide Berechnungsmethoden von CoinTax unterstützt werden sollen. Es hat sich
                     allerdings schnell herausgestellt, dass dies den Umfang der Projektarbeit sprengen würden. Da
                     meistens sowieso die FIFO-Methode gewählt wird, weil durch sie vor allem im Kryptobereich eine
-                    geringere Steuerlast anfällt hat sich der Autor dieses Projekt schließlich dazu entschieden nur die
+                    geringere Steuerlast anfällt hat sich der Autor dieses Projekts schließlich dazu entschieden nur die
                     FIFO-Methode zu implementieren.
                 </p>
 
@@ -872,7 +872,11 @@
                 <ul>
                     <li>Steuerberechnungen / Gewinnreports cachen, um Ladezeiten zu verkürzen: Aktuell werden alle
                         Berechnungen beim Neuladen der Seite erneut ausgeführt. Dies verlangsamt die Webseite bei einer
-                        großen Anzahl an Transaktionen pro Jahr erheblich
+                        großen Anzahl an Transaktionen pro Jahr erheblich. Ein Caching könnte beispielsweise durch das
+                        Speichern der PHP Ergebnisobjekte in einer NoSQL Datenbank erreicht werden. Durch das Erzeugen
+                        eines Hashwerts über die konkatenierten Transaktions-IDs die für die Berechnung herangezogen
+                        wurden, könnten Cache-Objekte eindeutig identifiziert werden. Eine genaue Lösungsstrategie muss
+                        in Zukunft separat evaluiert werden.
                     </li>
                     <li>"Passwort vergessen"-Funktion</li>
                     <li>E-Mail Bestätigungscode nach der Registrierung zum Aktivieren des Accounts</li>
