@@ -29,6 +29,7 @@ form.addEventListener('submit', function (e) {
     formData.append('password', password)
     formData.append('password-repeat', passwordRepeat)
 
+    // use fetch instead of XMLHttpRequest to show that I understand both and know how to use both
     fetch('../api/register', {
         method: 'POST',
         body: formData

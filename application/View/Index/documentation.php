@@ -783,7 +783,10 @@
                         <td>ja</td>
                         <td>Die Pagination ist über scrollen in der Trade- und Transaktionsübersicht möglich. Außerdem
                             werden Token gemäß der eingegebenen Zeichenkette im Suchfeld der Transaktions- und
-                            Tradeübersichtsseite dynamisch per Ajax vom Server geladen.
+                            Tradeübersichtsseite dynamisch per Ajax vom Server geladen. An einigen Stellen wird <code>XMLHttpRequest</code>
+                            und an anderen Stellen <code>fetch</code> verwendet. Normalerweise würde man sich auf eine
+                            Lösungsmethode einigen aber um in der Projektarbeit zu zeigen, dass der Autor mit beidem
+                            umgehen kann, wurden beide Methoden eingesetzt.
                         </td>
                     </tr>
                     <tr>
