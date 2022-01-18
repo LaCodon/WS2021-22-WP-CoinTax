@@ -13,7 +13,7 @@
 2. Datenbank erzeugen. Dafür muss der SQL Export aus dem Projektverzeichnis unter `doc/dbexport.sql` in den MariaDB
    Server importiert werden
 3. Datenbankuser für CoinTax anlegen. Für diesen User kann ein beliebiger Username und ein beliebiges Passwort definiert
-   werden
+   werden (es werden mindestens `SELECT`, `INSERT`, `DELETE` und `UPDATE` Rechte für die Datenbank benötigt)
 4. Konfigurationsdatei im Projektordner unter `application/Config/Config.php` anlegen. Diese muss den folgenden Inhalt
    haben (Name und Passwort des Datenbankusers muss entsprechend Schritt drei angepasst werden):
     ```php
